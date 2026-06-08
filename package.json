@@ -1,0 +1,28 @@
+{
+  "name": "gerenciamento-clinica",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FelipeCaetanoSS/gerenciamento-clinica.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FelipeCaetanoSS/gerenciamento-clinica/issues"
+  },
+  "homepage": "https://github.com/FelipeCaetanoSS/gerenciamento-clinica#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
