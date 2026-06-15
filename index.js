@@ -34,6 +34,17 @@ app.get('/medicos', (req, res) => {
   res.json(medicos);
 });
 
+app.get('/medicos/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const medico = medicos.find(m => m.id === id);
+
+  if (!medico) {
+    return res.status(404).json({ erro: 'Médico não encontrado' });
+  }
+
+  res.json(medico);
+});
+
 app.post('/medicos', (req, res) => {
   const { medico, crm, idade, sexo } = req.body;
 
@@ -57,6 +68,17 @@ app.get('/pacientes', (req, res) => {
   res.json(pacientes);
 });
 
+app.get('/pacientes/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const paciente = pacientes.find(p => p.id === id);
+
+  if (!paciente) {
+    return res.status(404).json({ erro: 'Paciente não encontrado' });
+  }
+
+  res.json(paciente);
+});
+
 app.post('/pacientes', (req, res) => {
   const { paciente, idade, sexo } = req.body;
 
@@ -77,6 +99,17 @@ app.post('/pacientes', (req, res) => {
 
 app.get('/agendamentos', (req, res) => {
   res.json(agendamentos);
+});
+
+app.get('/agendamentos/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const agendamento = agendamentos.find(a => a.id === id);
+
+  if (!agendamento) {
+    return res.status(404).json({ erro: 'Agendamento não encontrado' });
+  }
+
+  res.json(agendamento);
 });
 
 app.post('/agendamentos', (req, res) => {
