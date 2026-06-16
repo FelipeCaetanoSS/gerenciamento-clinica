@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 03 — Rotas e Métodos HTTP | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-title{font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+/* HTTP Methods table */
+.methods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.method-card{border-radius:8px;padding:12px 14px;text-align:center;border:1px solid}
+.method-verb{font-size:16px;font-weight:700;font-family:monospace;margin-bottom:4px}
+.method-desc{font-size:12px;line-height:1.5}
+/* Thunder demo */
+.tc-demo{background:#1e1e2e;border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'Courier New',monospace;font-size:13px;line-height:1.8}
+.tc-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:8px}
+.tc-method-get{color:#86efac;font-weight:700}
+.tc-method-post{color:#fbbf24;font-weight:700}
+.tc-url{color:#93c5fd}
+.tc-body-key{color:#fdba74}
+.tc-body-val{color:#fca5a5}
+.tc-response{color:#a5f3fc}
+/* Inline note */
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 03 DE 34</div>
+  <h1>Rotas e Métodos HTTP — A API Começa a Tomar Forma</h1>
+  <h2>Aprenda a enviar e receber dados de verdade, e ganhe a ferramenta que todo desenvolvedor usa para testar APIs</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 Express · Postman · HTTP</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESS -->
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01</span>Planejamento</div>
+      <div class="pb-step pb-done"><span class="pb-num">02</span>Ambiente</div>
+      <div class="pb-step pb-active"><span class="pb-num">03</span>Rotas e HTTP</div>
+      <div class="pb-step pb-future"><span class="pb-num">04</span>Parâmetros</div>
+      <div class="pb-step pb-future"><span class="pb-num">05</span>CRUD</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+      <div class="pb-step pb-future"><span class="pb-num">34</span>Demo Day</div>
+    </div>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      No encontro anterior você criou um servidor que responde com dados. Mas ele só sabe fazer uma coisa: responder quando alguém acessa a raiz <span class="inline-code">/</span>. Uma API de verdade precisa de muito mais — precisa saber <em>o que</em> o cliente quer fazer (buscar? criar? deletar?) e precisa receber os dados que o cliente envia.
+      <br><br>
+      Hoje você vai aprender os métodos HTTP — os "verbos" que definem a intenção de cada requisição — e vai criar rotas que <strong>recebem dados</strong> além de enviá-los. Você também vai instalar o Thunder Client, a ferramenta que usaremos para testar a API durante todo o resto da UC.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Rotas GET e POST funcionando no projeto</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Postman configurado e funcionando</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>API recebendo e retornando dados reais</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Entendimento claro de quando usar GET vs POST</div>
+    </div>
+  </div>
+
+  <!-- ══ INÍCIO DA AULA ══ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Antes de tudo — retomar o projeto</h2>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div>
+        <div class="step-title">Abrir o Codespace e retomar de onde parou</div>
+        <div class="step-subtitle">Faça isso no início de todo encontro</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Acesse <strong>github.com</strong>, faça login, abra o seu repositório, clique no botão verde <strong>Code → Codespaces</strong> e clique no Codespace que já existe (não crie um novo). Aguarde o ambiente carregar.</p>
+      <p>Com o Codespace aberto, abra o terminal (<span class="inline-code">Ctrl + `</span>) e inicie o servidor:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>Servidor rodando em http://localhost:3000</pre>
+      </div>
+      <div class="warn"><strong>Settings Sync — se as extensões sumiram</strong> Se o VS Code pedir para fazer login, clique no ícone de perfil no canto inferior esquerdo → Sign in with GitHub. Aguarde 1-2 minutos e as extensões voltam automaticamente.</div>
+    </div>
+  </div>
+
+  <!-- ══ CONCEITOS ══ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Entendendo os métodos HTTP</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Toda requisição HTTP carrega junto um <strong>método</strong> — uma palavra que indica o que o cliente quer fazer. Quando você digita um endereço no navegador e pressiona Enter, o navegador envia uma requisição com o método GET. Mas existem outros métodos para outras intenções.</p>
+
+  <div class="methods-grid">
+    <div class="method-card" style="background:#f0fdf4;border-color:#86efac">
+      <div class="method-verb" style="color:#15803d">GET</div>
+      <div class="method-desc" style="color:#14532d"><strong>Buscar</strong> informações. Não altera nada no servidor.</div>
+    </div>
+    <div class="method-card" style="background:#fefce8;border-color:#fde68a">
+      <div class="method-verb" style="color:#92400e">POST</div>
+      <div class="method-desc" style="color:#78350f"><strong>Criar</strong> algo novo. Envia dados no corpo da requisição.</div>
+    </div>
+    <div class="method-card" style="background:#eff6ff;border-color:#bfdbfe">
+      <div class="method-verb" style="color:#1d4ed8">PUT</div>
+      <div class="method-desc" style="color:#1e3a8a"><strong>Atualizar</strong> algo que já existe. Substitui o recurso inteiro.</div>
+    </div>
+    <div class="method-card" style="background:#fef2f2;border-color:#fecaca">
+      <div class="method-verb" style="color:#dc2626">DELETE</div>
+      <div class="method-desc" style="color:#991b1b"><strong>Apagar</strong> algo. Identifica o que deve ser removido.</div>
+    </div>
+  </div>
+
+  <div class="concept">
+    <strong>Por que isso importa?</strong>
+    Imagine uma API de agendamentos. O endereço <span class="inline-code">/agendamentos</span> pode fazer coisas completamente diferentes dependendo do método: <strong>GET</strong> /agendamentos → lista todos os agendamentos; <strong>POST</strong> /agendamentos → cria um novo agendamento; <strong>PUT</strong> /agendamentos → atualiza um agendamento; <strong>DELETE</strong> /agendamentos → remove um agendamento. O mesmo endereço, quatro comportamentos distintos. Isso é o design de uma API REST — padrão usado em todo o mercado.
+  </div>
+
+  <div class="concept">
+    <strong>GET vs POST — a diferença mais importante agora</strong>
+    O método GET não carrega dados no corpo da requisição — apenas na URL. O método POST carrega dados no <strong>corpo</strong> (body) da requisição, de forma que não aparecem na URL. Por isso usamos POST quando queremos enviar informações para criar algo: nome, e-mail, senha, título — qualquer dado que o servidor precisa receber para criar um novo registro.
+  </div>
+
+  <!-- ══ POSTMAN ══ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Postman — sua ferramenta de testes de API</h2>
+  </div>
+
+  <div class="concept">
+    <strong>Por que precisamos de uma ferramenta de teste?</strong>
+    O navegador só consegue enviar requisições GET facilmente (quando você digita um endereço). Para testar rotas POST — que recebem dados no corpo da requisição — o navegador não serve. Profissionais usam ferramentas específicas para isso. O <strong>Postman</strong> é a mais utilizada no mercado: permite criar e enviar qualquer tipo de requisição, configurar headers e body, e ver a resposta completa com status code. Usaremos a versão web, que funciona direto no navegador ao lado do Codespace — sem instalação. É o que usaremos do Encontro 03 até o fim da UC.
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Criar conta e acessar o Postman</div>
+        <div class="step-subtitle">Feito uma vez — a conta salva tudo entre as aulas</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <ol class="steps-list">
+        <li>Acesse <strong>postman.com</strong> no navegador</li>
+        <li>Clique em <strong>Sign Up for Free</strong> e crie uma conta gratuita (pode usar o e-mail ou entrar com Google/GitHub)</li>
+        <li>Após o cadastro, clique em <strong>Continue to Web App</strong> — o Postman abre no próprio navegador em <strong>web.postman.co</strong></li>
+        <li>Se aparecer uma tela de boas-vindas, clique em <strong>Skip</strong> ou <strong>Continue</strong> para ir direto ao workspace</li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        A interface do Postman aparece no navegador com um workspace em branco. Você está pronto para criar requisições.
+      </div>
+      <div class="tip"><strong>Nas próximas aulas:</strong> Acesse web.postman.co e faça login. Todas as suas requisições salvas estarão lá — a conta sincroniza tudo automaticamente, sem depender do computador da sala.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Entender a interface do Postman</div>
+        <div class="step-subtitle">Conhecer a ferramenta antes de usar</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Para criar uma nova requisição, clique no botão <strong>New</strong> (canto superior esquerdo) → <strong>HTTP Request</strong>. Uma aba de requisição se abre com as seguintes partes principais:</p>
+      <ul class="check-list">
+        <li><strong>Método HTTP</strong> — o seletor à esquerda da URL (GET, POST, PUT, DELETE). Clique nele para trocar o método.</li>
+        <li><strong>URL</strong> — o campo onde você digita o endereço completo da requisição, incluindo o caminho da rota.</li>
+        <li><strong>Params</strong> — aba para adicionar query params (<span class="inline-code">?chave=valor</span>) de forma visual. O Postman monta a URL automaticamente.</li>
+        <li><strong>Body</strong> — aba para escrever os dados enviados no corpo (POST e PUT). Selecione <strong>raw</strong> e depois escolha <strong>JSON</strong> no menu dropdown que aparece à direita.</li>
+      </ul>
+      <p>Quando você clica em <strong>Send</strong>, o Postman envia a requisição e mostra a resposta na parte inferior — incluindo o status code, o tempo de resposta e os dados retornados.</p>
+      <div class="tip"><strong>Como obter a URL do Codespace:</strong> No VS Code, vá na aba <strong>Ports</strong> no painel inferior, passe o mouse sobre a porta 3000 — um ícone de globo aparece. Clique nele para abrir no navegador e copie a URL da barra de endereços. Cole essa URL no Postman e adicione o caminho da rota no final.</div>
+    </div>
+  </div>
+
+  <!-- ══ MANUAL ══ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">3</span> Manual — API de Frases do Dia</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Vamos construir uma pequena API para gerenciar frases do dia. Ela vai ter uma rota GET (para listar as frases) e uma rota POST (para adicionar uma nova). Ao final, você vai adaptar tudo isso para o seu projeto.</p>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Preparar o index.js para o exercício</div>
+        <div class="step-subtitle">Começar com uma base limpa para o exemplo</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Para este exercício, vamos trabalhar em um arquivo separado para não misturar com o projeto. Crie um arquivo chamado <span class="inline-code">frases.js</span> na raiz do projeto.</p>
+      <p>Vamos construir esse arquivo passo a passo. Por enquanto, escreva apenas a estrutura inicial — que você já conhece do encontro anterior:</p>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span></pre>
+      <p>Salve o arquivo. Não inicie o servidor ainda — vamos adicionar mais coisas primeiro.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Adicionar o express.json() — necessário para o POST funcionar</div>
+        <div class="step-subtitle">Uma linha que habilita o servidor a ler dados enviados no corpo da requisição</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Quando um cliente envia dados em uma requisição POST, esses dados chegam ao servidor como um texto bruto. O servidor precisa <em>interpretar</em> esse texto e transformá-lo em um objeto JavaScript que o código consegue usar.</p>
+      <p>O <span class="inline-code">express.json()</span> faz exatamente isso: ele intercepta as requisições que chegam, lê o corpo em formato JSON e coloca o resultado em <span class="inline-code">req.body</span> — que você vai usar nas rotas POST.</p>
+      <p>Adicione esta linha <strong>após a criação do <span class="inline-code">app</span> e antes das rotas</strong>. A ordem importa: ela precisa estar antes das rotas para que funcione em todas elas.</p>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>()) <span class="cm">// habilita leitura do corpo das requisições</span></pre>
+      <div class="warn"><strong>Se esquecer essa linha:</strong> O <span class="inline-code">req.body</span> nas rotas POST vai ser <span class="inline-code">undefined</span>. Se seus dados chegarem como undefined, verifique primeiro se essa linha está no código.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Criar os dados iniciais em memória</div>
+        <div class="step-subtitle">Por enquanto os dados ficam em um array no código — o banco de dados virá mais adiante</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Antes de criar as rotas, precisamos de onde os dados vão viver. Por enquanto vamos usar um array simples declarado no código. Isso significa que os dados existem enquanto o servidor está rodando — se você reiniciar o servidor, voltam para o estado inicial. Isso é esperado neste ponto da UC. Nos próximos blocos você vai migrar para um banco de dados real.</p>
+      <p>Adicione o array após o <span class="inline-code">app.use(express.json())</span>:</p>
+      <pre><span class="kw">const</span> <span class="var">frases</span> = [
+  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">texto</span>: <span class="str">'A jornada de mil milhas começa com um único passo.'</span>, <span class="prop">autor</span>: <span class="str">'Lao-Tzu'</span> },
+  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">texto</span>: <span class="str">'A simplicidade é a sofisticação máxima.'</span>, <span class="prop">autor</span>: <span class="str">'Leonardo da Vinci'</span> }
+]</pre>
+      <div class="note">Cada frase é um objeto com três propriedades: <span class="inline-code">id</span> (número único), <span class="inline-code">texto</span> e <span class="inline-code">autor</span>. Essa estrutura é a mesma que vai para o banco de dados — você está praticando o modelo de dados do seu projeto.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Criar a rota GET /frases</div>
+        <div class="step-subtitle">Retorna todas as frases cadastradas</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>A rota GET é a mais simples: o cliente pede, o servidor responde com os dados. Neste caso, respondemos com o array inteiro de frases.</p>
+      <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/frases'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">frases</span>)
+})</pre>
+      <p>Agora adicione o <span class="inline-code">app.listen</span> ao final do arquivo para poder testar:</p>
+      <pre><span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () => {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+      <p>Agora inicie este servidor no terminal. Como o <span class="inline-code">index.js</span> principal pode já estar rodando, abra um <strong>novo terminal</strong> (<span class="inline-code">+</span> no painel de terminais) e rode:</p>
+      <pre><span class="fn">node</span> <span class="var">frases.js</span></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div>
+        <div class="step-title">Testar o GET /frases no Postman</div>
+        <div class="step-subtitle">Primeira requisição com a nova ferramenta</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <ol class="steps-list">
+        <li>No Postman, clique em <strong>New → HTTP Request</strong></li>
+        <li>Confirme que o método selecionado é <strong>GET</strong></li>
+        <li>No campo de URL, cole o endereço do seu Codespace e adicione <span class="inline-code">/frases</span> no final</li>
+        <li>Clique em <strong>Send</strong></li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>[
+  {
+    "id": 1,
+    "texto": "A jornada de mil milhas começa com um único passo.",
+    "autor": "Lao-Tzu"
+  },
+  {
+    "id": 2,
+    "texto": "A simplicidade é a sofisticação máxima.",
+    "autor": "Leonardo da Vinci"
+  }
+]</pre>
+        O status na parte superior da resposta mostra <strong>200 OK</strong> — a requisição foi bem-sucedida.
+      </div>
+      <div class="error-box"><strong>Status 404 ou "Cannot GET /frases"</strong> A URL está incorreta ou o servidor não está rodando. Verifique o terminal do Codespace — o servidor deve mostrar "Servidor rodando em...". Confira também se digitou <span class="inline-code">/frases</span> corretamente na URL do Postman.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <div>
+        <div class="step-title">Criar a rota POST /frases</div>
+        <div class="step-subtitle">Recebe dados do cliente e adiciona uma nova frase ao array</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>A rota POST é onde as coisas ficam mais interessantes: o cliente envia dados (<span class="inline-code">texto</span> e <span class="inline-code">autor</span>) e o servidor cria um novo registro.</p>
+      <p>Veja como ler os dados enviados pelo cliente: eles chegam dentro de <span class="inline-code">req.body</span> como um objeto JavaScript — graças ao <span class="inline-code">express.json()</span> que adicionamos no Passo 4. Usamos desestruturação para extrair as propriedades que precisamos.</p>
+      <p>Adicione esta rota <strong>antes</strong> do <span class="inline-code">app.listen</span>:</p>
+      <pre><span class="var">app</span>.<span class="fn">post</span>(<span class="str">'/frases'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="cm">// Extrair os dados enviados pelo cliente do corpo da requisição</span>
+  <span class="kw">const</span> { <span class="var">texto</span>, <span class="var">autor</span> } = <span class="var">req</span>.<span class="prop">body</span>
+
+  <span class="cm">// Criar o novo objeto com um ID único</span>
+  <span class="kw">const</span> <span class="var">novaFrase</span> = {
+    <span class="prop">id</span>: <span class="var">frases</span>.<span class="prop">length</span> <span class="op">+</span> <span class="num">1</span>,
+    <span class="var">texto</span>,
+    <span class="var">autor</span>
+  }
+
+  <span class="cm">// Adicionar ao array e retornar o novo item criado</span>
+  <span class="var">frases</span>.<span class="fn">push</span>(<span class="var">novaFrase</span>)
+  <span class="var">res</span>.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>(<span class="var">novaFrase</span>)
+})</pre>
+
+      <div class="concept" style="margin-top:14px">
+        <strong>Por que status 201 e não 200?</strong>
+        O status 200 significa "OK — a requisição foi bem-sucedida". O status 201 significa "Created — um novo recurso foi criado com sucesso". Usar o status correto é boa prática: quem consome a API entende exatamente o que aconteceu sem precisar ler a documentação.
+      </div>
+      <p>Salve o arquivo. O nodemon vai reiniciar o servidor automaticamente.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">9</div>
+      <div>
+        <div class="step-title">Testar o POST /frases no Postman</div>
+        <div class="step-subtitle">Enviar dados no corpo da requisição e ver o resultado</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <ol class="steps-list">
+        <li>No Postman, clique em <strong>New → HTTP Request</strong></li>
+        <li>Troque o método de <strong>GET</strong> para <strong>POST</strong> clicando no seletor de método</li>
+        <li>Digite a mesma URL base com <span class="inline-code">/frases</span> no final</li>
+        <li>Clique na aba <strong>Body</strong></li>
+        <li>Selecione <strong>raw</strong></li>
+        <li>No menu dropdown à direita (onde aparece "Text"), troque para <strong>JSON</strong></li>
+        <li>No editor que aparece, escreva:</li>
+      </ol>
+      <pre>{
+  <span class="prop">"texto"</span>: <span class="str">"O segredo do sucesso é começar."</span>,
+  <span class="prop">"autor"</span>: <span class="str">"Mark Twain"</span>
+}</pre>
+      <ol class="steps-list" start="8">
+        <li>Clique em <strong>Send</strong></li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>{
+  "id": 3,
+  "texto": "O segredo do sucesso é começar.",
+  "autor": "Mark Twain"
+}</pre>
+        Status: <strong>201 Created</strong>. O servidor criou a frase e devolveu o objeto recém-criado, já com o ID gerado automaticamente.
+      </div>
+
+      <div class="step-body" style="padding:0;margin-top:14px">
+        <p><strong>Confirme que a frase foi adicionada:</strong> Faça uma nova requisição GET /frases. A lista agora deve ter 3 frases — incluindo a que você acabou de criar.</p>
+      </div>
+
+      <div class="error-box"><strong>Status 200 mas req.body está undefined / id aparece como NaN</strong> O express.json() está faltando ou está no lugar errado. Verifique se a linha <span class="inline-code">app.use(express.json())</span> está no código, antes das rotas.</div>
+      <div class="error-box"><strong>Status 404 — "Cannot POST /frases"</strong> O método da requisição está errado. No Postman, verifique se o seletor de método mostra POST, não GET.</div>
+    </div>
+  </div>
+
+  <!-- ARQUIVO COMPLETO -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">✓</div>
+      <div>
+        <div class="step-title">O arquivo frases.js completo</div>
+        <div class="step-subtitle">Confira se o seu está igual</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>()) <span class="cm">// habilita leitura do corpo das requisições</span>
+
+<span class="kw">const</span> <span class="var">frases</span> = [
+  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">texto</span>: <span class="str">'A jornada de mil milhas começa com um único passo.'</span>, <span class="prop">autor</span>: <span class="str">'Lao-Tzu'</span> },
+  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">texto</span>: <span class="str">'A simplicidade é a sofisticação máxima.'</span>, <span class="prop">autor</span>: <span class="str">'Leonardo da Vinci'</span> }
+]
+
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/frases'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">frases</span>)
+})
+
+<span class="var">app</span>.<span class="fn">post</span>(<span class="str">'/frases'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> { <span class="var">texto</span>, <span class="var">autor</span> } = <span class="var">req</span>.<span class="prop">body</span>
+
+  <span class="kw">const</span> <span class="var">novaFrase</span> = {
+    <span class="prop">id</span>: <span class="var">frases</span>.<span class="prop">length</span> <span class="op">+</span> <span class="num">1</span>,
+    <span class="var">texto</span>,
+    <span class="var">autor</span>
+  }
+
+  <span class="var">frases</span>.<span class="fn">push</span>(<span class="var">novaFrase</span>)
+  <span class="var">res</span>.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>(<span class="var">novaFrase</span>)
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () => {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+    </div>
+  </div>
+
+  <!-- ══ PROJETO ══ -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75">
+      <p>Agora é hora de aplicar o que aprendeu no <span class="inline-code">index.js</span> do seu projeto. Você vai adicionar o <span class="inline-code">express.json()</span>, criar uma rota GET e uma rota POST para o recurso principal do seu projeto.</p>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">1</span>
+      <strong>Adicione o express.json() no seu index.js</strong><br>
+      <span style="font-size:13.5px">Abra o <span class="inline-code">index.js</span> do seu projeto e adicione <span class="inline-code">app.use(express.json())</span> logo após a criação do <span class="inline-code">app</span>, antes de qualquer rota.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">2</span>
+      <strong>Crie um array com 2-3 itens de exemplo do seu projeto</strong><br>
+      <span style="font-size:13.5px">Pense nos dados que seu recurso principal precisa ter. Exemplo: se é um sistema de agendamentos, cada item pode ter id, cliente, servico, horario. Crie o array logo após o express.json().</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">3</span>
+      <strong>Crie a rota GET para listar os itens</strong><br>
+      <span style="font-size:13.5px">Substitua a rota GET que retornava dados estáticos por uma que retorna o array que você criou. O caminho deve ser o nome do recurso no plural. Exemplos: <span class="inline-code">/agendamentos</span>, <span class="inline-code">/produtos</span>, <span class="inline-code">/tarefas</span>.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">4</span>
+      <strong>Crie a rota POST para adicionar um novo item</strong><br>
+      <span style="font-size:13.5px">Siga o mesmo padrão do exemplo: leia os dados de <span class="inline-code">req.body</span>, crie o novo objeto com ID automático, adicione ao array com <span class="inline-code">push</span> e responda com status 201 e o item criado.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">5</span>
+      <strong>Teste as duas rotas no Postman</strong><br>
+      <span style="font-size:13.5px">GET deve retornar a lista. POST com os dados corretos no body (raw → JSON) deve retornar o item criado com status 201. Em seguida, faça um GET novamente para confirmar que o item foi adicionado ao array.</span>
+    </div>
+  </div>
+
+  <!-- ══ EXTRA ══ -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <ul class="check-list">
+      <li><strong>Trate o caso de body vazio:</strong> O que acontece se alguém fizer um POST sem enviar dados? Adicione uma verificação: se <span class="inline-code">texto</span> ou <span class="inline-code">autor</span> não existirem no body, retorne status 400 com a mensagem <span class="inline-code">{ "erro": "texto e autor são obrigatórios" }</span>.</li>
+      <li><strong>Salve suas requisições no Postman:</strong> Clique em <strong>Save</strong> em cada requisição e crie uma <strong>Collection</strong> com o nome do seu projeto. Isso evita redigitar a URL toda vez — nas próximas aulas suas requisições estarão esperando por você.</li>
+      <li><strong>Pesquise:</strong> O que são os status codes 400, 401, 403 e 500? Em qual situação cada um seria usado? Você vai ver todos eles durante a UC.</li>
+    </ul>
+  </div>
+
+  <!-- ══ FECHAMENTO ══ -->
+  <div class="closing">
+    <div class="closing-title">✅ Fechamento — Salvar o progresso</div>
+    <p style="font-size:14px;color:#94a3b8;line-height:1.75;margin-bottom:16px">Rode os três comandos no terminal para salvar tudo no GitHub.</p>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div>
+          <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span><br><span style="font-size:12.5px;color:#94a3b8">Marca todos os arquivos para salvar</span></div></div>
+          <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E03: rotas GET e POST com Postman"</span><br><span style="font-size:12.5px;color:#94a3b8">Cria o snapshot do progresso</span></div></div>
+          <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span><br><span style="font-size:12.5px;color:#94a3b8">Envia para o GitHub</span></div></div>
+        </div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">Postman configurado e funcionando</li>
+          <li style="color:#cbd5e1">Rota GET retornando lista de dados</li>
+          <li style="color:#cbd5e1">Rota POST recebendo dados e adicionando ao array</li>
+          <li style="color:#cbd5e1">express.json() configurado no projeto</li>
+          <li style="color:#cbd5e1">Status codes 200 e 201 aplicados</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 04</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Vamos aprender as três formas de receber dados de uma requisição — parâmetros na URL (<span class="inline-code">/itens/5</span>), filtros na query string (<span class="inline-code">?status=ativo</span>) e dados no body (que você já conhece). O projeto vai ganhar a capacidade de buscar um item específico pelo ID.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

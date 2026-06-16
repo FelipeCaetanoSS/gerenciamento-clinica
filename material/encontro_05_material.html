@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 05 — CRUD Completo | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-checkpoint{background:#f59e0b;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.checkpoint-banner{background:linear-gradient(135deg,#78350f,#d97706);color:#fff;border-radius:12px;padding:18px 24px;margin-top:20px;display:flex;align-items:center;gap:16px}
+.checkpoint-icon{font-size:32px;flex-shrink:0}
+.checkpoint-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.checkpoint-body{font-size:13.5px;opacity:.9;line-height:1.6}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+/* Checklist de teste */
+.checklist-card{background:#fff;border:2px solid #f59e0b;border-radius:12px;padding:22px 26px;margin-top:28px}
+.checklist-title{font-size:16px;font-weight:700;color:#92400e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #fde68a;font-size:14px;color:#374151;line-height:1.6}
+.check-item:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border:2px solid #d97706;border-radius:4px;flex-shrink:0;margin-top:2px}
+.check-method{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700;font-family:monospace;margin-right:6px;white-space:nowrap}
+.m-get{background:#dcfce7;color:#14532d}
+.m-post{background:#fef9c3;color:#854d0e}
+.m-put{background:#dbeafe;color:#1e3a8a}
+.m-del{background:#fee2e2;color:#991b1b}
+.check-status{font-size:11.5px;color:#6b7280;margin-left:4px}
+/* Extra / horizonte */
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-title{font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px}
+.horizonte-sub{font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa;display:flex;align-items:center;gap:6px}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+/* Status codes reference */
+.status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.status-card{border-radius:7px;padding:10px 12px;text-align:center;border:1px solid}
+.status-code{font-size:17px;font-weight:700;font-family:monospace;margin-bottom:3px}
+.status-desc{font-size:11.5px;line-height:1.4}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 05 DE 34 · ✦ CHECKPOINT 1</div>
+  <h1>CRUD Completo — Criar, Ler, Atualizar e Deletar</h1>
+  <h2>Fecha o ciclo: PUT e DELETE entram no projeto, e você chega ao primeiro marco da UC</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 PUT · DELETE · status codes · Checkpoint 1</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01</span>Planejamento</div>
+      <div class="pb-step pb-done"><span class="pb-num">02</span>Ambiente</div>
+      <div class="pb-step pb-done"><span class="pb-num">03</span>Rotas e HTTP</div>
+      <div class="pb-step pb-done"><span class="pb-num">04</span>Parâmetros</div>
+      <div class="pb-step pb-checkpoint"><span class="pb-num">05</span>CRUD ✦</div>
+      <div class="pb-step pb-future"><span class="pb-num">06</span>Middleware</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+      <div class="pb-step pb-future"><span class="pb-num">34</span>Demo Day</div>
+    </div>
+  </div>
+
+  <div class="checkpoint-banner">
+    <div class="checkpoint-icon">🏁</div>
+    <div>
+      <div class="checkpoint-title">Checkpoint 1 — ao final deste encontro</div>
+      <div class="checkpoint-body">Você vai demonstrar o CRUD completo do seu projeto funcionando no Postman. Não é uma prova — é uma verificação de que o projeto está no caminho certo antes de avançar para os próximos blocos.</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      Nos encontros anteriores você criou rotas para listar e buscar dados (GET) e para criar novos itens (POST). Faltam duas operações para fechar o ciclo: <strong>atualizar</strong> um item existente e <strong>deletar</strong> um item. Com as quatro operações funcionando — Create, Read, Update, Delete — você tem o que a indústria chama de CRUD completo.
+      <br><br>
+      É também neste encontro que a pasta de exercícios começa a fazer sentido: a partir de hoje, <strong>tudo vai direto para o projeto</strong>. Sem arquivos separados de treino — o exercício é o projeto.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>PUT /recurso/:id atualizando itens do projeto</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>DELETE /recurso/:id removendo itens do projeto</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>CRUD completo testado com checklist no Postman</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Checkpoint 1 concluído — primeiro marco da UC</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div>
+        <div class="step-title">Abrir o Codespace e verificar o estado do projeto</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace do seu projeto e rode o servidor:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+
+      <p>Antes de testar no Postman, é necessário tornar a porta pública — caso contrário o Postman recebe uma página de autenticação do GitHub em vez da resposta da API. Faça isso uma vez a cada vez que abrir o Codespace:</p>
+      <ol class="steps-list">
+        <li>No VS Code, abra o painel <strong>Ports</strong> (na barra inferior, ao lado do terminal)</li>
+        <li>Clique com o botão direito na porta <strong>3000</strong></li>
+        <li>Clique em <strong>Port Visibility → Public</strong></li>
+        <li>Copie a URL da coluna <strong>Forwarded Address</strong> — use essa URL no Postman</li>
+      </ol>
+
+      <p>Confirme que as rotas dos encontros anteriores ainda funcionam: no Postman, faça um GET na rota principal do seu recurso. Se retornar os dados corretamente, está tudo pronto — pode seguir.</p>
+      <div class="warn"><strong>Port Visibility volta para privada ao reiniciar o Codespace</strong> Sempre que abrir o Codespace numa nova sessão, repita o passo de tornar a porta pública. É rápido e se torna automático com o tempo.</div>
+      <div class="warn"><strong>Se o array do projeto estiver vazio ou incorreto</strong> Os dados em memória somem quando o servidor reinicia. Isso é esperado — se precisar, reescreva 2-3 itens de exemplo no array. Esse problema vai desaparecer completamente quando você migrar para banco de dados no Bloco 3.</div>
+    </div>
+  </div>
+
+  <!-- CONCEITOS -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Completando o CRUD — PUT e DELETE</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Você já conhece GET e POST. Hoje entram as duas operações que faltam:</p>
+
+  <div class="concept">
+    <strong>PUT — atualizar um recurso existente</strong>
+    PUT recebe o ID do item pelo parâmetro de rota e os novos dados pelo body. O servidor encontra o item, substitui seus dados pelos novos e devolve o item atualizado. Se o item não existir, retorna 404. Ao contrário do POST, o PUT não cria — ele só atualiza algo que já existe.
+  </div>
+
+  <div class="concept">
+    <strong>DELETE — remover um recurso</strong>
+    DELETE recebe o ID pelo parâmetro de rota e remove o item correspondente. Não precisa de body — o ID na URL é suficiente. Quando bem-sucedido, a convenção é retornar o status <strong>204 No Content</strong>: a operação funcionou, mas não há nada para devolver (o item foi removido).
+  </div>
+
+  <div class="concept">
+    <strong>findIndex() — necessário para PUT e DELETE</strong>
+    Nos encontros anteriores você usou <span class="inline-code">array.find()</span> para buscar um item — ele retorna o objeto ou <span class="inline-code">undefined</span>. Para atualizar e deletar, você precisa da <strong>posição</strong> do item no array, não o item em si. É aí que entra o <span class="inline-code">array.findIndex()</span>: ele retorna o índice (posição) do item no array, ou <span class="inline-code">-1</span> se não encontrar. Com o índice em mãos, você consegue substituir (<span class="inline-code">array[index] = novoItem</span>) ou remover (<span class="inline-code">array.splice(index, 1)</span>).
+  </div>
+
+  <!-- STATUS CODES -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Status codes — o idioma das respostas HTTP</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:14px">Cada resposta do servidor carrega um código de status que indica o que aconteceu. Usar o código correto é parte do design de uma boa API. Estes são os que você vai usar neste encontro — e na maioria dos projetos reais:</p>
+
+  <div class="status-grid">
+    <div class="status-card" style="background:#f0fdf4;border-color:#86efac">
+      <div class="status-code" style="color:#15803d">200</div>
+      <div class="status-desc" style="color:#14532d"><strong>OK</strong> — operação bem-sucedida com dados para retornar</div>
+    </div>
+    <div class="status-card" style="background:#fefce8;border-color:#fde68a">
+      <div class="status-code" style="color:#92400e">201</div>
+      <div class="status-desc" style="color:#78350f"><strong>Created</strong> — novo recurso criado com sucesso (POST)</div>
+    </div>
+    <div class="status-card" style="background:#eff6ff;border-color:#bfdbfe">
+      <div class="status-code" style="color:#1d4ed8">204</div>
+      <div class="status-desc" style="color:#1e3a8a"><strong>No Content</strong> — operação bem-sucedida sem nada a retornar (DELETE)</div>
+    </div>
+    <div class="status-card" style="background:#fef2f2;border-color:#fecaca">
+      <div class="status-code" style="color:#dc2626">404</div>
+      <div class="status-desc" style="color:#991b1b"><strong>Not Found</strong> — o recurso solicitado não existe</div>
+    </div>
+  </div>
+
+  <!-- MANUAL -->
+  <div class="sec-header">
+    <h2><span class="sec-number">3</span> Manual — adicionando PUT e DELETE ao projeto</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">A partir deste encontro, <strong>você trabalha diretamente no <span class="inline-code">index.js</span> do seu projeto</strong>. Veja o exemplo com uma API de contatos e em seguida adapte para o seu recurso.</p>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Criar a rota PUT /:recurso/:id</div>
+        <div class="step-subtitle">Atualizar um item existente pelo ID</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O PUT combina o que você já sabe: recebe o <span class="inline-code">id</span> pelo parâmetro de rota (como no GET por ID) e recebe os novos dados pelo body (como no POST). A diferença é que em vez de criar algo novo, você substitui os dados de um item que já existe.</p>
+      <p>O <span class="inline-code">findIndex()</span> retorna a posição do item no array. Se retornar <span class="inline-code">-1</span>, o item não existe. Se encontrar, a linha <span class="inline-code">contatos[index] = {...}</span> substitui o objeto naquela posição.</p>
+
+      <p><strong>Exemplo com contatos — adapte para o recurso do seu projeto:</strong></p>
+      <pre><span class="var">app</span>.<span class="fn">put</span>(<span class="str">'/contatos/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">index</span> = <span class="var">contatos</span>.<span class="fn">findIndex</span>(<span class="var">c</span> => <span class="var">c</span>.<span class="prop">id</span> === <span class="var">id</span>)
+
+  <span class="kw">if</span> (<span class="var">index</span> === <span class="op">-</span><span class="num">1</span>) {
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Contato não encontrado'</span> })
+  }
+
+  <span class="cm">// Extrair os novos dados do body</span>
+  <span class="kw">const</span> { <span class="var">nome</span>, <span class="var">telefone</span>, <span class="var">email</span> } = <span class="var">req</span>.<span class="prop">body</span>
+
+  <span class="cm">// Substituir o item na posição encontrada, mantendo o id original</span>
+  <span class="var">contatos</span>[<span class="var">index</span>] = { <span class="var">id</span>, <span class="var">nome</span>, <span class="var">telefone</span>, <span class="var">email</span> }
+
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">contatos</span>[<span class="var">index</span>])
+})</pre>
+
+      <div class="tip"><strong>Por que manter o id original?</strong> O ID identifica o item — ele não deve mudar numa atualização. Por isso passamos <span class="inline-code">id</span> diretamente no novo objeto em vez de deixar vir do body. Se viesse do body, um cliente poderia enviar um ID diferente e causar inconsistência.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Testar o PUT no Postman</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>No Postman, crie uma nova requisição com método <strong>PUT</strong>. A URL deve incluir o ID de um item que existe no array. Na aba <strong>Body → raw → JSON</strong>, envie os novos dados:</p>
+      <pre>{
+  <span class="prop">"nome"</span>: <span class="str">"Ana Paula Silva"</span>,
+  <span class="prop">"telefone"</span>: <span class="str">"(41) 99999-0000"</span>,
+  <span class="prop">"email"</span>: <span class="str">"ana.paula@email.com"</span>
+}</pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 200</div>
+        <pre>{ "id": 1, "nome": "Ana Paula Silva", "telefone": "(41) 99999-0000", "email": "ana.paula@email.com" }</pre>
+        O item retornado deve ter o ID original e os dados atualizados. Confirme com um GET por ID que a alteração persiste.
+      </div>
+      <div class="error-box"><strong>findIndex retorna -1 para um ID que existe</strong> O mesmo problema do GET por ID: o ID chega como string. Confirme que <span class="inline-code">const id = Number(req.params.id)</span> está na primeira linha da rota.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Criar a rota DELETE /:recurso/:id</div>
+        <div class="step-subtitle">Remover um item pelo ID</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O DELETE é o mais simples das quatro operações: só precisa do ID na URL. Encontra a posição com <span class="inline-code">findIndex()</span>, remove com <span class="inline-code">splice()</span> e retorna status <strong>204</strong> sem corpo na resposta.</p>
+      <p>O <span class="inline-code">splice(index, 1)</span> remove 1 elemento a partir da posição <span class="inline-code">index</span>, alterando o array original.</p>
+
+      <pre><span class="var">app</span>.<span class="fn">delete</span>(<span class="str">'/contatos/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">index</span> = <span class="var">contatos</span>.<span class="fn">findIndex</span>(<span class="var">c</span> => <span class="var">c</span>.<span class="prop">id</span> === <span class="var">id</span>)
+
+  <span class="kw">if</span> (<span class="var">index</span> === <span class="op">-</span><span class="num">1</span>) {
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Contato não encontrado'</span> })
+  }
+
+  <span class="var">contatos</span>.<span class="fn">splice</span>(<span class="var">index</span>, <span class="num">1</span>)
+  <span class="var">res</span>.<span class="fn">status</span>(<span class="num">204</span>).<span class="fn">send</span>()
+})</pre>
+
+      <div class="tip"><strong>Por que res.status(204).send() e não res.json()?</strong> Status 204 significa "sem conteúdo" — enviar um body junto seria contraditório. O <span class="inline-code">.send()</span> sem argumento envia uma resposta vazia, que é o comportamento correto para DELETE bem-sucedido.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Testar o DELETE no Postman</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Crie uma requisição com método <strong>DELETE</strong>. Não precisa de body. A URL deve incluir o ID de um item existente.</p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 204</div>
+        O painel de resposta do Postman mostra <strong>204 No Content</strong> e nenhum body. Faça em seguida um GET na lista completa — o item deletado não deve mais aparecer.
+      </div>
+      <div class="warn"><strong>Postman mostrando aviso ao receber 204</strong> Algumas versões do Postman exibem um aviso para respostas sem body — isso é normal e não é um erro. O status 204 é o comportamento correto.</div>
+    </div>
+  </div>
+
+  <!-- PROJETO -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:14px">Adicione PUT e DELETE ao <span class="inline-code">index.js</span> do projeto usando o recurso principal definido no seu MVP.</div>
+
+    <div class="project-task">
+      <span class="project-task-num">1</span>
+      <strong>Adicione a rota PUT /:seuRecurso/:id</strong><br>
+      <span style="font-size:13.5px">Use o mesmo padrão do exemplo: findIndex → 404 se não encontrar → substituir com os dados do body → retornar o item atualizado com status 200. Os campos do body devem ser os campos do seu recurso.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">2</span>
+      <strong>Adicione a rota DELETE /:seuRecurso/:id</strong><br>
+      <span style="font-size:13.5px">findIndex → 404 se não encontrar → splice para remover → status 204 sem body.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">3</span>
+      <strong>Execute o Checklist de Testes abaixo</strong><br>
+      <span style="font-size:13.5px">Siga todos os passos na ordem. Cada item deve funcionar antes de marcar. Esse checklist é o que o professor vai verificar no Checkpoint 1.</span>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="checklist-card">
+    <div class="checklist-title">☑ Checklist do Checkpoint 1 — CRUD Completo</div>
+    <p style="font-size:13.5px;color:#92400e;margin-bottom:14px">Execute cada teste no Postman na ordem abaixo. Marque cada item conforme for concluindo.</p>
+
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-post">POST</span> <span class="inline-code">/seuRecurso</span> com dados válidos no body <span class="check-status">→ 201 + item criado com ID</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-get">GET</span> <span class="inline-code">/seuRecurso</span> sem filtro <span class="check-status">→ 200 + lista com o item recém-criado</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-get">GET</span> <span class="inline-code">/seuRecurso/:id</span> com ID existente <span class="check-status">→ 200 + item específico</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-get">GET</span> <span class="inline-code">/seuRecurso/:id</span> com ID inexistente <span class="check-status">→ 404 + mensagem de erro</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-get">GET</span> <span class="inline-code">/seuRecurso?filtro=valor</span> com query param <span class="check-status">→ 200 + lista filtrada</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-put">PUT</span> <span class="inline-code">/seuRecurso/:id</span> com ID existente e dados novos <span class="check-status">→ 200 + item atualizado</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-put">PUT</span> <span class="inline-code">/seuRecurso/:id</span> com ID inexistente <span class="check-status">→ 404 + mensagem de erro</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-del">DELETE</span> <span class="inline-code">/seuRecurso/:id</span> com ID existente <span class="check-status">→ 204 sem body</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-del">DELETE</span> <span class="inline-code">/seuRecurso/:id</span> com ID inexistente <span class="check-status">→ 404 + mensagem de erro</span></div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div><span class="check-method m-get">GET</span> <span class="inline-code">/seuRecurso</span> após o DELETE <span class="check-status">→ item deletado não aparece mais na lista</span></div>
+    </div>
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <ul class="check-list">
+      <li><strong>PATCH em vez de PUT:</strong> O método PUT substitui o item inteiro — você precisa enviar todos os campos. O PATCH atualiza só os campos enviados. Implemente uma rota PATCH que só altera os campos recebidos no body, mantendo os demais intactos. Dica: <span class="inline-code">contatos[index] = { ...contatos[index], ...req.body, id }</span>.</li>
+      <li><strong>Salvar Collection no Postman:</strong> Organize todas as suas requisições numa Collection com o nome do projeto. Vai ser útil ao longo de toda a UC para não precisar recriar as requisições toda aula.</li>
+    </ul>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div class="horizonte-title">Para quem quer ir além do encontro de hoje</div>
+    <div class="horizonte-sub">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>. São portas abertas para quem ficou curioso sobre o que existe além do que vimos.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">REST — o padrão por trás do que você está construindo</div>
+      <div class="horizonte-item-what">Você tem usado GET, POST, PUT e DELETE em URLs com substantivos no plural — sem saber, está seguindo os princípios do REST (Representational State Transfer), o estilo de arquitetura mais usado para APIs web. REST define convenções como: usar substantivos nas URLs (não verbos), usar os métodos HTTP para indicar a ação, retornar o status code correto. Entender REST vai te ajudar a projetar APIs que outros desenvolvedores conseguem usar intuitivamente.</div>
+      <div class="horizonte-item-link">→ <a href="https://restfulapi.net" target="_blank" style="color:#60a5fa">restfulapi.net — guia completo de REST em português e inglês</a></div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">PATCH vs PUT — qual a diferença real?</div>
+      <div class="horizonte-item-what">PUT substitui o recurso inteiro — você envia todos os campos. PATCH atualiza parcialmente — só os campos que mudaram. Na prática, muitas APIs usam PATCH para economizar banda e simplificar o cliente. O desafio extra acima já te dá uma ideia de como implementar. A documentação do MDN tem uma explicação clara sobre quando usar cada um.</div>
+      <div class="horizonte-item-link">→ <a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods/PATCH" target="_blank" style="color:#60a5fa">MDN — HTTP PATCH</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento — Checkpoint 1 e git commit</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E05: CRUD completo - PUT e DELETE"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">PUT atualizando itens com findIndex</li>
+          <li style="color:#cbd5e1">DELETE removendo itens com splice</li>
+          <li style="color:#cbd5e1">Status 204 para DELETE bem-sucedido</li>
+          <li style="color:#cbd5e1">CRUD completo testado com checklist</li>
+          <li style="color:#cbd5e1">Checkpoint 1 concluído ✦</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 06</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Middleware — o que acontece entre a requisição chegar e a rota responder. Você vai entender por que esse conceito é fundamental para autenticação, logs e validação, e vai criar o primeiro middleware do projeto.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 04 — Parâmetros | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+/* Comparison table */
+.compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+.compare-table th{background:#1e3b70;color:#fff;padding:10px 14px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.compare-table td{padding:10px 14px;border-bottom:1px solid #e5e7eb;vertical-align:top;line-height:1.65}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:nth-child(even) td{background:#f8faff}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;font-family:monospace}
+.tag-params{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+.tag-query{background:#dcfce7;color:#14532d;border:1px solid #86efac}
+.tag-body{background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 04 DE 34</div>
+  <h1>Dados Chegando ao Servidor — As Três Formas de Receber Informação</h1>
+  <h2>Parâmetros de rota, query string e body — quando usar cada um e como acessar no código</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 req.params · req.query · req.body · Postman</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01</span>Planejamento</div>
+      <div class="pb-step pb-done"><span class="pb-num">02</span>Ambiente</div>
+      <div class="pb-step pb-done"><span class="pb-num">03</span>Rotas e HTTP</div>
+      <div class="pb-step pb-active"><span class="pb-num">04</span>Parâmetros</div>
+      <div class="pb-step pb-future"><span class="pb-num">05</span>CRUD</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+      <div class="pb-step pb-future"><span class="pb-num">34</span>Demo Day</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      Você já sabe criar rotas que respondem a GET e POST. Mas até agora todas as suas rotas são genéricas — um GET em <span class="inline-code">/produtos</span> sempre retorna tudo. E se o cliente quiser buscar apenas o produto de id 5? E se quiser filtrar só os produtos da categoria "eletrônicos"?
+      <br><br>
+      Hoje você vai aprender as três formas de enviar dados para o servidor, quando usar cada uma, e como acessá-las no código. Ao final, o projeto terá rotas que respondem de forma diferente dependendo dos dados que chegam.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Rota que busca um item específico pelo ID</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Rota que filtra itens por uma propriedade</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Clareza sobre quando usar params, query e body</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Tratamento correto quando item não é encontrado</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div>
+        <div class="step-title">Abrir o Codespace e iniciar o servidor</div>
+        <div class="step-subtitle">Início de todo encontro</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Acesse github.com → seu repositório → Code → Codespaces → abra o Codespace existente. Com o terminal aberto:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>Servidor rodando em http://localhost:3000</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEITOS -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> As três formas de enviar dados ao servidor</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Toda requisição HTTP pode carregar dados de três formas diferentes. Cada uma tem um propósito específico e fica acessível em um lugar diferente no código.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Forma</th>
+        <th>Como aparece na requisição</th>
+        <th>Como acessar no Express</th>
+        <th>Quando usar</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag tag-params">Route Params</span></td>
+        <td>Na URL: <span class="inline-code">/produtos/<strong>5</strong></span></td>
+        <td><span class="inline-code">req.params.id</span></td>
+        <td>Identificar um recurso específico pelo seu ID ou outro identificador único</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-query">Query Params</span></td>
+        <td>Após <span class="inline-code">?</span> na URL: <span class="inline-code">/produtos<strong>?categoria=eletronicos</strong></span></td>
+        <td><span class="inline-code">req.query.categoria</span></td>
+        <td>Filtros opcionais, buscas, ordenação — não identificam um recurso único</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-body">Body</span></td>
+        <td>No corpo da requisição (invisível na URL)</td>
+        <td><span class="inline-code">req.body.nome</span></td>
+        <td>Criar ou atualizar um recurso — dados completos enviados no POST ou PUT</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="concept">
+    <strong>Uma analogia para fixar</strong>
+    Imagine que você está em uma biblioteca. Pedir um livro específico pelo número de registro é como um <strong>route param</strong> — você sabe exatamente o que quer. Pedir "me mostra todos os livros de suspense disponíveis" é como um <strong>query param</strong> — você está filtrando. Preencher um formulário de cadastro de novo livro é como o <strong>body</strong> — você está enviando dados completos para criar algo novo.
+  </div>
+
+  <!-- MANUAL -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Manual — API de Livros</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Vamos construir uma API de livros para praticar os três tipos de parâmetros. Crie um arquivo chamado <span class="inline-code">livros.js</span> na raiz do projeto.</p>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Base do arquivo e dados iniciais</div>
+        <div class="step-subtitle">Estrutura que você já conhece dos encontros anteriores</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Escreva a estrutura base — tudo que você já aprendeu nos encontros 02 e 03:</p>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>())
+
+<span class="kw">const</span> <span class="var">livros</span> = [
+  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">titulo</span>: <span class="str">'O Alquimista'</span>,  <span class="prop">genero</span>: <span class="str">'Romance'</span>,          <span class="prop">disponivel</span>: <span class="kw">true</span>  },
+  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">titulo</span>: <span class="str">'1984'</span>,          <span class="prop">genero</span>: <span class="str">'Ficção Científica'</span>, <span class="prop">disponivel</span>: <span class="kw">false</span> },
+  { <span class="prop">id</span>: <span class="num">3</span>, <span class="prop">titulo</span>: <span class="str">'Dom Casmurro'</span>,  <span class="prop">genero</span>: <span class="str">'Romance'</span>,          <span class="prop">disponivel</span>: <span class="kw">true</span>  },
+  { <span class="prop">id</span>: <span class="num">4</span>, <span class="prop">titulo</span>: <span class="str">'Sapiens'</span>,       <span class="prop">genero</span>: <span class="str">'Não-Ficção'</span>,       <span class="prop">disponivel</span>: <span class="kw">true</span>  }
+]
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () => {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+      <p>Inicie o servidor em um novo terminal: <span class="inline-code">node livros.js</span></p>
+      <div class="note">As rotas serão adicionadas entre o array <span class="inline-code">livros</span> e o <span class="inline-code">app.listen</span>. Sempre nessa posição — as rotas precisam ser registradas antes do servidor iniciar a escuta.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">GET /livros — lista com filtro opcional por query param</div>
+        <div class="step-subtitle">req.query — parâmetro opcional que chega após o ? na URL</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Vamos criar uma rota GET que, sem nenhum parâmetro, retorna todos os livros. Se o cliente enviar <span class="inline-code">?genero=Romance</span>, retorna apenas os livros daquele gênero.</p>
+      <p>O <span class="inline-code">req.query</span> é um objeto que contém todos os parâmetros enviados após o <span class="inline-code">?</span> na URL. Se nenhum parâmetro for enviado, <span class="inline-code">req.query</span> é um objeto vazio <span class="inline-code">{}</span>.</p>
+      <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/livros'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> { <span class="var">genero</span> } = <span class="var">req</span>.<span class="prop">query</span>
+
+  <span class="cm">// Se vier o filtro de gênero, filtra o array</span>
+  <span class="kw">if</span> (<span class="var">genero</span>) {
+    <span class="kw">const</span> <span class="var">filtrados</span> = <span class="var">livros</span>.<span class="fn">filter</span>(<span class="var">livro</span> => <span class="var">livro</span>.<span class="prop">genero</span> === <span class="var">genero</span>)
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">json</span>(<span class="var">filtrados</span>)
+  }
+
+  <span class="cm">// Sem filtro, retorna todos</span>
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">livros</span>)
+})</pre>
+      <div class="tip"><strong>array.filter()</strong> percorre cada item do array e retorna um novo array contendo apenas os itens para os quais a função retornou verdadeiro. Você já viu isso no JavaScript do frontend — o comportamento é exatamente o mesmo aqui.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Testar o query param no Postman</div>
+        <div class="step-subtitle">Com e sem filtro para ver a diferença</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p><strong>Teste 1 — sem filtro:</strong> GET na URL base <span class="inline-code">/livros</span></p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>[ 4 livros retornados — todos os itens do array ]</pre>
+      </div>
+
+      <p style="margin-top:14px"><strong>Teste 2 — com filtro de gênero:</strong> No Postman há duas formas de enviar query params:</p>
+      <ul class="check-list">
+        <li>Direto na URL: <span class="inline-code">/livros?genero=Romance</span></li>
+        <li>Pela aba <strong>Params</strong> no Postman: adicione a chave <span class="inline-code">genero</span> e o valor <span class="inline-code">Romance</span> — o Postman monta a URL automaticamente e você pode ativar/desativar cada parâmetro com o checkbox</li>
+      </ul>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>[
+  { "id": 1, "titulo": "O Alquimista", "genero": "Romance", "disponivel": true },
+  { "id": 3, "titulo": "Dom Casmurro", "genero": "Romance", "disponivel": true }
+]</pre>
+        Apenas os livros de Romance são retornados.
+      </div>
+      <div class="error-box"><strong>Filtro retorna array vazio []</strong> O valor enviado no query param não coincide exatamente com o valor no array — o filtro usa <span class="inline-code">===</span> que é sensível a maiúsculas. "romance" (minúsculo) não vai encontrar "Romance" (com maiúscula). Verifique se o valor no Postman está escrito exatamente igual ao valor no array.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">GET /livros/:id — buscar um livro específico pelo ID</div>
+        <div class="step-subtitle">req.params — parte dinâmica da URL que identifica um recurso único</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O <span class="inline-code">:id</span> na rota define um <strong>parâmetro dinâmico</strong>: quando alguém acessa <span class="inline-code">/livros/3</span>, o valor <span class="inline-code">3</span> fica disponível em <span class="inline-code">req.params.id</span>. O nome depois dos dois pontos é livre — se você escrever <span class="inline-code">:codigo</span>, o valor fica em <span class="inline-code">req.params.codigo</span>.</p>
+
+      <p><strong>Atenção importante:</strong> <span class="inline-code">req.params.id</span> sempre chega como <strong>string</strong> — mesmo que o valor enviado seja o número 3, você recebe a string <span class="inline-code">"3"</span>. Para comparar com os IDs do array (que são números), você precisa converter com <span class="inline-code">Number()</span>.</p>
+
+      <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/livros/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="cm">// Converter para número — req.params.id sempre chega como string</span>
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+
+  <span class="cm">// Procurar o livro com esse id no array</span>
+  <span class="kw">const</span> <span class="var">livro</span> = <span class="var">livros</span>.<span class="fn">find</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">id</span> === <span class="var">id</span>)
+
+  <span class="cm">// Se não encontrou, responder com 404</span>
+  <span class="kw">if</span> (<span class="op">!</span><span class="var">livro</span>) {
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Livro não encontrado'</span> })
+  }
+
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">livro</span>)
+})</pre>
+
+      <div class="concept" style="margin-top:14px">
+        <strong>Por que retornar 404 quando não encontra?</strong>
+        Status 404 significa "Not Found" — o recurso não existe. Se você não fizer essa verificação e simplesmente chamar <span class="inline-code">res.json(undefined)</span>, o servidor pode se comportar de forma inesperada. Sempre trate o caso "não encontrado" — é um dos erros mais comuns em APIs.
+      </div>
+      <div class="tip"><strong>array.find()</strong> percorre o array e retorna o primeiro item para o qual a função retornou verdadeiro. Se nenhum item satisfizer a condição, retorna <span class="inline-code">undefined</span> — que é exatamente o que testamos com <span class="inline-code">if (!livro)</span>.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Testar o route param no Postman</div>
+        <div class="step-subtitle">ID existente e ID inexistente</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p><strong>Teste 1 — ID existente:</strong> GET em <span class="inline-code">/livros/2</span></p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 200</div>
+        <pre>{ "id": 2, "titulo": "1984", "genero": "Ficção Científica", "disponivel": false }</pre>
+      </div>
+
+      <p style="margin-top:14px"><strong>Teste 2 — ID inexistente:</strong> GET em <span class="inline-code">/livros/99</span></p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 404</div>
+        <pre>{ "erro": "Livro não encontrado" }</pre>
+      </div>
+
+      <div class="error-box"><strong>Livro não encontrado mesmo para um ID que existe</strong> O ID está chegando como string e sendo comparado com um número usando ===. Certifique-se que a linha <span class="inline-code">const id = Number(req.params.id)</span> está no código.</div>
+    </div>
+  </div>
+
+  <!-- ARQUIVO COMPLETO -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">✓</div>
+      <div>
+        <div class="step-title">O arquivo livros.js completo</div>
+        <div class="step-subtitle">Confira se o seu está igual</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>())
+
+<span class="kw">const</span> <span class="var">livros</span> = [
+  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">titulo</span>: <span class="str">'O Alquimista'</span>,  <span class="prop">genero</span>: <span class="str">'Romance'</span>,          <span class="prop">disponivel</span>: <span class="kw">true</span>  },
+  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">titulo</span>: <span class="str">'1984'</span>,          <span class="prop">genero</span>: <span class="str">'Ficção Científica'</span>, <span class="prop">disponivel</span>: <span class="kw">false</span> },
+  { <span class="prop">id</span>: <span class="num">3</span>, <span class="prop">titulo</span>: <span class="str">'Dom Casmurro'</span>,  <span class="prop">genero</span>: <span class="str">'Romance'</span>,          <span class="prop">disponivel</span>: <span class="kw">true</span>  },
+  { <span class="prop">id</span>: <span class="num">4</span>, <span class="prop">titulo</span>: <span class="str">'Sapiens'</span>,       <span class="prop">genero</span>: <span class="str">'Não-Ficção'</span>,       <span class="prop">disponivel</span>: <span class="kw">true</span>  }
+]
+
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/livros'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> { <span class="var">genero</span> } = <span class="var">req</span>.<span class="prop">query</span>
+  <span class="kw">if</span> (<span class="var">genero</span>) {
+    <span class="kw">const</span> <span class="var">filtrados</span> = <span class="var">livros</span>.<span class="fn">filter</span>(<span class="var">livro</span> => <span class="var">livro</span>.<span class="prop">genero</span> === <span class="var">genero</span>)
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">json</span>(<span class="var">filtrados</span>)
+  }
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">livros</span>)
+})
+
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/livros/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">livro</span> = <span class="var">livros</span>.<span class="fn">find</span>(<span class="var">l</span> => <span class="var">l</span>.<span class="prop">id</span> === <span class="var">id</span>)
+  <span class="kw">if</span> (<span class="op">!</span><span class="var">livro</span>) {
+    <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Livro não encontrado'</span> })
+  }
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">livro</span>)
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () => {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+    </div>
+  </div>
+
+  <!-- PROJETO -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:14px">Leve tudo que aprendeu para o <span class="inline-code">index.js</span> do seu projeto. Você vai adicionar duas novas capacidades ao seu GET principal.</div>
+
+    <div class="project-task">
+      <span class="project-task-num">1</span>
+      <strong>Adicione GET /:recurso/:id ao seu projeto</strong><br>
+      <span style="font-size:13.5px">Crie uma rota que recebe o ID pela URL e retorna apenas aquele item. Use <span class="inline-code">Number()</span> para converter o ID, <span class="inline-code">array.find()</span> para buscar, e retorne 404 se não encontrado. Teste no Thunder Client com um ID existente e com um ID que não existe.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">2</span>
+      <strong>Adicione um filtro por query param no GET principal</strong><br>
+      <span style="font-size:13.5px">Pense em uma propriedade útil para filtrar no seu projeto. Exemplos: <span class="inline-code">?status=ativo</span> para tarefas, <span class="inline-code">?categoria=bebida</span> para produtos, <span class="inline-code">?disponivel=true</span> para itens de biblioteca. Atualize o GET principal para suportar esse filtro opcionalmente.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">3</span>
+      <strong>Teste os três tipos de parâmetro no Postman</strong><br>
+      <span style="font-size:13.5px">GET sem filtro (todos os itens) → GET com query param pela aba Params (filtrado) → GET com :id existente (um item) → GET com :id inexistente (404). Os quatro comportamentos devem funcionar corretamente.</span>
+    </div>
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <ul class="check-list">
+      <li><strong>Dois query params ao mesmo tempo:</strong> Adicione um segundo filtro ao GET de livros — por exemplo <span class="inline-code">?disponivel=true</span>. A URL ficaria <span class="inline-code">/livros?genero=Romance&amp;disponivel=true</span>. Ambos os filtros precisam ser aplicados ao mesmo tempo.</li>
+      <li><strong>Busca parcial com includes():</strong> Em vez de filtrar por gênero exato, implemente uma busca no título. <span class="inline-code">/livros?busca=alq</span> deveria retornar "O Alquimista". Use <span class="inline-code">livro.titulo.toLowerCase().includes(busca.toLowerCase())</span>.</li>
+    </ul>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E04: busca por ID e filtro por query param"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">Route param :id para buscar item específico</li>
+          <li style="color:#cbd5e1">Query param para filtrar resultados</li>
+          <li style="color:#cbd5e1">Retorno 404 quando item não existe</li>
+          <li style="color:#cbd5e1">Diferença clara entre params, query e body</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 05 — Checkpoint 1</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Vamos fechar o ciclo: adicionar as rotas PUT (atualizar) e DELETE (apagar) para completar o CRUD. Você vai ter todas as quatro operações funcionando no projeto — o primeiro marco avaliativo da UC.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

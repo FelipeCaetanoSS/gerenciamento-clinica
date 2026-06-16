@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apostila — Encontro 01 | Codificação para Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Georgia',serif;font-size:15px;line-height:1.8;color:#1a1a1a;background:#fafaf8}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#0f4c81 100%);color:#fff;padding:60px 48px;min-height:220px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:13px;font-family:sans-serif;letter-spacing:.5px;margin-bottom:20px}
+.cover h1{font-size:30px;font-weight:700;line-height:1.25;margin-bottom:10px}
+.cover h2{font-size:18px;font-weight:400;opacity:.8;margin-bottom:24px}
+.cover-meta{display:flex;gap:32px;font-size:13px;font-family:sans-serif;opacity:.75;flex-wrap:wrap}
+.cover-meta span{display:flex;align-items:center;gap:6px}
+.container{max-width:900px;margin:0 auto;padding:0 32px 60px}
+/* Section headers */
+.sec{margin-top:48px;padding-bottom:8px;border-bottom:2px solid #0f4c81}
+.sec h2{font-size:22px;color:#0f4c81;font-family:sans-serif;font-weight:700}
+.subsec{margin-top:32px}
+.subsec h3{font-size:17px;font-family:sans-serif;font-weight:700;color:#1a1a1a;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.subsec h3::before{content:'';display:inline-block;width:4px;height:18px;background:#0f4c81;border-radius:2px}
+.subsec h4{font-size:15px;font-family:sans-serif;font-weight:700;color:#333;margin:20px 0 8px}
+p{margin-bottom:14px}
+/* Boxes */
+.box{border-radius:8px;padding:16px 20px;margin:20px 0;font-family:sans-serif;font-size:14px;line-height:1.7}
+.box-concept{background:#EFF6FF;border-left:4px solid #3B82F6}
+.box-concept strong{color:#1D4ED8}
+.box-analogy{background:#F0FDF4;border-left:4px solid #22C55E}
+.box-analogy strong{color:#15803D}
+.box-market{background:#FEF3C7;border-left:4px solid #F59E0B}
+.box-market strong{color:#92400E}
+.box-alert{background:#FEF2F2;border-left:4px solid #EF4444}
+.box-alert strong{color:#991B1B}
+.box-tip{background:#F5F3FF;border-left:4px solid #8B5CF6}
+.box-tip strong{color:#5B21B6}
+.box-practice{background:#ECFDF5;border-left:4px solid #10B981}
+.box-practice strong{color:#065F46}
+/* Code */
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:20px 24px;overflow-x:auto;font-size:13px;line-height:1.75;margin:16px 0;font-family:'Courier New',monospace}
+code{font-family:'Courier New',monospace;font-size:13px}
+.inline-code{background:#f1f5f9;color:#0f172a;padding:1px 6px;border-radius:4px;font-size:13px}
+/* Code comments */
+.cm{color:#64748b}
+.kw{color:#93c5fd}
+.fn{color:#86efac}
+.str{color:#fca5a5}
+.num{color:#fbbf24}
+.op{color:#67e8f9}
+.var{color:#c4b5fd}
+/* Table */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-family:sans-serif;font-size:14px}
+th{background:#0f172a;color:#fff;padding:10px 14px;text-align:left;font-weight:600}
+td{padding:9px 14px;border-bottom:1px solid #e2e8f0}
+tr:nth-child(even) td{background:#f8fafc}
+/* Lists */
+ul,ol{padding-left:24px;margin:10px 0}
+li{margin-bottom:8px;line-height:1.7}
+/* Badge */
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-family:sans-serif;font-weight:600}
+.b-es6{background:#dbeafe;color:#1d4ed8}
+.b-node{background:#dcfce7;color:#166534}
+.b-market{background:#fef3c7;color:#92400e}
+.divider{height:1px;background:#e2e8f0;margin:36px 0}
+/* Step */
+.step-list{list-style:none;padding:0;counter-reset:steps}
+.step-list li{counter-increment:steps;display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+.step-list li::before{content:counter(steps);background:#0f4c81;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:13px;font-weight:700;flex-shrink:0;margin-top:3px}
+/* Timeline */
+.timeline{border-left:2px solid #0f4c81;padding-left:24px;margin:16px 0}
+.timeline-item{margin-bottom:20px;position:relative}
+.timeline-item::before{content:'';position:absolute;left:-31px;top:5px;width:12px;height:12px;border-radius:50%;background:#0f4c81;border:2px solid #fff;box-shadow:0 0 0 2px #0f4c81}
+.timeline-year{font-size:12px;font-family:sans-serif;font-weight:700;color:#0f4c81;margin-bottom:2px}
+/* Print */
+@media print{
+  body{background:#fff}
+  .cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre{white-space:pre-wrap}
+  .box{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE — SEÇÃO 1: APOSTILA</div>
+  <h1>Encontro 01 — Fundamentos do Backend e JavaScript ES6+</h1>
+  <h2>Unidade Curricular: Codificação para Backend &nbsp;|&nbsp; Bloco 1</h2>
+  <div class="cover-meta">
+    <span>📚 Curso Técnico em Informática para Internet</span>
+    <span>⏱ 4 horas</span>
+    <span>🔧 Node.js · JavaScript ES6+</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ===================== SEÇÃO 1 ===================== -->
+<div class="sec">
+  <h2>1. A Unidade Curricular, a Metodologia e o Projeto Integrador</h2>
+</div>
+
+<div class="subsec">
+  <h3>1.1 O que é esta Unidade Curricular?</h3>
+  <p>A Unidade Curricular <strong>Codificação para Backend</strong> é a disciplina responsável por ensinar você a construir o "motor" das aplicações web — a parte que os usuários não veem, mas que faz tudo funcionar: o servidor, os dados, as regras de negócio, a segurança.</p>
+  <p>Ao longo de 34 encontros de 4 horas cada (136 horas no total), você vai sair de zero e chegar a um nível onde é capaz de construir, documentar e colocar em produção uma API completa — o tipo de trabalho realizado todos os dias por desenvolvedores backend no mercado de trabalho.</p>
+
+  <div class="box box-concept">
+    <strong>Conceito-chave:</strong> <em>Backend</em> é toda a lógica que roda no servidor: receber dados do usuário, processar regras de negócio, salvar no banco de dados, autenticar usuários e devolver respostas. É invisível, mas é a espinha dorsal de todo sistema.
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>1.2 A Metodologia: Aprendizagem Baseada em Problemas (PBL)</h3>
+  <p>Esta UC utiliza a abordagem <strong>Problem-Based Learning (PBL)</strong>, ou Aprendizagem Baseada em Problemas. Isso significa que você <em>nunca</em> vai aprender um conteúdo de forma isolada — cada novo conceito será introduzido por um <strong>problema real</strong> que você precisará resolver.</p>
+
+  <div class="box box-analogy">
+    <strong>Analogia:</strong> Imagine que você quer aprender a dirigir. Na PBL, em vez de estudar o manual do DETRAN por semanas antes de ligar o carro, você já senta no banco do motorista no primeiro dia — com um instrutor ao lado. Você aprende dirigindo, com desafios reais e progressivos. É exatamente assim que funciona aqui.
+  </div>
+
+  <p>Na prática, cada encontro começa com uma <strong>situação-problema</strong> (ex: "Como proteger os dados dos usuários sem tornar o sistema lento?") e avança para explicação, prática e entrega. Isso reproduz exatamente o ambiente de trabalho real de um desenvolvedor.</p>
+
+  <div class="subsec">
+    <h4>Como a avaliação funciona na PBL?</h4>
+    <p>Você será avaliado continuamente ao longo da UC, com quatro tipos de atividades avaliativas:</p>
+    <table>
+      <tr><th>Tipo</th><th>Quando ocorre</th><th>O que avalia</th></tr>
+      <tr><td><strong>Diagnóstica</strong></td><td>Início de blocos</td><td>O que você já sabe — ponto de partida</td></tr>
+      <tr><td><strong>Formativa</strong></td><td>Durante os encontros</td><td>Progresso e consolidação no processo</td></tr>
+      <tr><td><strong>Mini-Projetos</strong></td><td>Final de cada bloco</td><td>Habilidades técnicas específicas (nota parcial)</td></tr>
+      <tr><td><strong>Entregas Parciais</strong></td><td>Marcos do Projeto Integrador</td><td>Evolução do projeto principal (notas parciais)</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>1.3 O Projeto Integrador: seu produto ao final da UC</h3>
+  <p>O <strong>Projeto Integrador</strong> é o eixo central de toda a UC. Trata-se de um sistema backend completo, com frontend integrado, que você vai construir progressivamente ao longo dos 34 encontros — entregando partes funcionais a cada bloco.</p>
+
+  <p>Você escolherá <strong>um tema</strong> entre as opções abaixo no Encontro 31. Todos os temas exigem as mesmas habilidades técnicas e serão avaliados pelos mesmos critérios:</p>
+
+  <table>
+    <tr><th>#</th><th>Tema</th><th>Descrição resumida</th></tr>
+    <tr><td>1</td><td>🛒 E-commerce</td><td>API para loja virtual: produtos, pedidos, pagamentos, painel admin</td></tr>
+    <tr><td>2</td><td>📱 Rede Social</td><td>API com posts, curtidas, seguidores, comentários e feed</td></tr>
+    <tr><td>3</td><td>🏥 Clínica Médica</td><td>API para agendamentos, pacientes, médicos e prontuários</td></tr>
+    <tr><td>4</td><td>📚 Biblioteca Digital</td><td>API para catálogo de livros, empréstimos e reservas</td></tr>
+    <tr><td>5</td><td>🏠 Marketplace de Serviços</td><td>API tipo freela: perfis, propostas, projetos e avaliações</td></tr>
+  </table>
+
+  <div class="box box-tip">
+    <strong>Dica profissional:</strong> Ao final da UC, seu Projeto Integrador estará no GitHub, publicado em produção (acessível pela internet) e funcionando como portfólio real para vagas de desenvolvedor backend. Cuide desde o início como se fosse um produto real — porque é.
+  </div>
+</div>
+
+<!-- ===================== SEÇÃO 2 ===================== -->
+<div class="sec">
+  <h2>2. Arquitetura Cliente-Servidor: O Modelo Fundamental da Web</h2>
+</div>
+
+<div class="subsec">
+  <h3>2.1 O que é a arquitetura cliente-servidor?</h3>
+  <p>Toda aplicação web moderna funciona sobre um modelo chamado <strong>arquitetura cliente-servidor</strong>. Nesse modelo, dois atores se comunicam pela internet:</p>
+
+  <ul>
+    <li><strong>Cliente:</strong> é quem faz as requisições. Normalmente é o navegador do usuário (Chrome, Firefox) ou um aplicativo móvel (Android, iOS). O cliente exibe as informações para o usuário e envia dados para o servidor.</li>
+    <li><strong>Servidor:</strong> é quem processa as requisições. Recebe os dados do cliente, executa a lógica de negócio, consulta o banco de dados e devolve uma resposta.</li>
+  </ul>
+
+  <div class="box box-analogy">
+    <strong>Analogia do restaurante:</strong> O <strong>cliente</strong> é o garçom que anota seu pedido e traz o prato. O <strong>servidor</strong> é a cozinha — o cliente nunca vai até lá, só faz pedidos. A cozinha (backend) tem toda a lógica: como preparar cada prato, onde guardar os ingredientes, quem pode cozinhar o quê. O menu que você vê é o <strong>frontend</strong>; a cozinha que você não vê é o <strong>backend</strong>.
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>2.2 O papel do Frontend</h3>
+  <p>O <strong>frontend</strong> é tudo que roda no navegador do usuário — a interface visual. Suas responsabilidades são:</p>
+  <ul>
+    <li>Exibir informações de forma visual (HTML, CSS)</li>
+    <li>Capturar interações do usuário (cliques, formulários, gestos)</li>
+    <li>Fazer requisições ao servidor via HTTP e exibir as respostas recebidas</li>
+    <li><strong>Nunca</strong> conter lógica de negócio sensível ou validação definitiva (um usuário mal-intencionado pode manipular o frontend)</li>
+  </ul>
+  <p>Tecnologias típicas do frontend: HTML, CSS, JavaScript, React, Vue, Angular.</p>
+</div>
+
+<div class="subsec">
+  <h3>2.3 O papel do Backend</h3>
+  <p>O <strong>backend</strong> é o coração da aplicação. Suas responsabilidades são:</p>
+  <ul>
+    <li><strong>Receber e processar requisições</strong> do cliente (via HTTP)</li>
+    <li><strong>Validar todos os dados</strong> recebidos — nunca confiar no frontend</li>
+    <li><strong>Aplicar as regras de negócio</strong> (ex: "só pode fazer pedido quem tem saldo suficiente")</li>
+    <li><strong>Comunicar com o banco de dados</strong> — ler, criar, atualizar e deletar informações</li>
+    <li><strong>Autenticar e autorizar</strong> usuários — "quem é você e o que pode fazer?"</li>
+    <li><strong>Enviar respostas</strong> ao cliente no formato correto (geralmente JSON)</li>
+  </ul>
+
+  <div class="box box-alert">
+    <strong>⚠️ Erro conceitual comum:</strong> Muitos iniciantes acham que validar dados no frontend é suficiente. NÃO É. O frontend pode ser manipulado por qualquer usuário com conhecimento mínimo de DevTools. O backend DEVE revalidar TUDO que recebe, sempre.
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>2.4 Como cliente e servidor se comunicam? O Protocolo HTTP</h3>
+  <p>A comunicação entre cliente e servidor ocorre pelo protocolo <strong>HTTP</strong> (HyperText Transfer Protocol). Cada comunicação é composta por:</p>
+
+  <ul>
+    <li><strong>Requisição (Request):</strong> enviada pelo cliente ao servidor. Contém: método (GET, POST, PUT, DELETE), URL, cabeçalhos (headers) e, às vezes, um corpo (body) com dados.</li>
+    <li><strong>Resposta (Response):</strong> enviada pelo servidor ao cliente. Contém: código de status (200, 404, 500...), cabeçalhos e, normalmente, um corpo com dados em JSON.</li>
+  </ul>
+
+  <table>
+    <tr><th>Método HTTP</th><th>Significado</th><th>Exemplo de uso</th></tr>
+    <tr><td><span class="badge b-es6">GET</span></td><td>Buscar dados</td><td>Listar produtos, buscar usuário por ID</td></tr>
+    <tr><td><span class="badge b-node">POST</span></td><td>Criar novo dado</td><td>Cadastrar usuário, criar pedido</td></tr>
+    <tr><td><span class="badge b-market">PUT</span></td><td>Atualizar dado completo</td><td>Atualizar perfil inteiro do usuário</td></tr>
+    <tr><td><span class="badge b-es6">PATCH</span></td><td>Atualizar dado parcial</td><td>Alterar só o email do usuário</td></tr>
+    <tr><td><span class="badge b-node">DELETE</span></td><td>Remover dado</td><td>Deletar um produto do catálogo</td></tr>
+  </table>
+
+  <div class="box box-market">
+    <strong>No mercado de trabalho:</strong> Você vai ver e criar <strong>APIs REST</strong> diariamente. Uma API (Application Programming Interface) é um servidor que expõe funcionalidades para ser consumido por outros sistemas (front-ends, apps, outros servidores). Saber construir APIs robustas é uma das habilidades mais valorizadas em vagas de desenvolvedor backend.
+  </div>
+</div>
+
+<!-- ===================== SEÇÃO 3 ===================== -->
+<div class="sec">
+  <h2>3. Panorama do Mercado de Trabalho Backend</h2>
+</div>
+
+<div class="subsec">
+  <h3>3.1 Por que o mercado de backend é tão aquecido?</h3>
+  <p>Toda empresa que tem sistema digital tem backend. Bancos, e-commerces, redes sociais, aplicativos de saúde, sistemas de logística — todos dependem de servidores backend funcionando 24/7. A demanda por desenvolvedores backend é historicamente maior que a oferta de profissionais qualificados, o que mantém os salários elevados e as oportunidades abundantes.</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">Perfil Júnior (0–2 anos)</div>
+      <div>Trabalha sob supervisão. Conhece os fundamentos: APIs REST, banco de dados, autenticação básica. Sabe usar frameworks do mercado. É exatamente onde você chegará ao final desta UC.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">Perfil Pleno (2–5 anos)</div>
+      <div>Trabalha com autonomia. Projeta sistemas, decide arquiteturas, otimiza performance, lidera pull requests. Conhece boas práticas avançadas de segurança e testes.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">Perfil Sênior (5+ anos)</div>
+      <div>Referência técnica da equipe. Define arquitetura de sistemas distribuídos, microserviços, políticas de segurança, mentora outros desenvolvedores.</div>
+    </div>
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>3.2 As principais tecnologias do mercado backend</h3>
+  <p>O mercado backend é diverso, com diferentes tecnologias dominando nichos distintos. As principais são:</p>
+
+  <table>
+    <tr><th>Linguagem/Runtime</th><th>Pontos fortes</th><th>Onde domina</th><th>Nossa UC</th></tr>
+    <tr>
+      <td><strong>Node.js (JavaScript)</strong></td>
+      <td>Alta performance em I/O, ecossistema gigante, fullstack JS, ótima comunidade</td>
+      <td>Startups, APIs REST, real-time, serverless</td>
+      <td>✅ Foco principal</td>
+    </tr>
+    <tr>
+      <td><strong>Python</strong></td>
+      <td>Sintaxe simples, enorme ecossistema, forte em dados e IA</td>
+      <td>Data Science, ML, APIs com Django/FastAPI</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><strong>Java</strong></td>
+      <td>Maturidade, performance, tipagem forte, Spring Framework</td>
+      <td>Bancos, grandes corporações, sistemas legados</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><strong>Go (Golang)</strong></td>
+      <td>Performance extrema, baixa latência, compilado, concorrência nativa</td>
+      <td>Infraestrutura, APIs de alta performance, cloud</td>
+      <td>—</td>
+    </tr>
+  </table>
+
+  <div class="box box-concept">
+    <strong>Por que Node.js?</strong> Node.js é hoje a escolha dominante para APIs REST no ecossistema de startups e empresas de tecnologia (Nubank, iFood, Mercado Livre, Netflix usam Node em partes críticas). Permite usar JavaScript tanto no frontend quanto no backend (fullstack), tem o maior ecossistema de pacotes do mundo (npm) e possui performance excelente para operações de I/O (leitura de banco, chamadas de API). É a escolha ideal para o aprendizado inicial e altamente valorizado no mercado.
+  </div>
+</div>
+
+<div class="subsec">
+  <h3>3.3 O ecossistema Node.js: o que você vai aprender nesta UC</h3>
+  <p>Veja a evolução das tecnologias que você vai dominar ao longo dos 34 encontros:</p>
+
+  <table>
+    <tr><th>Bloco</th><th>O que você aprende</th><th>Por que é importante</th></tr>
+    <tr><td>Bloco 1</td><td>Node.js puro, NPM, Event Loop, módulos</td><td>Base de tudo — entender como Node funciona por dentro</td></tr>
+    <tr><td>Bloco 2</td><td>Express.js, APIs REST, Middleware, Zod, Swagger</td><td>O framework padrão do mercado para APIs Node.js</td></tr>
+    <tr><td>Bloco 3</td><td>PostgreSQL, Prisma ORM, migrations, relacionamentos</td><td>Persistência de dados com banco relacional profissional</td></tr>
+    <tr><td>Bloco 4</td><td>JWT, bcrypt, segurança, OWASP, upload, e-mail</td><td>Sistemas seguros, autenticados e robustos</td></tr>
+    <tr><td>Bloco 5</td><td>Jest, Socket.io, Deploy, ESLint, Winston</td><td>Qualidade, tempo real e produção</td></tr>
+    <tr><td>Bloco 6</td><td>Projeto Integrador completo</td><td>Portfolio profissional real</td></tr>
+  </table>
+</div>
+
+<!-- ===================== SEÇÃO 4 ===================== -->
+<div class="sec">
+  <h2>4. Nivelamento JavaScript ES6+: O que você precisa saber</h2>
+</div>
+
+<p>Esta seção é o conteúdo mais denso do Encontro 01 e serve como <strong>nivelamento</strong> — todos os conceitos aqui são fundamentais para programar em Node.js. Mesmo que você já conheça alguns deles, leia com atenção: os exemplos são voltados para o contexto de backend.</p>
+
+<div class="subsec">
+  <h3>4.1 Arrow Functions — Funções de Seta</h3>
+
+  <div class="subsec">
+    <h4>O que são?</h4>
+    <p>Arrow functions são uma sintaxe mais curta e moderna para declarar funções em JavaScript, introduzida no ES6 (2015). Além da sintaxe compacta, têm um comportamento diferente em relação ao <span class="inline-code">this</span>, o que as torna essenciais em programação assíncrona e callbacks.</p>
+  </div>
+
+  <div class="subsec">
+    <h4>Comparação: função tradicional vs arrow function</h4>
+<pre>
+<span class="cm">// ✦ FORMA TRADICIONAL (ES5) — ainda válida, mas verbosa</span>
+<span class="kw">function</span> <span class="fn">somar</span>(a, b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// ✦ ARROW FUNCTION (ES6+) — sintaxe compacta</span>
+<span class="kw">const</span> <span class="var">somar</span> = (a, b) <span class="op">=&gt;</span> {
+  <span class="kw">return</span> a + b;
+};
+
+<span class="cm">// ✦ ARROW FUNCTION com retorno implícito (quando há só 1 expressão)</span>
+<span class="kw">const</span> <span class="var">somar</span> = (a, b) <span class="op">=&gt;</span> a + b;
+<span class="cm">// A chave {} e o return são omitidos — JavaScript entende que deve retornar a + b</span>
+
+<span class="cm">// ✦ Com apenas 1 parâmetro: os parênteses são opcionais</span>
+<span class="kw">const</span> <span class="var">dobrar</span> = n <span class="op">=&gt;</span> n * <span class="num">2</span>;
+
+<span class="cm">// ✦ Sem parâmetros: parênteses são obrigatórios</span>
+<span class="kw">const</span> <span class="var">saudar</span> = () <span class="op">=&gt;</span> <span class="str">"Olá, mundo!"</span>;
+
+console.log(somar(<span class="num">3</span>, <span class="num">4</span>));  <span class="cm">// → 7</span>
+console.log(dobrar(<span class="num">5</span>));    <span class="cm">// → 10</span>
+console.log(saudar());     <span class="cm">// → "Olá, mundo!"</span>
+</pre>
+
+  <div class="subsec">
+    <h4>Onde são mais usadas no backend?</h4>
+    <p>Arrow functions são especialmente úteis em <strong>callbacks</strong> — funções passadas como argumento para outras funções. Você vai usar isso o tempo todo em Node.js:</p>
+<pre>
+<span class="cm">// ✦ Filtrando um array de usuários ativos (backend frequentemente processa listas assim)</span>
+<span class="kw">const</span> <span class="var">usuarios</span> = [
+  { nome: <span class="str">"Ana"</span>, ativo: <span class="kw">true</span> },
+  { nome: <span class="str">"Bob"</span>, ativo: <span class="kw">false</span> },
+  { nome: <span class="str">"Carlos"</span>, ativo: <span class="kw">true</span> },
+];
+
+<span class="cm">// Com função tradicional:</span>
+<span class="kw">const</span> <span class="var">ativos1</span> = usuarios.filter(<span class="kw">function</span>(u) { <span class="kw">return</span> u.ativo; });
+
+<span class="cm">// Com arrow function (mais limpo e idiomático):</span>
+<span class="kw">const</span> <span class="var">ativos2</span> = usuarios.filter(u <span class="op">=&gt;</span> u.ativo);
+
+<span class="cm">// ✦ Extraindo apenas os nomes:</span>
+<span class="kw">const</span> <span class="var">nomes</span> = usuarios.map(u <span class="op">=&gt;</span> u.nome);
+<span class="cm">// → ["Ana", "Bob", "Carlos"]</span>
+</pre>
+  </div>
+
+  <div class="box box-alert">
+    <strong>⚠️ Atenção — Arrow function e <code>this</code>:</strong> Arrow functions <em>não possuem seu próprio</em> <code>this</code>. Elas herdam o <code>this</code> do contexto externo onde foram criadas. Isso as torna ideais para callbacks, mas inapropriadas para métodos de objetos que precisam referenciar o próprio objeto via <code>this</code>. Em Node.js puro, você raramente vai se preocupar com isso nos exemplos desta UC — mas é bom saber.
+  </div>
+
+  <div class="box box-practice">
+    <strong>Boas práticas profissionais:</strong> Use arrow functions para callbacks, .map(), .filter(), .forEach() e funções anônimas curtas. Use <code>function</code> tradicional quando precisar de hoisting (função disponível antes da declaração) ou quando o <code>this</code> for relevante para o contexto do objeto.
+  </div>
+</div>
+
+<!-- ---- Destructuring ---- -->
+<div class="subsec">
+  <h3>4.2 Destructuring — Desestruturação</h3>
+
+  <div class="subsec">
+    <h4>O que é?</h4>
+    <p>Destructuring é uma sintaxe que permite <strong>extrair valores de arrays ou propriedades de objetos</strong> de forma direta, sem precisar acessar um por um. No backend, isso é usado constantemente para extrair dados de requisições HTTP, respostas de banco de dados e configurações.</p>
+  </div>
+
+  <div class="subsec">
+    <h4>Destructuring de Objetos</h4>
+<pre>
+<span class="cm">// ✦ Sem destructuring (modo antigo — verboso):</span>
+<span class="kw">const</span> <span class="var">usuario</span> = { nome: <span class="str">"Ana"</span>, email: <span class="str">"ana@email.com"</span>, idade: <span class="num">28</span> };
+<span class="kw">const</span> <span class="var">nome</span>  = usuario.nome;
+<span class="kw">const</span> <span class="var">email</span> = usuario.email;
+
+<span class="cm">// ✦ Com destructuring (modo moderno — limpo e direto):</span>
+<span class="kw">const</span> { nome, email, idade } = usuario;
+console.log(nome);  <span class="cm">// → "Ana"</span>
+console.log(email); <span class="cm">// → "ana@email.com"</span>
+
+<span class="cm">// ✦ Renomeando variáveis durante o destructuring:</span>
+<span class="kw">const</span> { nome: nomeDoUsuario, email: enderecoEmail } = usuario;
+console.log(nomeDoUsuario); <span class="cm">// → "Ana"</span>
+
+<span class="cm">// ✦ Valores padrão (default) — caso a propriedade não exista:</span>
+<span class="kw">const</span> { nome, role = <span class="str">"user"</span> } = usuario;
+<span class="cm">// Se 'role' não existir no objeto, assume "user" como padrão</span>
+console.log(role); <span class="cm">// → "user"</span>
+
+<span class="cm">// ✦ Exemplo real de backend — extraindo dados do body de uma requisição HTTP:</span>
+<span class="cm">// req.body seria algo como: { nome: "Ana", email: "ana@email.com", senha: "123" }</span>
+<span class="kw">const</span> { nome, email, senha } = req.body;
+<span class="cm">// Agora temos as 3 variáveis prontas para usar!</span>
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>Destructuring de Arrays</h4>
+<pre>
+<span class="cm">// ✦ Arrays usam [] em vez de {}</span>
+<span class="kw">const</span> <span class="var">frutas</span> = [<span class="str">"maçã"</span>, <span class="str">"banana"</span>, <span class="str">"laranja"</span>];
+
+<span class="cm">// Extrai na ordem: primeira variável = primeiro elemento</span>
+<span class="kw">const</span> [primeira, segunda] = frutas;
+console.log(primeira); <span class="cm">// → "maçã"</span>
+console.log(segunda);  <span class="cm">// → "banana"</span>
+
+<span class="cm">// ✦ Pulando elementos com vírgula:</span>
+<span class="kw">const</span> [, , terceira] = frutas;
+console.log(terceira); <span class="cm">// → "laranja"</span>
+
+<span class="cm">// ✦ Exemplo real — troca de variáveis sem variável auxiliar:</span>
+<span class="kw">let</span> <span class="var">a</span> = <span class="num">1</span>, <span class="var">b</span> = <span class="num">2</span>;
+[a, b] = [b, a];  <span class="cm">// Troca elegante!</span>
+console.log(a, b); <span class="cm">// → 2 1</span>
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>Destructuring em parâmetros de função</h4>
+<pre>
+<span class="cm">// ✦ Muito comum em Express.js — extrair diretamente no parâmetro:</span>
+
+<span class="cm">// Sem destructuring (menos legível):</span>
+<span class="kw">function</span> <span class="fn">criarUsuario</span>(dados) {
+  console.log(dados.nome, dados.email);
+}
+
+<span class="cm">// Com destructuring no parâmetro (mais legível e profissional):</span>
+<span class="kw">function</span> <span class="fn">criarUsuario</span>({ nome, email, senha }) {
+  console.log(nome, email);
+  <span class="cm">// A senha ficou disponível mas não foi usada aqui — boas práticas!</span>
+}
+
+<span class="cm">// ✦ Em rotas Express (você vai ver isso muito):</span>
+<span class="cm">// app.post('/usuarios', (req, res) => {</span>
+<span class="cm">//   const { nome, email, senha } = req.body;  ← destructuring do body</span>
+<span class="cm">//   const { id } = req.params;                ← destructuring dos params</span>
+<span class="cm">// })</span>
+</pre>
+  </div>
+
+  <div class="box box-alert">
+    <strong>⚠️ Erro comum:</strong> Tentar fazer destructuring de <code>null</code> ou <code>undefined</code> causa um erro em tempo de execução: <code>TypeError: Cannot destructure property 'nome' of undefined</code>. Sempre valide se o objeto existe antes de desestruturar em código de produção.
+  </div>
+</div>
+
+<!-- ---- Spread / Rest ---- -->
+<div class="subsec">
+  <h3>4.3 Spread e Rest Operators — O Operador <code>...</code></h3>
+
+  <div class="subsec">
+    <h4>O que são?</h4>
+    <p>O operador <span class="inline-code">...</span> (três pontos) tem dois usos distintos dependendo do contexto:</p>
+    <ul>
+      <li><strong>Spread (expansão):</strong> <em>expande</em> um array ou objeto em elementos individuais</li>
+      <li><strong>Rest (agrupamento):</strong> <em>agrupa</em> múltiplos elementos em um único array ou objeto</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h4>Spread — expandindo dados</h4>
+<pre>
+<span class="cm">// ✦ Spread em Arrays — expandir os elementos de um array</span>
+<span class="kw">const</span> <span class="var">nums1</span> = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>];
+<span class="kw">const</span> <span class="var">nums2</span> = [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>];
+
+<span class="cm">// Sem spread (concat antigo):</span>
+<span class="kw">const</span> <span class="var">todos1</span> = nums1.concat(nums2); <span class="cm">// → [1, 2, 3, 4, 5, 6]</span>
+
+<span class="cm">// Com spread (mais elegante):</span>
+<span class="kw">const</span> <span class="var">todos2</span> = [...nums1, ...nums2]; <span class="cm">// → [1, 2, 3, 4, 5, 6]</span>
+
+<span class="cm">// ✦ Spread em Objetos — copiar/mesclar objetos (MUITO usado em backend)</span>
+<span class="kw">const</span> <span class="var">usuarioBase</span> = { nome: <span class="str">"Ana"</span>, email: <span class="str">"ana@mail.com"</span> };
+<span class="kw">const</span> <span class="var">dadosExtras</span>  = { role: <span class="str">"admin"</span>, ativo: <span class="kw">true</span> };
+
+<span class="cm">// Mesclar dois objetos em um novo objeto:</span>
+<span class="kw">const</span> <span class="var">usuarioCompleto</span> = { ...usuarioBase, ...dadosExtras };
+<span class="cm">// → { nome: "Ana", email: "ana@mail.com", role: "admin", ativo: true }</span>
+
+<span class="cm">// ✦ Criar cópia de um objeto com uma propriedade alterada (imutabilidade):</span>
+<span class="kw">const</span> <span class="var">usuarioAtualizado</span> = { ...usuarioBase, nome: <span class="str">"Ana Paula"</span> };
+<span class="cm">// → { nome: "Ana Paula", email: "ana@mail.com" }</span>
+<span class="cm">// O objeto original 'usuarioBase' NÃO foi alterado!</span>
+
+<span class="cm">// ✦ Exemplo real de backend — ao atualizar um usuário no banco:</span>
+<span class="cm">// const usuarioAtualizado = await prisma.usuario.update({</span>
+<span class="cm">//   where: { id },</span>
+<span class="cm">//   data: { ...dadosAtuais, ...novosDados }  ← spread para mesclar</span>
+<span class="cm">// })</span>
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>Rest — agrupando parâmetros</h4>
+<pre>
+<span class="cm">// ✦ Rest em funções — captura todos os argumentos extras em um array</span>
+<span class="kw">function</span> <span class="fn">somarTodos</span>(...numeros) {
+  <span class="cm">// 'numeros' é um array com todos os argumentos recebidos</span>
+  <span class="kw">return</span> numeros.reduce((total, n) <span class="op">=&gt;</span> total + n, <span class="num">0</span>);
+}
+somarTodos(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>); <span class="cm">// → 15</span>
+
+<span class="cm">// ✦ Rest em destructuring — pegar o "resto" das propriedades</span>
+<span class="kw">const</span> <span class="var">usuario</span> = { nome: <span class="str">"Ana"</span>, email: <span class="str">"ana@mail.com"</span>, senha: <span class="str">"hash123"</span>, role: <span class="str">"admin"</span> };
+
+<span class="cm">// Separar a senha do restante (NUNCA retornar a senha em responses de API!):</span>
+<span class="kw">const</span> { senha, ...dadosPublicos } = usuario;
+console.log(dadosPublicos); <span class="cm">// → { nome: "Ana", email: "ana@mail.com", role: "admin" }</span>
+console.log(senha);         <span class="cm">// → "hash123" (guardado separado, não será enviado ao cliente)</span>
+</pre>
+  </div>
+
+  <div class="box box-tip">
+    <strong>Padrão profissional muito importante:</strong> O exemplo do rest acima (<code>const { senha, ...dadosPublicos } = usuario</code>) é um padrão que você vai usar constantemente ao retornar dados de usuários. Nunca retorne a senha (mesmo hasheada) em respostas de API. Separe ela com rest antes de enviar a resposta.
+  </div>
+</div>
+
+<!-- ---- Promises ---- -->
+<div class="subsec">
+  <h3>4.4 Promises — Promessas Assíncronas</h3>
+
+  <div class="subsec">
+    <h4>O problema: operações que levam tempo</h4>
+    <p>Em qualquer aplicação backend, operações como leitura de banco de dados, chamadas a APIs externas ou leitura de arquivos são <strong>assíncronas</strong> — elas levam tempo e não bloqueiam a execução do programa. JavaScript precisa de um mecanismo para lidar com isso: as <strong>Promises</strong>.</p>
+
+    <div class="box box-analogy">
+      <strong>Analogia:</strong> Você vai a uma lanchonete, faz o pedido e recebe uma senha numérica. Você não fica parado na fila esperando — vai sentar, conversa, faz outras coisas. Quando o pedido fica pronto, te chamam. A senha numérica é a <strong>Promise</strong>: uma "promessa" de que algo será entregue no futuro, podendo terminar em sucesso (<code>.then</code>) ou fracasso (<code>.catch</code>).
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h4>O que é uma Promise?</h4>
+    <p>Uma Promise é um objeto que representa a eventual conclusão (ou falha) de uma operação assíncrona. Ela sempre está em um de três estados:</p>
+    <ul>
+      <li><strong>Pending (pendente):</strong> a operação ainda está em andamento</li>
+      <li><strong>Fulfilled (cumprida):</strong> a operação concluiu com sucesso</li>
+      <li><strong>Rejected (rejeitada):</strong> a operação falhou</li>
+    </ul>
+  </div>
+
+  <div class="subsec">
+    <h4>Criando e consumindo Promises</h4>
+<pre>
+<span class="cm">// ✦ Criando uma Promise manualmente (você fará isso raramente — geralmente usa prontas)</span>
+<span class="kw">const</span> <span class="var">minhaPromise</span> = <span class="kw">new</span> <span class="fn">Promise</span>((resolve, reject) <span class="op">=&gt;</span> {
+  <span class="cm">// 'resolve' é chamado quando a operação tem SUCESSO</span>
+  <span class="cm">// 'reject' é chamado quando a operação FALHA</span>
+
+  <span class="kw">const</span> <span class="var">sucesso</span> = <span class="kw">true</span>; <span class="cm">// Simulando resultado</span>
+
+  <span class="kw">if</span> (sucesso) {
+    resolve(<span class="str">"Operação bem sucedida!"</span>); <span class="cm">// Promise fulfilled</span>
+  } <span class="kw">else</span> {
+    reject(<span class="kw">new</span> Error(<span class="str">"Algo deu errado"</span>)); <span class="cm">// Promise rejected</span>
+  }
+});
+
+<span class="cm">// ✦ Consumindo uma Promise com .then() e .catch()</span>
+minhaPromise
+  .then(resultado <span class="op">=&gt;</span> {
+    <span class="cm">// Executado quando a Promise é fulfilled</span>
+    console.log(resultado); <span class="cm">// → "Operação bem sucedida!"</span>
+  })
+  .catch(erro <span class="op">=&gt;</span> {
+    <span class="cm">// Executado quando a Promise é rejected</span>
+    console.error(<span class="str">"Erro:"</span>, erro.message);
+  })
+  .finally(() <span class="op">=&gt;</span> {
+    <span class="cm">// Executado sempre, com sucesso ou falha (ex: fechar loading spinner)</span>
+    console.log(<span class="str">"Operação finalizada"</span>);
+  });
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>Promise.all — executar várias Promises em paralelo</h4>
+<pre>
+<span class="cm">// ✦ Imagine que você precisa buscar usuário E seus pedidos ao mesmo tempo</span>
+<span class="cm">// Em vez de esperar um e depois o outro (sequencial e lento),</span>
+<span class="cm">// execute ambos em paralelo com Promise.all:</span>
+
+<span class="kw">const</span> <span class="var">buscarUsuario</span> = () <span class="op">=&gt;</span> Promise.resolve({ id: <span class="num">1</span>, nome: <span class="str">"Ana"</span> });
+<span class="kw">const</span> <span class="var">buscarPedidos</span> = () <span class="op">=&gt;</span> Promise.resolve([{ id: <span class="num">10</span>, produto: <span class="str">"Notebook"</span> }]);
+
+Promise.all([buscarUsuario(), buscarPedidos()])
+  .then(([usuario, pedidos]) <span class="op">=&gt;</span> {
+    <span class="cm">// Ambos terminaram — os resultados chegam como array na mesma ordem</span>
+    console.log(usuario);  <span class="cm">// → { id: 1, nome: "Ana" }</span>
+    console.log(pedidos);  <span class="cm">// → [{ id: 10, produto: "Notebook" }]</span>
+  });
+
+<span class="cm">// ⚠️ Se QUALQUER uma das Promises falhar, Promise.all vai para o .catch()</span>
+</pre>
+  </div>
+
+  <div class="box box-alert">
+    <strong>⚠️ O "callback hell" — por que Promises existem:</strong> Antes das Promises, todo código assíncrono usava callbacks aninhados. Com múltiplas operações em sequência, o código ficava profundamente indentado (o famoso "pyramid of doom"). Promises resolveram isso com o encadeamento de <code>.then()</code>, e o async/await (próxima seção) tornou o código ainda mais legível.
+  </div>
+</div>
+
+<!-- ---- async/await ---- -->
+<div class="subsec">
+  <h3>4.5 async/await — A forma moderna de escrever código assíncrono</h3>
+
+  <div class="subsec">
+    <h4>O que são?</h4>
+    <p><span class="inline-code">async/await</span> é uma sintaxe construída sobre Promises que permite escrever código assíncrono como se fosse síncrono — muito mais legível e fácil de debugar. É o padrão dominante no desenvolvimento Node.js moderno.</p>
+    <ul>
+      <li><strong><code>async</code>:</strong> declara que uma função é assíncrona. Toda função <code>async</code> retorna automaticamente uma Promise.</li>
+      <li><strong><code>await</code>:</strong> usado dentro de funções <code>async</code>. Pausa a execução da função até que a Promise seja resolvida, sem bloquear o restante do programa.</li>
+    </ul>
+  </div>
+
+<pre>
+<span class="cm">// ✦ Comparação: .then() vs async/await para a mesma operação</span>
+
+<span class="cm">// === COM .then() (ainda válido, mas menos legível em sequências) ===</span>
+<span class="kw">function</span> <span class="fn">buscarDadosThen</span>() {
+  buscarUsuario(id)
+    .then(usuario <span class="op">=&gt;</span> buscarPedidosDoUsuario(usuario.id))
+    .then(pedidos <span class="op">=&gt;</span> console.log(pedidos))
+    .catch(erro <span class="op">=&gt;</span> console.error(erro));
+}
+
+<span class="cm">// === COM async/await (muito mais legível — padrão de mercado) ===</span>
+<span class="kw">async function</span> <span class="fn">buscarDados</span>(id) {
+  <span class="kw">const</span> <span class="var">usuario</span> = <span class="kw">await</span> buscarUsuario(id);   <span class="cm">// Aguarda o usuário</span>
+  <span class="kw">const</span> <span class="var">pedidos</span>  = <span class="kw">await</span> buscarPedidos(usuario.id); <span class="cm">// Depois aguarda os pedidos</span>
+  console.log(pedidos);
+}
+
+<span class="cm">// ✦ Tratamento de erros com async/await: use try/catch</span>
+<span class="kw">async function</span> <span class="fn">buscarDadosSeguro</span>(id) {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> <span class="var">usuario</span> = <span class="kw">await</span> buscarUsuario(id);
+    <span class="kw">const</span> <span class="var">pedidos</span>  = <span class="kw">await</span> buscarPedidos(usuario.id);
+    console.log(<span class="str">"Pedidos encontrados:"</span>, pedidos);
+  } <span class="kw">catch</span> (erro) {
+    <span class="cm">// Qualquer erro no bloco try cai aqui</span>
+    console.error(<span class="str">"Erro ao buscar dados:"</span>, erro.message);
+  }
+}
+
+<span class="cm">// ✦ Exemplo real de rota Express com async/await:</span>
+<span class="cm">// app.get('/usuarios/:id', async (req, res) => {</span>
+<span class="cm">//   try {</span>
+<span class="cm">//     const { id } = req.params;</span>
+<span class="cm">//     const usuario = await prisma.usuario.findUnique({ where: { id } });</span>
+<span class="cm">//     if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado' });</span>
+<span class="cm">//     res.json(usuario);</span>
+<span class="cm">//   } catch (erro) {</span>
+<span class="cm">//     res.status(500).json({ error: 'Erro interno do servidor' });</span>
+<span class="cm">//   }</span>
+<span class="cm">// })</span>
+</pre>
+
+  <div class="subsec">
+    <h4>await com Promise.all — o melhor dos dois mundos</h4>
+<pre>
+<span class="cm">// ✦ Combine async/await com Promise.all para operações paralelas:</span>
+<span class="kw">async function</span> <span class="fn">carregarPaginaInicial</span>(usuarioId) {
+  <span class="cm">// Executa as 3 buscas em PARALELO (não sequencial) — muito mais rápido!</span>
+  <span class="kw">const</span> [usuario, pedidos, notificacoes] = <span class="kw">await</span> Promise.all([
+    buscarUsuario(usuarioId),
+    buscarPedidos(usuarioId),
+    buscarNotificacoes(usuarioId),
+  ]);
+
+  <span class="kw">return</span> { usuario, pedidos, notificacoes };
+}
+</pre>
+  </div>
+
+  <div class="box box-alert">
+    <strong>⚠️ Erro muito comum — await em loop:</strong> Usar <code>await</code> dentro de um <code>for...of</code> é sequencial (um aguarda o outro). Se quiser paralelismo, use <code>Promise.all(array.map(...))</code>. Executar 10 queries sequencialmente quando poderiam ser paralelas é um problema de performance grave em produção.
+  </div>
+</div>
+
+<!-- ---- Módulos ES ---- -->
+<div class="subsec">
+  <h3>4.6 Módulos ES — import e export</h3>
+
+  <div class="subsec">
+    <h4>O que são módulos?</h4>
+    <p>Em projetos reais, você não coloca todo o código em um único arquivo — isso seria impossível de manter. O sistema de módulos permite <strong>dividir o código em arquivos independentes</strong>, cada um com uma responsabilidade clara, e depois conectá-los com <span class="inline-code">import</span> e <span class="inline-code">export</span>.</p>
+
+    <div class="box box-market">
+      <strong>Por que isso importa no mercado?</strong> Em uma empresa, vários desenvolvedores trabalham no mesmo projeto. Sem módulos, editar um arquivo significaria conflito constante com os colegas. Com módulos bem definidos, cada desenvolvedor edita sua "peça" sem interferir nas demais.
+    </div>
+  </div>
+
+  <div class="subsec">
+    <h4>CommonJS (CJS) vs ES Modules (ESM)</h4>
+    <p>Existem dois sistemas de módulos no mundo Node.js:</p>
+    <table>
+      <tr><th>Característica</th><th>CommonJS (CJS)</th><th>ES Modules (ESM)</th></tr>
+      <tr><td>Sintaxe para importar</td><td><code>require()</code></td><td><code>import</code></td></tr>
+      <tr><td>Sintaxe para exportar</td><td><code>module.exports =</code></td><td><code>export</code> / <code>export default</code></td></tr>
+      <tr><td>Quando surgiu</td><td>Node.js original (2009)</td><td>ES6 (2015), nativo no browser</td></tr>
+      <tr><td>Uso hoje</td><td>Muitos projetos legados</td><td>Padrão moderno recomendado</td></tr>
+      <tr><td>Extensão do arquivo</td><td>.js (com CJS config)</td><td>.mjs ou .js (com "type":"module")</td></tr>
+    </table>
+  </div>
+
+  <div class="subsec">
+    <h4>CommonJS — require (você vai encontrar isso em código legado)</h4>
+<pre>
+<span class="cm">// === ARQUIVO: matematica.js (CommonJS) ===</span>
+<span class="kw">function</span> <span class="fn">somar</span>(a, b) { <span class="kw">return</span> a + b; }
+<span class="kw">function</span> <span class="fn">subtrair</span>(a, b) { <span class="kw">return</span> a - b; }
+
+module.exports = { somar, subtrair }; <span class="cm">// Exporta um objeto</span>
+
+<span class="cm">// === ARQUIVO: app.js ===</span>
+<span class="kw">const</span> { somar, subtrair } = require(<span class="str">"./matematica"</span>); <span class="cm">// Importa do arquivo</span>
+console.log(somar(<span class="num">2</span>, <span class="num">3</span>)); <span class="cm">// → 5</span>
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>ES Modules — import/export (padrão moderno que usaremos)</h4>
+<pre>
+<span class="cm">// ✦ EXPORTS NOMEADOS — exporte múltiplas funções/variáveis do mesmo arquivo</span>
+
+<span class="cm">// === ARQUIVO: utils/matematica.js ===</span>
+<span class="kw">export function</span> <span class="fn">somar</span>(a, b) { <span class="kw">return</span> a + b; }
+<span class="kw">export function</span> <span class="fn">subtrair</span>(a, b) { <span class="kw">return</span> a - b; }
+<span class="kw">export const</span> <span class="var">PI</span> = <span class="num">3.14159</span>;
+
+<span class="cm">// === ARQUIVO: app.js ===</span>
+<span class="kw">import</span> { somar, PI } <span class="kw">from</span> <span class="str">"./utils/matematica.js"</span>;
+<span class="cm">// Importa apenas o que precisa — mais eficiente!</span>
+console.log(somar(<span class="num">2</span>, <span class="num">3</span>)); <span class="cm">// → 5</span>
+console.log(PI);           <span class="cm">// → 3.14159</span>
+
+<span class="cm">// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="cm">// ✦ DEFAULT EXPORT — quando o arquivo exporta uma única coisa principal</span>
+
+<span class="cm">// === ARQUIVO: services/usuarioService.js ===</span>
+<span class="kw">class</span> <span class="fn">UsuarioService</span> {
+  <span class="kw">async</span> <span class="fn">criar</span>(dados)   { <span class="cm">/* lógica */</span> }
+  <span class="kw">async</span> <span class="fn">buscarPorId</span>(id) { <span class="cm">/* lógica */</span> }
+}
+
+<span class="kw">export default</span> <span class="kw">new</span> UsuarioService(); <span class="cm">// Exporta instância da classe</span>
+
+<span class="cm">// === ARQUIVO: controllers/usuarioController.js ===</span>
+<span class="kw">import</span> usuarioService <span class="kw">from</span> <span class="str">"../services/usuarioService.js"</span>;
+<span class="cm">// No default export: qualquer nome pode ser usado no import!</span>
+<span class="kw">import</span> meuServico <span class="kw">from</span> <span class="str">"../services/usuarioService.js"</span>; <span class="cm">// Também funciona</span>
+
+<span class="cm">// ✦ Importar módulos externos (pacotes NPM):</span>
+<span class="kw">import</span> express <span class="kw">from</span> <span class="str">"express"</span>;          <span class="cm">// Sem './' = pacote instalado (NPM)</span>
+<span class="kw">import</span> { Router } <span class="kw">from</span> <span class="str">"express"</span>;       <span class="cm">// Named import de pacote NPM</span>
+<span class="kw">import</span> path <span class="kw">from</span> <span class="str">"node:path"</span>;          <span class="cm">// Módulo nativo do Node (prefixo node:)</span>
+</pre>
+  </div>
+
+  <div class="subsec">
+    <h4>Estrutura de projeto usando módulos — como funciona na prática</h4>
+<pre>
+<span class="cm">// Estrutura típica de um projeto Express com módulos ES:</span>
+<span class="cm">//</span>
+<span class="cm">// src/</span>
+<span class="cm">// ├── app.js              ← configura o Express, middlewares globais</span>
+<span class="cm">// ├── server.js           ← inicia o servidor (listen)</span>
+<span class="cm">// ├── routes/</span>
+<span class="cm">// │   ├── index.js        ← agrupa todas as rotas</span>
+<span class="cm">// │   └── usuarios.js     ← rotas de /usuarios</span>
+<span class="cm">// ├── controllers/</span>
+<span class="cm">// │   └── usuarioController.js  ← lida com req/res</span>
+<span class="cm">// ├── services/</span>
+<span class="cm">// │   └── usuarioService.js     ← regras de negócio</span>
+<span class="cm">// └── utils/</span>
+<span class="cm">//     └── matematica.js         ← funções auxiliares</span>
+
+<span class="cm">// Cada arquivo exporta exatamente o que é necessário,</span>
+<span class="cm">// e importa apenas o que precisa dos outros. Limpo e escalável.</span>
+</pre>
+  </div>
+
+  <div class="box box-alert">
+    <strong>⚠️ Não esqueça a extensão .js!</strong> Em ES Modules, você <em>deve</em> incluir a extensão no caminho do import: <code>import somar from './matematica.js'</code>. Sem o <code>.js</code>, o Node lança um erro. Isso é diferente do que acontece no webpack/bundlers que resolvem automaticamente.
+  </div>
+
+  <div class="box box-practice">
+    <strong>Habilitando ES Modules no Node.js:</strong> Adicione <code>"type": "module"</code> no seu <code>package.json</code>. Com isso, todos os arquivos <code>.js</code> do projeto são tratados como ESM. Se precisar de um arquivo CJS específico, renomeie para <code>.cjs</code>.
+<br><br>
+<code>// package.json<br>{ "type": "module" }</code>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===================== RESUMO ===================== -->
+<div class="subsec">
+  <h3>Resumo do Encontro 01 — O que você aprendeu</h3>
+  <table>
+    <tr><th>Conceito</th><th>Resumo em uma frase</th><th>Onde usar no projeto</th></tr>
+    <tr><td>Arquitetura cliente-servidor</td><td>Cliente faz requisições; servidor processa e responde</td><td>Base de toda a API</td></tr>
+    <tr><td>Frontend vs Backend</td><td>Frontend: o que o usuário vê. Backend: o motor invisível</td><td>Divisão de responsabilidades</td></tr>
+    <tr><td>Protocolo HTTP</td><td>GET, POST, PUT, DELETE — verbos para operações em recursos</td><td>Todas as rotas da API</td></tr>
+    <tr><td>Arrow Functions</td><td>Sintaxe compacta para funções — padrão em callbacks e arrays</td><td>Callbacks, .map(), .filter()</td></tr>
+    <tr><td>Destructuring</td><td>Extrai propriedades de objetos/arrays de forma direta e limpa</td><td>Extrair dados do req.body</td></tr>
+    <tr><td>Spread / Rest</td><td>Spread expande; Rest agrupa — ambos usam <code>...</code></td><td>Mesclar objetos, esconder senha</td></tr>
+    <tr><td>Promises</td><td>Objeto que representa uma operação assíncrona futura</td><td>Toda chamada ao banco de dados</td></tr>
+    <tr><td>async/await</td><td>Escreva código assíncrono como se fosse síncrono</td><td>Todas as rotas e services</td></tr>
+    <tr><td>ES Modules</td><td>import/export para dividir e organizar o código em arquivos</td><td>Toda a estrutura do projeto</td></tr>
+  </table>
+</div>
+
+<div class="box box-tip" style="margin-top:24px">
+  <strong>Próximo encontro (Encontro 02):</strong> Node.js — Ambiente, Event Loop, NPM e Sistema de Módulos. Você vai instalar e configurar o ambiente completo de desenvolvimento e entender como o Node.js funciona por dentro para processar milhares de requisições ao mesmo tempo sem travar.
+</div>
+
+</div><!-- /container -->
+</body>
+</html>

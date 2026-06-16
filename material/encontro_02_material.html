@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///C:/Users/nelci39177/Downloads/encontro_02_material.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 02 — Ambiente + Primeiro Servidor | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+
+/* ── COVER ── */
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.cover-meta span{display:flex;align-items:center;gap:6px}
+
+/* ── LAYOUT ── */
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+
+/* ── PROGRESS ── */
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+
+/* ── CONTEXT CARD ── */
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+
+/* ── SECTION HEADER ── */
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+
+/* ── CONCEPT BOX ── */
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+
+/* ── STEP ── */
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+
+/* ── CODE ── */
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+
+/* ── EXPECTED OUTPUT ── */
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+
+/* ── ERROR CALLOUT ── */
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+
+/* ── TIP ── */
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+
+/* ── WARNING ── */
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+
+/* ── PROFESSOR DEMO ── */
+.prof-demo{background:#fdf4ff;border:1.5px solid #d8b4fe;border-radius:10px;padding:16px 20px;margin:16px 0}
+.prof-demo-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7e22ce;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.prof-demo-body{font-size:14px;color:#581c87;line-height:1.7}
+.prof-demo pre{background:#1e0a2e;margin:8px 0 0}
+
+/* ── PROJECT SECTION ── */
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.project-section-body{font-size:14.5px;color:#374151;line-height:1.75}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0}
+
+/* ── EXTRA ── */
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* ── CLOSING ── */
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-title{font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.closing-card-body{font-size:13.5px;color:#cbd5e1;line-height:1.7}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-step:last-child{margin-bottom:0}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+
+/* ── FILE TREE ── */
+.file-tree{background:#0f172a;border-radius:8px;padding:14px 18px;margin:10px 0;font-family:'Courier New',monospace;font-size:13px;color:#94a3b8;line-height:1.9}
+.ft-dir{color:#86efac}
+.ft-file{color:#e2e8f0}
+.ft-new{color:#fbbf24}
+.ft-comment{color:#64748b;font-style:italic}
+
+/* ── NUMBERED LIST ITEMS ── */
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+
+@media print{
+  body{background:#fff}
+  .cover{min-height:auto;padding:32px}
+  .step{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ COVER ══════════════════ -->
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 02 DE 34</div>
+  <h1>Ambiente Profissional + Primeiro Servidor no Ar</h1>
+  <h2>Hoje você cria o alicerce do seu projeto — um servidor real, rodando de verdade</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 Node.js · Express · GitHub Codespaces</span>
+    <span>📁 Material: passo a passo completo</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ══ PROGRESS ══ -->
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01</span>Planejamento</div>
+      <div class="pb-step pb-active"><span class="pb-num">02</span>Ambiente e 1º servidor</div>
+      <div class="pb-step pb-future"><span class="pb-num">03</span>Rotas</div>
+      <div class="pb-step pb-future"><span class="pb-num">04</span>Parâmetros</div>
+      <div class="pb-step pb-future"><span class="pb-num">05</span>CRUD</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+      <div class="pb-step pb-future"><span class="pb-num">34</span>Demo Day</div>
+    </div>
+  </div>
+
+  <!-- ══ CONTEXT ══ -->
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      Ao final deste encontro você terá um servidor real rodando na nuvem, respondendo a requisições, com o código versionado no GitHub — acessível de qualquer computador, em qualquer aula, sem perder nada.
+      <br><br>Esse servidor é o ponto de partida do seu projeto integrador. Tudo o que vier nos próximos encontros — banco de dados, autenticação, frontend — vai ser construído em cima do que você cria hoje.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Servidor Express respondendo na URL pública do Codespace</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Projeto no GitHub com primeiro commit</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Ambiente configurado: nunca mais perde o que fez</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Primeira rota do projeto funcionando</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 1: CONCEITOS ══════════════════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Entendendo o que vamos construir</h2>
+  </div>
+  <p style="font-size:14.5px;color:#374151;line-height:1.8">Antes de escrever qualquer código, é importante entender o que cada ferramenta faz e por que você vai usá-la. Leia com atenção — fará tudo mais fácil.</p>
+
+  <div class="concept">
+    <strong>O que é um servidor?</strong>
+    Pense em um servidor como um <strong>garçom de restaurante</strong>. O garçom fica esperando alguém fazer um pedido. Quando o pedido chega ("me traz um suco"), ele processa e devolve uma resposta ("aqui está seu suco"). O servidor web faz exatamente isso: fica esperando requisições chegarem pela internet, processa cada uma e devolve uma resposta. A diferença é que em vez de pedidos de comida, são requisições HTTP — e em vez de pratos, são dados em formato JSON ou páginas HTML.
+  </div>
+
+  <div class="concept">
+    <strong>O que é Node.js?</strong>
+    Você já conhece JavaScript — a linguagem que roda nos navegadores para deixar as páginas interativas. O Node.js é uma forma de <strong>rodar JavaScript fora do navegador</strong>, diretamente no computador ou em um servidor. Isso significa que você pode usar a linguagem que já conhece para criar o backend da aplicação. Não precisa aprender uma linguagem nova.
+  </div>
+
+  <div class="concept">
+    <strong>O que é Express?</strong>
+    Node.js puro consegue criar servidores, mas exige muito código repetitivo. Express é um <strong>framework</strong> — uma ferramenta construída em cima do Node.js que simplifica esse trabalho. Com Express, criar uma rota que responde a uma requisição levam 3 linhas de código. Sem ele, levariam 20. Express é um dos frameworks mais populares do mundo e está em uso em milhares de empresas.
+  </div>
+
+  <div class="concept">
+    <strong>O que é npm?</strong>
+    npm significa <em>Node Package Manager</em> — o gerenciador de pacotes do Node.js. É como uma <strong>loja de ferramentas</strong> online. Quando você quer adicionar uma funcionalidade ao projeto (como o Express, por exemplo), em vez de escrever tudo do zero, você usa o npm para baixar e instalar o que precisa. Ele também controla quais ferramentas seu projeto usa e em quais versões.
+  </div>
+
+  <div class="concept">
+    <strong>Por que vamos usar GitHub Codespaces?</strong>
+    Os computadores desta sala têm um sistema de proteção que apaga tudo que foi instalado quando você desliga. Isso significa que, sem uma solução, você perderia todo o progresso a cada aula. O <strong>GitHub Codespaces</strong> resolve isso: é um ambiente de desenvolvimento que roda na nuvem, dentro do próprio VS Code. Seu código fica salvo no GitHub — não na máquina local. Você pode entrar de qualquer computador e continuar de onde parou.
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 2: AMBIENTE ══════════════════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Configurando o ambiente</h2>
+  </div>
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Esta seção só precisa ser feita <strong>uma vez</strong>. Nos próximos encontros você pula direto para abrir o Codespace e continuar o projeto.</p>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Verificar conta no GitHub</div>
+        <div class="step-subtitle">github.com</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Acesse <strong>github.com</strong> no navegador. Se você já criou sua conta, faça login. Se ainda não tem conta, clique em <strong>Sign up</strong> e crie agora — é gratuito.</p>
+      <p>Guarde bem o seu <strong>usuário</strong> e <strong>senha</strong> do GitHub. Você vai usar toda aula.</p>
+      <div class="tip"><strong>Por que o GitHub?</strong> GitHub é onde a maioria das empresas de tecnologia armazena seus projetos. Ao final da UC você vai ter um portfólio real lá, com todo o histórico de tudo que construiu.</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Criar o repositório do seu projeto no GitHub</div>
+        <div class="step-subtitle">Um repositório é a "pasta" do projeto no GitHub</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Um <strong>repositório</strong> (ou "repo") é onde o seu projeto fica armazenado no GitHub — com todo o histórico de alterações. Vamos criar o repositório do seu projeto integrador agora.</p>
+      <ol class="steps-list">
+        <li>No GitHub, clique no ícone <strong>+</strong> (canto superior direito) → <strong>New repository</strong></li>
+        <li>Em <strong>Repository name</strong>, coloque o nome do seu projeto em letras minúsculas com hífens. Ex: <span class="inline-code">minha-agenda</span>, <span class="inline-code">cardapio-digital</span>, <span class="inline-code">sistema-pedidos</span></li>
+        <li>Em <strong>Description</strong>, escreva uma linha sobre o projeto (ex: "API backend do meu projeto integrador")</li>
+        <li>Deixe marcado como <strong>Public</strong></li>
+        <li>Marque a opção <strong>Add a README file</strong></li>
+        <li>Clique em <strong>Create repository</strong></li>
+      </ol>
+
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        Você será redirecionado para a página do seu repositório. Ele estará vazio, com apenas o arquivo <span class="inline-code">README.md</span>.
+      </div>
+
+      
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Configurar o Settings Sync no VS Code</div>
+        <div class="step-subtitle">Suas extensões serão reinstaladas automaticamente toda aula</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O VS Code tem um recurso chamado <strong>Settings Sync</strong>: ele salva suas configurações e extensões na sua conta do GitHub. Assim, toda vez que você abrir o VS Code e fizer login, tudo volta automaticamente — mesmo que o computador tenha sido resetado.</p>
+      <ol class="steps-list">
+        <li>Abra o <strong>VS Code</strong></li>
+        <li>No canto inferior esquerdo, clique no ícone de <strong>pessoa</strong> (perfil)</li>
+        <li>Clique em <strong>Turn on Settings Sync…</strong></li>
+        <li>Uma janela vai perguntar o que sincronizar — deixe tudo marcado e clique em <strong>Sign in &amp; Turn on</strong></li>
+        <li>Escolha <strong>Sign in with GitHub</strong></li>
+        <li>O navegador vai abrir pedindo autorização — clique em <strong>Authorize</strong></li>
+        <li>Volte ao VS Code — a sincronização começa automaticamente</li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        No canto inferior esquerdo do VS Code, onde estava o ícone de pessoa, agora aparece o seu nome de usuário do GitHub. As extensões que você já tinha instaladas anteriormente começam a ser instaladas automaticamente (pode levar 1-2 minutos).
+      </div>
+      <div class="tip"><strong>Para as próximas aulas:</strong> Basta abrir o VS Code e fazer login com o GitHub quando solicitado. Em cerca de 2 minutos tudo estará pronto — sem precisar instalar nada manualmente.</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Abrir o projeto no GitHub Codespaces</div>
+        <div class="step-subtitle">Seu ambiente de desenvolvimento na nuvem — imune ao reset da máquina</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Agora vamos abrir o seu repositório dentro do Codespaces. A primeira vez demora cerca de 1-2 minutos porque o ambiente está sendo criado. Nas próximas vezes é quase instantâneo.</p>
+      <ol class="steps-list">
+        <li>No GitHub, acesse o seu repositório</li>
+        <li>Clique no botão verde <strong>Code</strong></li>
+        <li>Clique na aba <strong>Codespaces</strong></li>
+        <li>Clique em <strong>Create codespace on main</strong></li>
+        <li>Aguarde o ambiente carregar (uma tela de carregamento aparece)</li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        O VS Code abre — seja no navegador ou no VS Code do computador (dependendo da configuração). Você vai ver a estrutura de pastas do repositório à esquerda e um terminal na parte de baixo.
+      </div>
+      <div class="tip"><strong>VS Code local ou no navegador?</strong> Se o VS Code desktop abrir e perguntar se quer abrir o Codespace localmente, clique em <strong>Open in VS Code Desktop</strong>. Se abrir no navegador, funciona da mesma forma — a experiência é idêntica.</div>
+      <div class="warn"><strong>Próximas aulas — como abrir o projeto</strong> Vá em github.com → seu repositório → Code → Codespaces → clique no codespace já existente (não crie um novo). Assim você abre exatamente de onde parou.</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Verificar que o Node.js está disponível</div>
+        <div class="step-subtitle">O Codespaces já vem com Node.js instalado</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O Codespaces já vem com o Node.js instalado. Vamos confirmar isso no terminal.</p>
+      <p>No VS Code, clique no menu <strong>Terminal → New Terminal</strong> (ou use o atalho <span class="inline-code">Ctrl + `</span>). Um terminal aparece na parte inferior. Digite:</p>
+      <pre><span class="fn">node</span> <span class="op">--version</span></pre>
+      <pre><span class="fn">npm</span> <span class="op">--version</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>v20.x.x
+10.x.x</pre>
+        Os números exatos podem variar — o importante é que apareçam versões, sem mensagens de erro.
+      </div>
+      <div class="error-box"><strong>Erro: "command not found: node"</strong> Se isso aparecer, chame o professor. O Codespaces deve ter Node.js por padrão, mas ocasionalmente pode ser necessário instalar manualmente.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 3: PROJETO NODE ══════════════════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">3</span> Inicializando o projeto Node.js</h2>
+  </div>
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Com o ambiente pronto, vamos inicializar o projeto. Todo projeto Node.js começa com os mesmos passos.</p>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Inicializar o projeto com npm init</div>
+        <div class="step-subtitle">Cria o package.json — a "identidade" do projeto</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Todo projeto Node.js tem um arquivo chamado <span class="inline-code">package.json</span>. Esse arquivo é como a <strong>carteira de identidade</strong> do projeto: guarda o nome, a versão, quais ferramentas ele usa (chamadas de <em>dependências</em>) e quais comandos podem ser executados.</p>
+      <p>No terminal, digite o comando abaixo. A flag <span class="inline-code">-y</span> significa "aceitar tudo com os valores padrão" — sem precisar responder perguntas.</p>
+      <pre><span class="fn">npm</span> init <span class="op">-y</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>Wrote to /workspaces/seu-projeto/package.json:
+{
+  "name": "seu-projeto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  ...
+}</pre>
+        Um arquivo <span class="inline-code">package.json</span> aparece na barra lateral esquerda do VS Code.
+      </div>
+      <div class="tip"><strong>Curiosidade:</strong> Abra o <span class="inline-code">package.json</span> clicando nele na barra lateral. Você pode ver o nome do projeto, a versão e outras informações. Ao longo da UC esse arquivo vai crescer à medida que adicionamos ferramentas.</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">7</div>
+      <div>
+        <div class="step-title">Instalar o Express</div>
+        <div class="step-subtitle">O framework que vai simplificar a criação do servidor</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Para instalar o Express, usamos o npm. O comando <span class="inline-code">npm install</span> busca o pacote na internet, baixa e salva na pasta do projeto.</p>
+      <pre><span class="fn">npm</span> install <span class="var">express</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>added 64 packages in 3s</pre>
+        <p style="margin-top:8px;font-size:13px;color:#374151">Duas coisas novas aparecem no projeto:</p>
+        <div class="file-tree">
+<span class="ft-dir">📁 node_modules/</span>   <span class="ft-comment">← pasta com o Express e suas dependências (não edite!)</span>
+<span class="ft-file">📄 package.json</span>      <span class="ft-comment">← atualizado com Express listado em "dependencies"</span>
+<span class="ft-new">📄 package-lock.json</span> <span class="ft-comment">← criado automaticamente — não apague</span>
+        </div>
+      </div>
+      <div class="tip"><strong>O que é a pasta node_modules?</strong> É onde o Express (e tudo que ele precisa para funcionar) fica salvo. Essa pasta pode ter centenas de arquivos — é normal. Você nunca precisa mexer nela diretamente.</div>
+      <div class="warn"><strong>Não suba a pasta node_modules para o GitHub!</strong> Ela é grande e desnecessária — o GitHub só precisa do package.json. Vamos resolver isso logo mais com o .gitignore.</div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">8</div>
+      <div>
+        <div class="step-title">Instalar o nodemon</div>
+        <div class="step-subtitle">Reinicia o servidor automaticamente quando você salva o código</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Toda vez que você alterar um arquivo, o servidor precisa ser reiniciado para aplicar as mudanças. Fazer isso manualmente (Ctrl+C, npm start, repetir) seria muito trabalhoso. O <strong>nodemon</strong> monitora seus arquivos e reinicia o servidor sozinho toda vez que você salva.</p>
+      <p>Note a flag <span class="inline-code">--save-dev</span>: isso diz ao npm que o nodemon é uma ferramenta de <em>desenvolvimento</em> — só usada durante a programação, não no servidor em produção.</p>
+      <pre><span class="fn">npm</span> install <span class="var">nodemon</span> <span class="op">--save-dev</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>added 28 packages in 2s</pre>
+        Abra o <span class="inline-code">package.json</span> — agora você verá duas seções: <span class="inline-code">"dependencies"</span> com o Express, e <span class="inline-code">"devDependencies"</span> com o nodemon.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 9 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">9</div>
+      <div>
+        <div class="step-title">Criar o .gitignore</div>
+        <div class="step-subtitle">Dizer ao Git o que ele não deve enviar para o GitHub</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O arquivo <span class="inline-code">.gitignore</span> lista arquivos e pastas que o Git deve ignorar — ou seja, que não devem ir para o GitHub. A pasta <span class="inline-code">node_modules</span> é o exemplo clássico: ela é gerada automaticamente pelo <span class="inline-code">npm install</span> e não precisa estar no repositório.</p>
+      <p>Na barra lateral do VS Code, clique com o botão direito → <strong>New File</strong> e crie um arquivo chamado exatamente <span class="inline-code">.gitignore</span> (com o ponto na frente). Dentro dele, escreva:</p>
+      <pre><span class="var">node_modules</span><span class="op">/</span></pre>
+      <p>Salve o arquivo com <span class="inline-code">Ctrl + S</span>.</p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        O arquivo <span class="inline-code">.gitignore</span> aparece na barra lateral. A pasta <span class="inline-code">node_modules</span> pode ficar com a cor diferente no explorador de arquivos — isso indica que ela está sendo ignorada pelo Git.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 10 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">10</div>
+      <div>
+        <div class="step-title">Configurar o script de desenvolvimento no package.json</div>
+        <div class="step-subtitle">Definir o comando npm run dev para iniciar o servidor</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Em vez de digitar <span class="inline-code">nodemon index.js</span> toda vez, vamos criar um atalho chamado <span class="inline-code">dev</span>. Scripts são atalhos de comandos definidos no <span class="inline-code">package.json</span>.</p>
+      <p>Abra o <span class="inline-code">package.json</span> e encontre a seção <span class="inline-code">"scripts"</span>. Ela deve estar assim:</p>
+      <pre>{
+  <span class="str">"scripts"</span>: {
+    <span class="str">"test"</span>: <span class="str">"echo \"Error: no test specified\" &amp;&amp; exit 1"</span>
+  }
+}</pre>
+      <p>Substitua pela versão abaixo (mantendo a vírgula):</p>
+      <pre>{
+  <span class="str">"scripts"</span>: {
+    <span class="str">"dev"</span>: <span class="str">"nodemon index.js"</span>,
+    <span class="str">"start"</span>: <span class="str">"node index.js"</span>
+  }
+}</pre>
+      <div class="tip"><strong>Por que dois scripts?</strong> <span class="inline-code">dev</span> usa o nodemon (reinicia automático — para programar). <span class="inline-code">start</span> usa o node puro (para rodar em produção). Usaremos <span class="inline-code">npm run dev</span> durante todo o desenvolvimento.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 4: PRIMEIRO SERVIDOR ══════════════════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">4</span> Criando o primeiro servidor</h2>
+  </div>
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Agora vem a parte mais importante do encontro: escrever o código do servidor. Vamos construir linha por linha, entendendo o que cada parte faz.</p>
+
+  <!-- STEP 11 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">11</div>
+      <div>
+        <div class="step-title">Criar o arquivo index.js</div>
+        <div class="step-subtitle">O ponto de entrada do servidor</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Na barra lateral do VS Code, clique com o botão direito → <strong>New File</strong> → nomeie como <span class="inline-code">index.js</span>.</p>
+      <p>Esse arquivo será o <strong>ponto de entrada</strong> da sua aplicação — é o primeiro arquivo que o Node.js vai executar quando você iniciar o servidor.</p>
+      <div class="expected">
+        <div class="expected-label">✓ Estrutura do projeto até agora</div>
+        <div class="file-tree">
+<span class="ft-dir">📁 seu-projeto/</span>
+├── <span class="ft-dir">📁 node_modules/</span>      <span class="ft-comment">← ignorada pelo Git</span>
+├── <span class="ft-new">📄 index.js</span>            <span class="ft-comment">← acabou de criar ← você está aqui</span>
+├── <span class="ft-file">📄 .gitignore</span>
+├── <span class="ft-file">📄 package.json</span>
+├── <span class="ft-file">📄 package-lock.json</span>
+└── <span class="ft-file">📄 README.md</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 12 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">12</div>
+      <div>
+        <div class="step-title">Escrever o código do servidor — linha por linha</div>
+        <div class="step-subtitle">Cada linha será explicada antes de você escrever</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o <span class="inline-code">index.js</span> e vamos escrever o código. <strong>Leia a explicação de cada bloco antes de digitá-lo.</strong></p>
+
+      <p style="margin-top:16px"><strong>Bloco 1 — Importar o Express e criar a aplicação</strong></p>
+      <p><span class="inline-code">require('express')</span> importa o Express que instalamos. É como dizer "quero usar essa ferramenta aqui". O resultado é guardado na constante <span class="inline-code">express</span>.<br>
+      Na segunda linha, chamamos <span class="inline-code">express()</span> para criar nossa aplicação — o objeto <span class="inline-code">app</span> vai ser o centro de tudo: nele registramos rotas, middlewares e configurações.</p>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()</pre>
+
+      <p style="margin-top:16px"><strong>Bloco 2 — Definir a porta</strong></p>
+      <p>A <strong>porta</strong> é como um número de apartamento em um prédio: o prédio é o servidor, e cada porta é um "canal" por onde diferentes serviços se comunicam. A porta 3000 é a convenção para servidores em desenvolvimento. <span class="inline-code">process.env.PORT</span> permite que o servidor use uma porta diferente quando estiver em produção — veremos isso nos próximos encontros.</p>
+      <pre><span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span></pre>
+
+      <p style="margin-top:16px"><strong>Bloco 3 — Criar a primeira rota</strong></p>
+      <p>Uma <strong>rota</strong> define o que acontece quando alguém faz uma requisição para um endereço específico. <span class="inline-code">app.get('/', ...)</span> significa: "quando alguém fizer uma requisição GET para o caminho <span class="inline-code">/</span> (a raiz), execute esta função".<br><br>
+      A função recebe dois parâmetros:<br>
+      — <span class="inline-code">req</span> (request) → tudo sobre a requisição que chegou (quem pediu, o que pediu, dados enviados)<br>
+      — <span class="inline-code">res</span> (response) → o objeto que usamos para enviar a resposta de volta<br><br>
+      <span class="inline-code">res.json()</span> envia a resposta no formato JSON — o formato padrão de comunicação entre sistemas web.</p>
+      <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) =&gt; {
+  <span class="var">res</span>.<span class="fn">json</span>({ <span class="prop">mensagem</span>: <span class="str">'Servidor funcionando! 🎉'</span> })
+})</pre>
+
+      <p style="margin-top:16px"><strong>Bloco 4 — Iniciar o servidor</strong></p>
+      <p><span class="inline-code">app.listen(PORT, callback)</span> diz ao servidor para começar a escutar requisições na porta definida. A função callback (o segundo argumento) é executada assim que o servidor estiver pronto — usamos ela para exibir uma mensagem de confirmação no terminal.</p>
+      <pre><span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () =&gt; {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+
+      <p style="margin-top:16px"><strong>O arquivo completo deve estar assim:</strong></p>
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) =&gt; {
+  <span class="var">res</span>.<span class="fn">json</span>({ <span class="prop">mensagem</span>: <span class="str">'Servidor funcionando! 🎉'</span> })
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () =&gt; {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+
+      
+    </div>
+  </div>
+
+  <!-- STEP 13 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">13</div>
+      <div>
+        <div class="step-title">Iniciar o servidor</div>
+        <div class="step-subtitle">O momento em que tudo ganha vida</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>No terminal, execute:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado no terminal</div>
+        <pre>[nodemon] starting `node index.js`
+Servidor rodando em http://localhost:3000</pre>
+        O nodemon fica rodando continuamente (não volta para o prompt). Isso é normal — significa que o servidor está ativo e aguardando requisições.
+      </div>
+      <div class="tip"><strong>Como parar o servidor:</strong> Pressione <span class="inline-code">Ctrl + C</span> no terminal. Para reiniciá-lo, execute <span class="inline-code">npm run dev</span> novamente. Com o nodemon, você raramente precisará fazer isso — ele reinicia sozinho quando você salva alterações.</div>
+      <div class="error-box"><strong>Erro: "Cannot find module 'express'"</strong> O Express não foi instalado corretamente. Tente rodar <span class="inline-code">npm install</span> novamente e depois <span class="inline-code">npm run dev</span>.</div>
+      <div class="error-box"><strong>Erro: "Error: listen EADDRINUSE :::3000"</strong> A porta 3000 já está sendo usada por outro servidor. Pare o servidor anterior com Ctrl+C ou reinicie o terminal.</div>
+    </div>
+  </div>
+
+  <!-- STEP 14 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">14</div>
+      <div>
+        <div class="step-title">Acessar o servidor no navegador</div>
+        <div class="step-subtitle">Ver a resposta chegando de verdade</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O servidor está rodando, mas como acessá-lo? No Codespaces, quando um servidor é iniciado em uma porta, o VS Code detecta automaticamente e mostra uma notificação.</p>
+      <ol class="steps-list">
+        <li>Procure a notificação que aparece no canto inferior direito: <strong>"Your application on port 3000 is available"</strong></li>
+        <li>Clique em <strong>Open in Browser</strong> — ou acesse a aba <strong>Ports</strong> (junto ao terminal) e clique no ícone de globo ao lado da porta 3000</li>
+        <li>O navegador abre com uma URL no formato <span class="inline-code">https://xxxx-3000.app.github.dev</span></li>
+      </ol>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado no navegador</div>
+        <pre>{"mensagem":"Servidor funcionando! 🎉"}</pre>
+        Você está vendo a resposta JSON que seu servidor enviou. Isso é a sua API respondendo em tempo real!
+      </div>
+      <div class="tip"><strong>Esse link funciona de qualquer lugar!</strong> A URL do Codespace é pública (enquanto o servidor estiver rodando). Você pode abrir no celular, compartilhar com alguém — é um servidor real na internet.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 5: PROJETO ══════════════════ -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div class="project-section-body">
+      <p>O servidor está funcionando com uma rota genérica. Agora é hora de personalizar para o <strong>seu projeto</strong>. Faça as três tarefas abaixo:</p>
+
+      <div class="project-task">
+        <span class="project-task-num">1</span>
+        <strong>Personalize a rota principal</strong><br>
+        <span style="font-size:13.5px;color:#374151">Altere a rota <span class="inline-code">app.get('/')</span> para retornar o nome do seu projeto e uma breve descrição. Exemplo:</span>
+        <pre style="margin-top:8px"><span class="var">res</span>.<span class="fn">json</span>({
+  <span class="prop">projeto</span>: <span class="str">'Sistema de Agendamentos'</span>,
+  <span class="prop">descricao</span>: <span class="str">'API para gerenciar horários e clientes'</span>,
+  <span class="prop">status</span>: <span class="str">'online'</span>
+})</pre>
+      </div>
+
+      <div class="project-task">
+        <span class="project-task-num">2</span>
+        <strong>Adicione uma segunda rota relacionada ao seu projeto</strong><br>
+        <span style="font-size:13.5px;color:#374151">Pense em um recurso do seu projeto (produtos, agendamentos, tarefas, filmes…) e crie uma rota que retorna uma lista estática com 2-3 itens de exemplo. O banco de dados virá nos próximos encontros — por enquanto, os dados ficam direto no código.</span>
+        <pre style="margin-top:8px"><span class="cm">// Exemplo para um sistema de agendamentos:</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/agendamentos'</span>, (<span class="var">req</span>, <span class="var">res</span>) =&gt; {
+  <span class="var">res</span>.<span class="fn">json</span>([
+    { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">cliente</span>: <span class="str">'Ana'</span>, <span class="prop">horario</span>: <span class="str">'09:00'</span> },
+    { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">cliente</span>: <span class="str">'Carlos'</span>, <span class="prop">horario</span>: <span class="str">'10:30'</span> }
+  ])
+})</pre>
+      </div>
+
+      <div class="project-task">
+        <span class="project-task-num">3</span>
+        <strong>Teste as duas rotas no navegador</strong><br>
+        <span style="font-size:13.5px;color:#374151">Acesse a URL base e veja a resposta. Depois acrescente o caminho da segunda rota na URL (ex: <span class="inline-code">.../agendamentos</span>) e veja os dados retornados. Ambas devem responder com JSON correto.</span>
+      </div>
+
+      
+    </div>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 6: EXTRA ══════════════════ -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional — só se terminar antes)</div>
+    <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:12px">Estes desafios não são obrigatórios e não valem nota. São para quem terminou e quer explorar mais.</p>
+    <ul class="check-list">
+      <li><strong>Adicione uma terceira rota</strong> para um segundo recurso do seu projeto (ex: além de /agendamentos, adicione /clientes)</li>
+      <li><strong>Experimente retornar HTML:</strong> Troque <span class="inline-code">res.json()</span> por <span class="inline-code">res.send('&lt;h1&gt;Olá!&lt;/h1&gt;')</span> em uma rota e veja a diferença no navegador. Por que usamos JSON em vez de HTML no backend?</li>
+      <li><strong>Pesquise:</strong> O que é o código de status HTTP 200? E o 404? Por que eles importam? (Próximo encontro vamos trabalhar com isso)</li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════ SEÇÃO 7: FECHAMENTO ══════════════════ -->
+  <div class="closing">
+    <div class="closing-title">✅ Fechamento — Salvar o progresso</div>
+    <p style="font-size:14px;color:#94a3b8;line-height:1.75;margin-bottom:16px">Antes de encerrar, vamos salvar tudo no GitHub. Este é um hábito que você vai repetir no final de todo encontro — e eventualmente vai querer fazer várias vezes durante a aula também.</p>
+
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git — faça no terminal</div>
+        <div class="closing-card-body">
+          <div class="git-step"><span class="git-badge">1</span> <div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span><br><span style="font-size:12.5px;color:#94a3b8">Marca todos os arquivos modificados para salvar</span></div></div>
+          <div class="git-step"><span class="git-badge">2</span> <div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E02: primeiro servidor com rotas iniciais"</span><br><span style="font-size:12.5px;color:#94a3b8">Cria o "snapshot" com uma descrição do que foi feito</span></div></div>
+          <div class="git-step"><span class="git-badge">3</span> <div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span><br><span style="font-size:12.5px;color:#94a3b8">Envia para o GitHub — agora está salvo na nuvem</span></div></div>
+        </div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <div class="closing-card-body" style="font-size:13.5px">
+          <ul class="check-list" style="margin:0">
+            <li style="color:#cbd5e1">Ambiente de desenvolvimento na nuvem (Codespaces)</li>
+            <li style="color:#cbd5e1">Settings Sync — nunca mais perde extensões</li>
+            <li style="color:#cbd5e1">Projeto Node.js inicializado com Express e nodemon</li>
+            <li style="color:#cbd5e1">Primeiro servidor respondendo com JSON</li>
+            <li style="color:#cbd5e1">Rotas iniciais do projeto integrador</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 03</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Vamos aprofundar as rotas: GET com parâmetros, POST recebendo dados, e conhecer o <strong>Thunder Client</strong> — a ferramenta que usamos para testar APIs sem precisar de frontend. Seu projeto vai ganhar as rotas principais de criação e busca de dados.</div>
+    </div>
+  </div>
+
+</div>
+
+
+</body></html>

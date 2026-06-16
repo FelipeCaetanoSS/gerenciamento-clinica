@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 06 — Middleware | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+/* Pipeline diagram */
+.pipeline{display:flex;align-items:stretch;gap:0;margin:16px 0;overflow-x:auto}
+.pipe-box{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 14px;text-align:center;min-width:110px;font-size:12.5px}
+.pipe-box.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+.pipe-box.mw{background:#f5f3ff;border-color:#a78bfa;color:#4c1d95}
+.pipe-box-label{font-weight:700;font-size:13px;margin-bottom:3px}
+.pipe-box-sub{font-size:11px;opacity:.75}
+.pipe-arrow{display:flex;align-items:center;padding:0 6px;color:#94a3b8;font-size:20px;flex-shrink:0}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 06 DE 34</div>
+  <h1>Middleware — O Que Acontece Entre a Requisição e a Resposta</h1>
+  <h2>O conceito que conecta rotas, autenticação e logs — e que você já estava usando sem saber</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 app.use() · next() · middleware de log</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01–05</span>Blocos iniciais</div>
+      <div class="pb-step pb-active"><span class="pb-num">06</span>Middleware</div>
+      <div class="pb-step pb-future"><span class="pb-num">07</span>Organização</div>
+      <div class="pb-step pb-future"><span class="pb-num">08</span>Erros</div>
+      <div class="pb-step pb-future"><span class="pb-num">09</span>.env</div>
+      <div class="pb-step pb-future"><span class="pb-num">10</span>Sprint</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      Você tem um CRUD completo funcionando. Mas cada requisição que chega no servidor é invisível — você não sabe quantas estão chegando, de qual rota, em qual horário. Hoje você vai adicionar uma camada de visibilidade ao projeto: middleware de log que registra cada requisição no terminal em tempo real.
+      <br><br>
+      Mais importante: vai entender o conceito de middleware — a peça fundamental que reaparece em <strong>autenticação</strong> (Bloco 4), tratamento de erros (E08) e em praticamente todo pacote Express que você vai usar no futuro.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Middleware de log registrando cada requisição do projeto</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Entendimento do pipeline de requisição do Express</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Domínio do next() — o que faz e o que acontece sem ele</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Base conceitual para a autenticação do Bloco 4</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div><div class="step-title">Abrir o Codespace, iniciar o servidor e liberar a porta</div></div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace, inicie o servidor e torne a porta pública para o Postman funcionar:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <p>Em seguida, no painel <strong>Ports</strong> → botão direito na porta 3000 → <strong>Port Visibility → Public</strong>. Confirme que um GET no Postman retorna seus dados corretamente antes de avançar.</p>
+    </div>
+  </div>
+
+  <!-- CONCEITOS -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> O que é middleware</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Antes de qualquer código novo, é importante entender o conceito — porque middleware aparece em todo lugar a partir daqui.</p>
+
+  <div class="concept">
+    <strong>A definição</strong>
+    Middleware é uma <strong>função que fica no meio do caminho</strong> entre a requisição chegar e a rota responder. O nome vem do inglês: <em>middle</em> (meio) + <em>ware</em> (software). Toda vez que uma requisição entra no servidor Express, ela passa por uma fila de funções antes de chegar na rota — cada uma dessas funções é um middleware.
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:12px">Veja como uma requisição percorre o servidor:</p>
+
+  <div class="pipeline">
+    <div class="pipe-box active"><div class="pipe-box-label">Requisição</div><div class="pipe-box-sub">chega ao servidor</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-box mw"><div class="pipe-box-label">express.json()</div><div class="pipe-box-sub">middleware</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-box mw"><div class="pipe-box-label">logger</div><div class="pipe-box-sub">middleware</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-box mw"><div class="pipe-box-label">auth</div><div class="pipe-box-sub">middleware</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-box"><div class="pipe-box-label">Rota</div><div class="pipe-box-sub">GET /produtos</div></div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-box active"><div class="pipe-box-label">Resposta</div><div class="pipe-box-sub">volta ao cliente</div></div>
+  </div>
+
+  <div class="concept">
+    <strong>Você já usa middleware desde o Encontro 03</strong>
+    A linha <span class="inline-code">app.use(express.json())</span> que você adicionou no E03 — essa é exatamente um middleware. O <span class="inline-code">express.json()</span> é uma função que intercepta a requisição, lê o corpo JSON, coloca o resultado em <span class="inline-code">req.body</span> e passa para o próximo. Você não precisou escrever essa lógica porque ela já vem pronta no Express — mas o mecanismo é o mesmo que você vai usar para criar os seus próprios middlewares hoje.
+  </div>
+
+  <div class="concept">
+    <strong>A assinatura de um middleware</strong>
+    Todo middleware tem exatamente três parâmetros:
+    <br><br>
+    <span class="inline-code">(req, res, next) => { ... }</span>
+    <br><br>
+    — <strong>req</strong>: o objeto da requisição (o mesmo que nas rotas)<br>
+    — <strong>res</strong>: o objeto da resposta (o mesmo que nas rotas)<br>
+    — <strong>next</strong>: uma função que você chama para passar para o próximo da fila
+    <br><br>
+    A diferença de uma rota: um middleware não precisa enviar uma resposta — ele faz seu trabalho e chama <span class="inline-code">next()</span> para continuar. Se não chamar <span class="inline-code">next()</span>, a requisição para ali e nunca chega na rota.
+  </div>
+
+  <!-- MANUAL -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Manual — criando middleware no projeto</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:20px">Tudo que segue vai diretamente no <span class="inline-code">index.js</span> do seu projeto — sem arquivos separados.</p>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Criar o middleware de log</div>
+        <div class="step-subtitle">Registra método, rota e horário de cada requisição no terminal</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o <span class="inline-code">index.js</span> e adicione o código abaixo <strong>após o <span class="inline-code">app.use(express.json())</span> e antes das rotas</strong>. A posição importa: middleware registrado com <span class="inline-code">app.use()</span> afeta apenas as rotas que vêm depois dele no arquivo.</p>
+
+      <pre><span class="cm">// Middleware de log — registra toda requisição recebida</span>
+<span class="var">app</span>.<span class="fn">use</span>((<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) => {
+  <span class="kw">const</span> <span class="var">horario</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleTimeString</span>(<span class="str">'pt-BR'</span>)
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[<span class="op">${</span><span class="var">horario</span><span class="op">}</span>] <span class="op">${</span><span class="var">req</span>.<span class="prop">method</span><span class="op">}</span> <span class="op">${</span><span class="var">req</span>.<span class="prop">path</span><span class="op">}</span>`</span>)
+  <span class="fn">next</span>()
+})</pre>
+
+      <p>Salve o arquivo. O nodemon reinicia o servidor automaticamente.</p>
+
+      <div class="note">O <span class="inline-code">next()</span> na última linha é obrigatório. Ele diz ao Express: "este middleware terminou, pode passar para o próximo da fila". Sem ele, a requisição fica presa aqui e nenhuma rota vai responder.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Observar o middleware funcionando no terminal</div>
+        <div class="step-subtitle">O log aparece em tempo real a cada requisição</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Com o servidor rodando, faça algumas requisições no Postman — qualquer rota, qualquer método. Observe o terminal do VS Code.</p>
+
+      <div class="expected">
+        <div class="expected-label">✓ O que aparece no terminal</div>
+        <pre>[14:32:05] GET /produtos
+[14:32:11] POST /produtos
+[14:32:18] GET /produtos/3
+[14:32:24] DELETE /produtos/3</pre>
+        Cada requisição aparece no terminal com o horário exato, o método e o caminho. O servidor continua respondendo normalmente — o middleware só adicionou o log, não interferiu nas rotas.
+      </div>
+
+      <div class="tip"><strong>Por que isso é útil?</strong> Durante o desenvolvimento, o log te ajuda a entender o que está acontecendo no servidor em tempo real — quantas requisições chegaram, em que ordem, quais rotas estão sendo chamadas. Em produção, logs são essenciais para diagnóstico de problemas.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Ver o que acontece sem o next()</div>
+        <div class="step-subtitle">O erro mais comum com middleware — entender para nunca cometer</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Remova temporariamente o <span class="inline-code">next()</span> do middleware (só para ver o efeito — vai desfazer em seguida):</p>
+
+      <pre><span class="cm">// ⚠ VERSÃO COM BUG — não deixe assim</span>
+<span class="var">app</span>.<span class="fn">use</span>((<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) => {
+  <span class="kw">const</span> <span class="var">horario</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleTimeString</span>(<span class="str">'pt-BR'</span>)
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[<span class="op">${</span><span class="var">horario</span><span class="op">}</span>] <span class="op">${</span><span class="var">req</span>.<span class="prop">method</span><span class="op">}</span> <span class="op">${</span><span class="var">req</span>.<span class="prop">path</span><span class="op">}</span>`</span>)
+  <span class="cm">// next() removido</span>
+})</pre>
+
+      <p>Salve e tente fazer qualquer requisição no Postman.</p>
+
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — requisição trava</div>
+        O Postman fica esperando indefinidamente — eventualmente dá timeout. O log aparece no terminal (o middleware rodou), mas a requisição nunca chegou na rota porque <span class="inline-code">next()</span> não foi chamado.
+      </div>
+
+      <div class="error-box"><strong>Requisição travada / timeout no Postman</strong> O middleware não está chamando next(). Toda vez que uma requisição "some" sem resposta, verifique se todos os middlewares no caminho estão chamando next() ao final.</div>
+
+      <p style="margin-top:14px"><strong>Restaure o next()</strong> no middleware antes de continuar.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Adicionar dados ao req dentro do middleware</div>
+        <div class="step-subtitle">Middleware pode enriquecer a requisição antes de chegar na rota</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Middlewares não só observam as requisições — eles podem <strong>modificar</strong> o objeto <span class="inline-code">req</span> para adicionar informações que as rotas podem usar. Isso é exatamente o que o middleware de autenticação vai fazer no Bloco 4: ele vai verificar o token e colocar os dados do usuário logado em <span class="inline-code">req.usuario</span>.</p>
+
+      <p>Para entender o mecanismo agora, adicione o horário da requisição ao objeto <span class="inline-code">req</span>. Atualize o middleware de log para incluir essa linha:</p>
+
+      <pre><span class="var">app</span>.<span class="fn">use</span>((<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) => {
+  <span class="kw">const</span> <span class="var">horario</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleTimeString</span>(<span class="str">'pt-BR'</span>)
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[<span class="op">${</span><span class="var">horario</span><span class="op">}</span>] <span class="op">${</span><span class="var">req</span>.<span class="prop">method</span><span class="op">}</span> <span class="op">${</span><span class="var">req</span>.<span class="prop">path</span><span class="op">}</span>`</span>)
+  <span class="var">req</span>.<span class="prop">horario</span> = <span class="var">horario</span>  <span class="cm">// disponível em todas as rotas</span>
+  <span class="fn">next</span>()
+})</pre>
+
+      <p>Agora qualquer rota pode acessar <span class="inline-code">req.horario</span>. Por exemplo, adicione temporariamente a uma rota GET para ver funcionando:</p>
+
+      <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>({
+    <span class="prop">status</span>: <span class="str">'online'</span>,
+    <span class="prop">horario</span>: <span class="var">req</span>.<span class="prop">horario</span>  <span class="cm">// veio do middleware</span>
+  })
+})</pre>
+
+      <div class="expected">
+        <div class="expected-label">✓ GET / no Postman</div>
+        <pre>{ "status": "online", "horario": "14:45:22" }</pre>
+        O horário foi definido no middleware e chegou na rota via <span class="inline-code">req</span>. Este é o mesmo mecanismo que o middleware de autenticação usará para passar <span class="inline-code">req.usuario</span> para as rotas protegidas.
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJETO -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:14px">
+      Você já fez os passos acima no seu projeto. Agora refine e complemente.
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">1</span>
+      <strong>Confirme a posição do middleware no arquivo</strong><br>
+      <span style="font-size:13.5px">O middleware de log deve estar depois de <span class="inline-code">app.use(express.json())</span> e <strong>antes de todas as suas rotas</strong>. Abra o <span class="inline-code">index.js</span> e verifique a ordem. Se estiver após as rotas, o log não vai aparecer — mova para antes.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">2</span>
+      <strong>Personalize a mensagem de log do projeto</strong><br>
+      <span style="font-size:13.5px">Adapte o log para incluir o nome do projeto. Exemplo: <span class="inline-code">[14:32:05] catalogo-filmes | GET /filmes</span>. Substitua "catalogo-filmes" pelo nome do seu projeto. Pequeno detalhe, mas torna o terminal muito mais legível quando você tem múltiplos projetos abertos.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">3</span>
+      <strong>Faça o checklist de rotas no Postman e observe o terminal</strong><br>
+      <span style="font-size:13.5px">Execute GET, POST, PUT e DELETE no Postman. Para cada requisição, confirme que uma linha aparece no terminal com método e rota corretos. Ao final, o terminal deve mostrar um histórico de tudo que foi testado.</span>
+    </div>
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <ul class="check-list">
+      <li><strong>Logar o status da resposta:</strong> O middleware atual só sabe o método e o rota quando a requisição chega. Para logar também o status da resposta, use o evento <span class="inline-code">res.on('finish', ...)</span> dentro do middleware: <span class="inline-code">res.on('finish', () => console.log(res.statusCode))</span>. Esse evento dispara depois que a resposta foi enviada.</li>
+      <li><strong>Middleware para rota específica:</strong> Até agora usamos <span class="inline-code">app.use()</span> que aplica o middleware a todas as rotas. Você pode aplicar apenas a uma rota passando o middleware como segundo argumento: <span class="inline-code">app.get('/admin', meuMiddleware, (req, res) => {...})</span>. Teste essa variação.</li>
+    </ul>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px">Para quem quer ir além do encontro de hoje</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>. São portas abertas para quem ficou curioso.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">morgan — o middleware de log padrão do mercado</div>
+      <div class="horizonte-item-what">O middleware de log que você criou hoje faz o essencial. O <strong>morgan</strong> é um pacote npm que faz a mesma coisa, mas com muito mais opções: formatos pré-definidos, cores no terminal, registro em arquivo, filtros por status code. Em empresas, usar morgan (ou similar) é mais comum do que criar um middleware de log do zero. Vale conhecer para quando você ver em projetos reais.</div>
+      <div class="horizonte-item-link">→ <a href="https://github.com/expressjs/morgan" target="_blank" style="color:#60a5fa">github.com/expressjs/morgan — documentação e exemplos</a></div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">helmet — segurança com uma linha</div>
+      <div class="horizonte-item-what">O <strong>helmet</strong> é um pacote npm que funciona como middleware e adiciona dezenas de cabeçalhos de segurança HTTP ao servidor automaticamente — protegendo contra ataques comuns como clickjacking, XSS e injeção de conteúdo. É usado em praticamente todo projeto Express em produção. O uso é simplesmente: <code style="background:rgba(255,255,255,.1);padding:1px 6px;border-radius:3px;font-family:monospace">app.use(helmet())</code>.</div>
+      <div class="horizonte-item-link">→ <a href="https://helmetjs.github.io" target="_blank" style="color:#60a5fa">helmetjs.github.io — documentação completa</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E06: middleware de log"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">Middleware de log rodando no projeto</li>
+          <li style="color:#cbd5e1">next() — o que faz e o efeito de esquecer</li>
+          <li style="color:#cbd5e1">Enriquecimento do req dentro do middleware</li>
+          <li style="color:#cbd5e1">Posição correta do middleware no arquivo</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 07</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Organização do código — Express Router e separação de rotas em arquivos. O <span class="inline-code">index.js</span> vai ser refatorado: as rotas do projeto saem de lá e ganham arquivos próprios, sem quebrar nada que já funciona.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
