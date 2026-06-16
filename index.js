@@ -30,10 +30,24 @@ app.get("/", (req, res) => {
   });
 });
 
-// medicos
+// Medicos
 
 app.get("/medicos", (req, res) => {
-  res.json(medicos);
+  const { busca, sexo } = req.query;
+  let resultado = medicos;
+
+  if (busca) {
+    resultado = resultado.filter((m) => {
+      const nomeDoMedico = m.nome || "";
+      return nomeDoMedico.toLowerCase().includes(busca.toLowerCase());
+    });
+  }
+
+  if (sexo) {
+    resultado = resultado.filter((m) => m.sexo.toUpperCase() === sexo.toUpperCase());
+  }
+
+  res.json(resultado);
 });
 
 app.get("/medicos/:id", (req, res) => {
@@ -82,6 +96,18 @@ app.put("/medicos/:id", (req, res) => {
   res.json(medicos[index]);
 });
 
+app.patch("/medicos/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = medicos.findIndex((m) => m.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ erro: "Medico não encontrado" });
+  }
+
+  medicos[index] = { ...medicos[index], ...req.body };
+  res.json(medicos[index]);
+});
+
 app.delete("/medicos/:id", (req, res) => {
   const id = Number(req.params.id);
   const index = medicos.findIndex((m) => m.id === id);
@@ -97,7 +123,21 @@ app.delete("/medicos/:id", (req, res) => {
 // Pacientes
 
 app.get("/pacientes", (req, res) => {
-  res.json(pacientes);
+  const { busca, sexo } = req.query;
+  let resultado = pacientes;
+
+  if (busca) {
+    resultado = resultado.filter((p) => {
+      const nomeDoPaciente = p.nome || p.paciente || "";
+      return nomeDoPaciente.toLowerCase().includes(busca.toLowerCase());
+    });
+  }
+
+  if (sexo) {
+    resultado = resultado.filter((p) => p.sexo.toUpperCase() === sexo.toUpperCase());
+  }
+
+  res.json(resultado);
 });
 
 app.get("/pacientes/:id", (req, res) => {
@@ -145,6 +185,18 @@ app.put("/pacientes/:id", (req, res) => {
   res.json(pacientes[index]);
 });
 
+app.patch("/pacientes/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = pacientes.findIndex((p) => p.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ erro: "Paciente não encontrado" });
+  }
+
+  pacientes[index] = { ...pacientes[index], ...req.body };
+  res.json(pacientes[index]);
+});
+
 app.delete("/pacientes/:id", (req, res) => {
   const id = Number(req.params.id);
   const index = pacientes.findIndex((p) => p.id === id);
@@ -160,7 +212,18 @@ app.delete("/pacientes/:id", (req, res) => {
 // Agendamentos
 
 app.get("/agendamentos", (req, res) => {
-  res.json(agendamentos);
+  const { dia, medicoId } = req.query;
+  let resultado = agendamentos;
+
+  if (dia) {
+    resultado = resultado.filter((a) => a.dia.includes(dia));
+  }
+
+  if (medicoId) {
+    resultado = resultado.filter((a) => a.medicoId === Number(medicoId));
+  }
+
+  res.json(resultado);
 });
 
 app.get("/agendamentos/:id", (req, res) => {
@@ -209,6 +272,18 @@ app.put("/agendamentos/:id", (req, res) => {
   const { paciente, pacienteId, dia, horario, medicoId } = req.body;
 
   agendamentos[index] = { id, paciente, pacienteId, dia, horario, medicoId };
+  res.json(agendamentos[index]);
+});
+
+app.patch("/agendamentos/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = agendamentos.findIndex((a) => a.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ erro: "Agendamento não encontrado" });
+  }
+
+  agendamentos[index] = { ...agendamentos[index], ...req.body };
   res.json(agendamentos[index]);
 });
 
