@@ -5,6 +5,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Middleware de log — registra toda requisição recebida
+app.use((req, res, next) => {
+  const horario = new Date().toLocaleTimeString('pt-BR');
+  console.log(`[${horario}] ${req.method} ${req.path}`);
+  res.on('finish', () => {
+    console.log(`Status code: ${res.statusCode}`);
+  });
+
+  req.horario = horario;
+  next();
+})
+
 const medicos = [
   { id: 1, nome: "Maria", crm: 123456, idade: 46, sexo: "F" },
   { id: 2, nome: "Miguel", crm: 654321, idade: 49, sexo: "M" },
