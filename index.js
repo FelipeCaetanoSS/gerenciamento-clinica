@@ -16,6 +16,9 @@ const medicosRoute = require('./routes/medicos.router');
 const pacientesRoute = require('./routes/pacientes.router');
 
 app.use('/', indexRoute);
+app.use('/agendamentos', agendamentosRoute);
+app.use('/medicos', medicosRoute);
+app.use('/pacientes', pacientesRoute);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
