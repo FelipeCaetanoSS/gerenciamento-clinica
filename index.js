@@ -19,6 +19,16 @@ app.use('/', indexRoute);
 app.use('/agendamentos', agendamentosRoute);
 app.use('/medicos', medicosRoute);
 app.use('/pacientes', pacientesRoute);
+app.use((req, res) => res.status(404).json({ erro: 'Rota não encontrada' }))
+
+app.use((err, req, res, next) => {
+  console.error(`[ERRO] ${err.message}`)
+
+  const status = err.status || 500
+  const mensagem = err.message || 'Erro interno do servidor'
+
+  res.status(status).json({ erro: mensagem })
+})
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
