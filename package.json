@@ -1,11 +1,13 @@
 {
   "name": "gerenciamento-clinica",
+  "type": "commonjs",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -14,16 +16,20 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/FelipeCaetanoSS/gerenciamento-clinica/issues"
   },
   "homepage": "https://github.com/FelipeCaetanoSS/gerenciamento-clinica#readme",
   "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "helmet": "^8.2.0",
-    "morgan": "^1.11.0"
+    "morgan": "^1.11.0",
+    "pg": "^8.22.0",
+    "prisma": "^7.9.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
