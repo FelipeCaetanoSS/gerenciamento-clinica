@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<!-- saved from url=(0346)file:///C:/Users/nelci39177/OneDrive%20-%20Sistema%20Fiep/01%20-%20Cursos/02%20-%20T%C3%89CNICOS%20BALC%C3%83O%20&%20GRATUIDADE/03%20-%20Tecnico%20de%20Inform%C3%A1tica%20para%20Internet/Codifica%C3%A7%C3%A3o%20para%20Backend/Encontros/Encontro%2009+10%20%E2%80%94%20Vari%C3%A1veis%20de%20Ambiente%20+%20Sprint%20do%20Bloco%202%20_%20Backend.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 09+10 — Variáveis de Ambiente + Sprint do Bloco 2 | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-checkpoint{background:#f59e0b;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.checkpoint-banner{background:linear-gradient(135deg,#78350f,#d97706);color:#fff;border-radius:12px;padding:18px 24px;margin-top:20px;display:flex;align-items:center;gap:16px}
+.checkpoint-icon{font-size:32px;flex-shrink:0}
+.checkpoint-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.checkpoint-body{font-size:13.5px;opacity:.9;line-height:1.6}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.sec-tag{background:#f1f5f9;color:#64748b;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;letter-spacing:.3px;margin-left:auto}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.danger{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:16px 20px;margin:16px 0}
+.danger-title{font-size:13px;font-weight:700;color:#dc2626;display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.danger-body{font-size:14px;color:#7f1d1d;line-height:1.7}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:14px}
+.extra-item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:14px}
+.extra-item:last-child{margin-bottom:0}
+.extra-item-title{font-size:14.5px;font-weight:700;color:#1f2937;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.extra-item-num{background:#6b7280;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex-shrink:0}
+.extra-item-body{font-size:13.5px;color:#374151;line-height:1.7}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+.file-tree{background:#0f172a;border-radius:8px;padding:16px 20px;margin:12px 0;font-family:'Courier New',monospace;font-size:13px;color:#94a3b8;line-height:2}
+.ft-dir{color:#86efac}.ft-file{color:#e2e8f0}.ft-new{color:#fbbf24}.ft-comment{color:#64748b;font-style:italic}
+pre.env{background:#0f172a;color:#e2e8f0}
+.env-key{color:#86efac}.env-val{color:#fbbf24}.env-comment{color:#64748b;font-style:italic}
+.env-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+.env-table th{background:#1e3b70;color:#fff;padding:9px 14px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.env-table td{padding:9px 14px;border-bottom:1px solid #e5e7eb;vertical-align:top;color:#374151;line-height:1.6;font-family:monospace;font-size:13px}
+.env-table tr:last-child td{border-bottom:none}
+.env-table tr:nth-child(even) td{background:#fafafa}
+.badge-now{background:#dcfce7;color:#15803d;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;font-family:sans-serif}
+.badge-future{background:#f3e8ff;color:#6b21a8;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700;font-family:sans-serif}
+/* Checklist */
+.checklist-card{background:#fff;border:2px solid #f59e0b;border-radius:12px;padding:22px 26px;margin-top:28px}
+.checklist-title{font-size:16px;font-weight:700;color:#92400e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #fde68a;font-size:14px;color:#374151;line-height:1.6}
+.check-item:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border:2px solid #d97706;border-radius:4px;flex-shrink:0;margin-top:2px}
+.check-cat{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-right:6px;white-space:nowrap}
+.cat-mw{background:#ede9fe;color:#5b21b6}
+.cat-org{background:#dbeafe;color:#1e3a8a}
+.cat-err{background:#fee2e2;color:#991b1b}
+.cat-env{background:#fef9c3;color:#854d0e}
+.cat-git{background:#dcfce7;color:#14532d}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 09+10 DE 34 · ✦ CHECKPOINT 2</div>
+  <h1>Variáveis de Ambiente + Sprint do Bloco 2</h1>
+  <h2>Protegendo segredos no código e consolidando tudo antes do Bloco 3</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 dotenv · .env · Checkpoint 2</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01–08</span>Base completa</div>
+      <div class="pb-step pb-checkpoint"><span class="pb-num">09+10</span>.env + Sprint ✦</div>
+      <div class="pb-step pb-future"><span class="pb-num">11+</span>Banco…</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+    </div>
+  </div>
+
+  <div class="checkpoint-banner">
+    <div class="checkpoint-icon">🏁</div>
+    <div>
+      <div class="checkpoint-title">Checkpoint 2 — ao final deste encontro</div>
+      <div class="checkpoint-body">Você vai mostrar ao professor que o projeto está organizado, robusto e protegido — toda a base construída no Bloco 2. Não é uma prova: é a confirmação de que está tudo pronto para o Bloco 3, onde o projeto ganha banco de dados de verdade.</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que vai acontecer hoje</div>
+    <div class="context-body">
+      Hoje tem duas partes. Primeiro, você protege o projeto com variáveis de ambiente — a chave secreta do JWT e outros dados sensíveis que virão nos próximos blocos não podem ir para o GitHub. Depois, o encontro vira <strong>sprint</strong>: você revisa, completa e fortalece tudo que construiu desde o Encontro 06.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>.env configurado e protegido com dotenv</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Os quatro pilares do Bloco 2 revisados e funcionando</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>CRUD completo retestado e confirmado no Postman</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Checkpoint 2 concluído com o professor</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div><div class="step-title">Abrir o Codespace, iniciar o servidor e liberar a porta</div></div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace, inicie o servidor e torne a porta pública:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <p>Painel <strong>Ports</strong> → botão direito na porta 3000 → <strong>Port Visibility → Public</strong>.</p>
+    </div>
+  </div>
+
+  <!-- ══════ PARTE 1 — VARIÁVEIS DE AMBIENTE (E09) ══════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> O problema e a solução <span class="sec-tag">PARTE 1</span></h2>
+  </div>
+
+  <div class="danger">
+    <div class="danger-title">⚠ O risco de segredos no código</div>
+    <div class="danger-body">Imagine que você adiciona a senha do banco de dados diretamente no código: <span class="inline-code">password: 'minha_senha_123'</span>. O código vai para o GitHub. O repositório é público. Agora qualquer pessoa no mundo pode ver essa senha. Isso acontece com frequência — senhas e chaves de API expostas em repositórios são uma das vulnerabilidades mais comuns em projetos de desenvolvedores iniciantes.</div>
+  </div>
+
+  <div class="concept">
+    <strong>A solução: variáveis de ambiente</strong>
+    Uma variável de ambiente é um valor que existe no ambiente onde o código roda — no sistema operacional, não no código em si. O arquivo <span class="inline-code">.env</span> é um arquivo local que define essas variáveis para o ambiente de desenvolvimento. O pacote <strong>dotenv</strong> carrega esse arquivo e coloca as variáveis em <span class="inline-code">process.env</span>. O código lê de <span class="inline-code">process.env</span>. O arquivo <span class="inline-code">.env</span> fica no <span class="inline-code">.gitignore</span> — nunca vai para o GitHub.
+  </div>
+
+  <div class="concept">
+    <strong>Desenvolvimento vs Produção</strong>
+    No desenvolvimento (seu Codespace), as variáveis vêm do arquivo <span class="inline-code">.env</span> carregado pelo dotenv. Em produção (Railway), as variáveis são configuradas diretamente no painel da plataforma — sem arquivo <span class="inline-code">.env</span>. O código não muda — ele sempre lê de <span class="inline-code">process.env</span>. O que muda é de onde esses valores vêm.
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin:16px 0 10px">As variáveis do seu projeto vão crescer ao longo da UC:</p>
+
+  <table class="env-table">
+    <thead><tr><th>Variável</th><th>Valor de exemplo</th><th>Quando entra</th></tr></thead>
+    <tbody>
+      <tr><td>PORT</td><td>3000</td><td><span class="badge-now">Hoje</span></td></tr>
+      <tr><td>DB_PATH</td><td>./banco.db</td><td><span class="badge-future">E11 — SQLite</span></td></tr>
+      <tr><td>JWT_SECRET</td><td>uma-chave-secreta-longa</td><td><span class="badge-future">E22 — Autenticação</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- MANUAL .ENV -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Manual — configurando variáveis de ambiente <span class="sec-tag">PARTE 1</span></h2>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Instalar o dotenv</div>
+        <div class="step-subtitle">O pacote que carrega o .env e popula o process.env</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>No terminal do Codespace:</p>
+      <pre><span class="fn">npm</span> install <span class="var">dotenv</span></pre>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        <pre>added 1 package in 1s</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Criar o arquivo .env</div>
+        <div class="step-subtitle">As variáveis de ambiente do projeto em desenvolvimento</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Na raiz do projeto, crie um arquivo chamado <span class="inline-code">.env</span> (com o ponto na frente, sem extensão). Por convenção, nomes de variáveis de ambiente são escritos em maiúsculas com underscore.</p>
+      <pre class="env"><span class="env-comment"># Configurações do servidor</span>
+<span class="env-key">PORT</span>=<span class="env-val">3000</span></pre>
+      <div class="note">Não use aspas ao redor dos valores no .env. <span class="inline-code">PORT=3000</span> está correto. <span class="inline-code">PORT="3000"</span> carrega a string com as aspas incluídas — geralmente não é o que você quer.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Adicionar o .env ao .gitignore</div>
+        <div class="step-subtitle">Garantir que o arquivo nunca vai para o GitHub</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o arquivo <span class="inline-code">.gitignore</span> e adicione o <span class="inline-code">.env</span>:</p>
+      <pre><span class="var">node_modules</span><span class="op">/</span>
+<span class="var">.env</span></pre>
+      <div class="warn"><strong>Confirme no GitHub que o .env não subiu</strong> Após o git push deste encontro, acesse o repositório no github.com e confirme que o arquivo <span class="inline-code">.env</span> não aparece na lista de arquivos.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Configurar o dotenv no index.js</div>
+        <div class="step-subtitle">Uma linha no topo do arquivo — deve ser a primeira coisa executada</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Adicione o <span class="inline-code">require('dotenv').config()</span> como <strong>primeira linha do arquivo</strong> — antes de qualquer outro código que use <span class="inline-code">process.env</span>.</p>
+      <pre><span class="fn">require</span>(<span class="str">'dotenv'</span>).<span class="fn">config</span>()  <span class="cm">// ← primeira linha — antes de tudo</span>
+
+<span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span></pre>
+      <div class="tip"><strong>O || 3000 continua sendo útil</strong> Garante que, mesmo sem .env, o servidor usa 3000 como padrão. Em produção (Railway), o PORT é definido pela plataforma automaticamente.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Verificar que o servidor continua funcionando</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Salve o <span class="inline-code">index.js</span>. O nodemon reinicia automaticamente. Faça um GET no Postman para confirmar que as rotas continuam respondendo.</p>
+      <div class="error-box"><strong>Servidor não inicia após adicionar o dotenv</strong> Verifique se <span class="inline-code">require('dotenv').config()</span> está correto e se o dotenv foi instalado.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Criar o arquivo .env.example</div>
+        <div class="step-subtitle">Documenta quais variáveis são necessárias — sem expor os valores</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>O <span class="inline-code">.env</span> não vai para o GitHub. O <span class="inline-code">.env.example</span> mostra a estrutura sem os valores reais — <strong>este arquivo vai para o GitHub</strong>.</p>
+      <pre class="env"><span class="env-comment"># Copie este arquivo para .env e preencha com seus valores</span>
+<span class="env-comment"># cp .env.example .env</span>
+
+<span class="env-comment"># Porta do servidor</span>
+<span class="env-key">PORT</span>=<span class="env-val">3000</span>
+
+<span class="env-comment"># JWT_SECRET=     (será adicionado no Bloco 4)</span>
+<span class="env-comment"># DB_PATH=        (será adicionado no Bloco 3)</span></pre>
+
+      <div class="expected">
+        <div class="expected-label">✓ Estrutura final do projeto</div>
+        <div class="file-tree">
+<span class="ft-dir">📁 seu-projeto/</span>
+├── <span class="ft-dir">📁 routes/</span>
+│   └── <span class="ft-file">📄 seuRecurso.js</span>
+├── <span class="ft-file">📄 index.js</span>
+├── <span class="ft-new">📄 .env</span>          <span class="ft-comment">← local, nunca vai ao GitHub</span>
+├── <span class="ft-new">📄 .env.example</span>   <span class="ft-comment">← vai ao GitHub, sem valores sensíveis</span>
+├── <span class="ft-file">📄 .gitignore</span>      <span class="ft-comment">← tem .env listado</span>
+└── <span class="ft-file">📄 package.json</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PARTE 2 — SPRINT + CHECKPOINT (E10) ══════ -->
+  <div class="sec-header">
+    <h2><span class="sec-number">3</span> Checklist do Bloco 2 — o que revisar <span class="sec-tag">PARTE 2</span></h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Com o .env pronto, é hora do sprint: percorra os quatro pilares do Bloco 2 e confirme cada item.</p>
+
+  <div class="checklist-card">
+    <div class="checklist-title">☑ Checklist do Checkpoint 2</div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-mw">E06</span> Middleware de log está ativo e aparece no terminal a cada requisição</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-org">E07</span> Rotas estão organizadas em arquivo(s) dentro de <span class="inline-code">routes/</span> usando Express Router</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-org">E07</span> O <span class="inline-code">index.js</span> está limpo — só configuração, middlewares e registro de rotas</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-err">E08</span> Todas as rotas têm <span class="inline-code">try/catch</span> com <span class="inline-code">next(err)</span> capturando erros inesperados</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-err">E08</span> Middleware global de erros está no <span class="inline-code">index.js</span>, com 4 parâmetros, após as rotas</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-err">Geral</span> O CRUD completo (GET, POST, PUT, DELETE) continua funcionando — reteste rapidamente no Postman</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-env">Hoje</span> <span class="inline-code">.env</span> existe e está sendo carregado com <span class="inline-code">dotenv</span></div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-env">Hoje</span> <span class="inline-code">.env</span> está no <span class="inline-code">.gitignore</span> — confirmado que não aparece no GitHub</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-env">Hoje</span> <span class="inline-code">.env.example</span> aparece no GitHub, documentando as variáveis</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-cat cat-git">Git</span> Último commit enviado ao GitHub, com mensagem descritiva</div></div>
+  </div>
+
+  <div class="warn"><strong>Algum item não está completo?</strong> Use a primeira parte do sprint para resolver — volte ao material do encontro correspondente (E06 a E08) se precisar relembrar algum passo. O professor está disponível para ajudar a destravar qualquer ponto.</div>
+
+  <!-- SPRINT -->
+  <div class="sec-header">
+    <h2><span class="sec-number">4</span> Sprint — tempo de desenvolvimento autônomo <span class="sec-tag">PARTE 2</span></h2>
+  </div>
+
+  <div class="concept">
+    <strong>Como usar este tempo</strong>
+    Sugestão de ordem: primeiro complete qualquer item pendente do checklist acima; depois, se tudo já estiver pronto, avance para a seção <strong>Quer ir além?</strong> mais abaixo, que traz duas funcionalidades extras que valorizam o projeto sem fugir do que você já aprendeu.
+  </div>
+
+  <!-- EXTRA DETALHADO -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px">Se o checklist já está completo, estas duas funcionalidades consolidam o que você aprendeu no Bloco 2 — e são o tipo de detalhe que aparece em projetos profissionais.</p>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">1</span> Rota de Health Check (verificação de saúde)</div>
+      <div class="extra-item-body">
+        <p>Em produção, ferramentas de monitoramento "perguntam" periodicamente para o servidor se ele está vivo e respondendo — isso se chama <em>health check</em>. É uma rota simples que qualquer API profissional tem.</p>
+        <p><strong>Como fazer:</strong></p>
+        <ol class="steps-list">
+          <li>Crie uma rota <span class="inline-code">GET /saude</span> diretamente no <span class="inline-code">index.js</span> (não é um recurso do domínio, então não precisa estar em <span class="inline-code">routes/</span>)</li>
+          <li>Retorne um JSON com três informações: o status (<span class="inline-code">'ok'</span>), o tempo que o servidor está rodando, e o horário atual</li>
+          <li>Para o tempo de execução, use <span class="inline-code">process.uptime()</span> — uma função nativa do Node.js que retorna os segundos desde que o processo começou</li>
+        </ol>
+        <pre><span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/saude'</span>, (<span class="var">req</span>, <span class="var">res</span>) =&gt; {
+  <span class="var">res</span>.<span class="fn">json</span>({
+    <span class="prop">status</span>: <span class="str">'ok'</span>,
+    <span class="prop">uptime</span>: <span class="var">process</span>.<span class="fn">uptime</span>(), <span class="cm">// segundos rodando</span>
+    <span class="prop">timestamp</span>: <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toISOString</span>()
+  })
+})</pre>
+        <p>Teste no Postman e chame a rota duas vezes com alguns segundos de intervalo — o <span class="inline-code">uptime</span> deve aumentar entre as chamadas, confirmando que está calculando corretamente.</p>
+      </div>
+    </div>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">2</span> Logs condicionais com NODE_ENV</div>
+      <div class="extra-item-body">
+        <p>O middleware de log que você criou no E06 é ótimo para desenvolvimento, mas em produção ele poluiria os registros do servidor com informação que ninguém vai ler. A prática comum é usar uma variável de ambiente chamada <span class="inline-code">NODE_ENV</span> para diferenciar os dois contextos — e hoje você já sabe exatamente como adicionar isso ao seu <span class="inline-code">.env</span>.</p>
+        <p><strong>Como fazer:</strong></p>
+        <ol class="steps-list">
+          <li>No <span class="inline-code">.env</span>, adicione a linha <span class="inline-code">NODE_ENV=development</span></li>
+          <li>No middleware de log (E06), envolva o <span class="inline-code">console.log</span> numa condição: só registra se <span class="inline-code">process.env.NODE_ENV</span> for diferente de <span class="inline-code">'production'</span></li>
+          <li>Atenção: o <span class="inline-code">next()</span> deve continuar sendo chamado <strong>sempre</strong> — com ou sem log, a requisição precisa seguir adiante</li>
+          <li>Para testar: troque o valor no <span class="inline-code">.env</span> para <span class="inline-code">production</span>, salve, e veja o log parar de aparecer. Depois volte para <span class="inline-code">development</span></li>
+        </ol>
+        <pre><span class="var">app</span>.<span class="fn">use</span>((<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) =&gt; {
+  <span class="kw">if</span> (<span class="var">process</span>.<span class="prop">env</span>.<span class="prop">NODE_ENV</span> <span class="op">!==</span> <span class="str">'production'</span>) {
+    <span class="kw">const</span> <span class="var">horario</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleTimeString</span>(<span class="str">'pt-BR'</span>)
+    <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[<span class="op">${</span><span class="var">horario</span><span class="op">}</span>] <span class="op">${</span><span class="var">req</span>.<span class="prop">method</span><span class="op">}</span> <span class="op">${</span><span class="var">req</span>.<span class="prop">path</span><span class="op">}</span>`</span>)
+  }
+  <span class="fn">next</span>() <span class="cm">// chamado sempre, com ou sem log</span>
+})</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px">Para quem quer ir além do Bloco 2</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>. São portas abertas para quem ficou curioso sobre como projetos profissionais garantem qualidade.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Testes automatizados com Jest e Supertest</div>
+      <div class="horizonte-item-what">Até agora, toda vez que você altera o código, você testa manualmente no Postman — clicando em cada requisição, uma por uma. Em projetos profissionais, isso é automatizado: <strong>Jest</strong> é um framework de testes para JavaScript, e <strong>Supertest</strong> permite simular requisições HTTP para testar rotas Express sem precisar do servidor rodando numa porta real. Você escreve o teste uma vez ("a rota GET /filmes deve retornar status 200 e uma lista"), e pode rodá-lo quantas vezes quiser com um único comando.</div>
+      <div class="horizonte-item-link">→ <a href="https://jestjs.io/" target="_blank" style="color:#60a5fa">jestjs.io</a> e <a href="https://github.com/ladjs/supertest" target="_blank" style="color:#60a5fa">github.com/ladjs/supertest</a></div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">CI/CD com GitHub Actions</div>
+      <div class="horizonte-item-what">CI significa <em>Continuous Integration</em> — Integração Contínua. A ideia: toda vez que você faz <span class="inline-code">git push</span>, um robô do GitHub roda automaticamente os testes do seu projeto e te avisa se algo quebrou — antes mesmo de você notar. O <strong>GitHub Actions</strong> é o recurso que faz isso, configurado por um arquivo de receita dentro da pasta <span class="inline-code">.github/workflows/</span> do repositório. É amplamente usado em equipes de desenvolvimento para garantir que ninguém envie código quebrado sem perceber.</div>
+      <div class="horizonte-item-link">→ <a href="https://docs.github.com/pt/actions" target="_blank" style="color:#60a5fa">docs.github.com/pt/actions</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento — Checkpoint 2 e git commit</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E09+10: dotenv e consolidação do Bloco 2 - Checkpoint 2"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">dotenv, .env e .env.example configurados</li>
+          <li style="color:#cbd5e1">Os 4 pilares do Bloco 2 revisados e funcionando</li>
+          <li style="color:#cbd5e1">Checkpoint 2 concluído com o professor</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 11 — Bloco 3 começa</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Banco de dados de verdade. Você vai entender por que os dados em memória não são suficientes, instalar o SQLite e criar o primeiro banco do seu projeto — dados que sobrevivem ao reinício do servidor.</div>
+    </div>
+  </div>
+
+</div>
+
+
+</body></html>

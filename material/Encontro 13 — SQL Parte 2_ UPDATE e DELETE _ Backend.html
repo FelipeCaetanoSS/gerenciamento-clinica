@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)https://juniorll.github.io/materiais-backend/encontro_13_material.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 13 — SQL Parte 2: UPDATE e DELETE | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}.sql{color:#f472b6}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.danger{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:16px 20px;margin:16px 0}
+.danger-title{font-size:13px;font-weight:700;color:#dc2626;display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.danger-body{font-size:14px;color:#7f1d1d;line-height:1.7}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:14px}
+.extra-item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:14px}
+.extra-item:last-child{margin-bottom:0}
+.extra-item-title{font-size:14.5px;font-weight:700;color:#1f2937;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.extra-item-num{background:#6b7280;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex-shrink:0}
+.extra-item-body{font-size:13.5px;color:#374151;line-height:1.7}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+.sql-syntax{background:#0f172a;border-radius:10px;padding:16px 20px;margin:14px 0;font-family:'Courier New',monospace;font-size:13px;color:#94a3b8;line-height:1.9}
+.sql-syntax .sql{color:#f472b6;font-weight:700}
+.sql-syntax .ph{color:#fbbf24}
+</style>
+<style type="text/css"></style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><link type="text/css" rel="stylesheet" href="./Encontro 13 — SQL Parte 2_ UPDATE e DELETE _ Backend_files/css2"><link type="text/css" rel="stylesheet" href="./Encontro 13 — SQL Parte 2_ UPDATE e DELETE _ Backend_files/css2"></head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 13 DE 34 · BLOCO 3</div>
+  <h1>SQL Parte 2 — Atualizando e Deletando Dados</h1>
+  <h2>UPDATE e DELETE completam o CRUD com banco de dados real</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 SQL · UPDATE · DELETE · ORDER BY · LIKE</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01–11</span>Bloco 1, 2 e início do 3</div>
+      <div class="pb-step pb-done"><span class="pb-num">12</span>SQL Parte 1</div>
+      <div class="pb-step pb-active"><span class="pb-num">13</span>SQL Parte 2</div>
+      <div class="pb-step pb-future"><span class="pb-num">14</span>Conectar ao Express</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+      <div class="pb-step pb-future"><span class="pb-num">34</span>Demo Day</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      No encontro passado você aprendeu INSERT e SELECT — criar e buscar dados no banco de verdade. Hoje completamos o ciclo com <strong>UPDATE</strong> (atualizar) e <strong>DELETE</strong> (remover). Ao final, seu CRUD inteiro vai estar rodando direto no SQLite — nenhuma rota do seu projeto vai depender de array em memória.
+      <br><br>
+      Esses dois comandos merecem atenção redobrada: são os únicos que, usados sem cuidado, podem apagar ou sobrescrever <strong>toda</strong> a tabela de uma vez. Você vai entender exatamente por que isso acontece e como nunca cair nessa armadilha.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Rota PUT atualizando registros no banco</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Rota DELETE removendo registros do banco</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>CRUD 100% persistente — sem nenhum array restante</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Consciência clara do risco de UPDATE/DELETE sem WHERE</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div><div class="step-title">Abrir o Codespace, iniciar o servidor e liberar a porta</div></div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace, inicie o servidor e torne a porta pública:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <p>Painel <strong>Ports</strong> → botão direito na porta 3000 → <strong>Port Visibility → Public</strong>. Confirme com um GET no Postman que o banco do encontro passado continua funcionando.</p>
+    </div>
+  </div>
+
+  <!-- CONCEITOS -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Os comandos de hoje — e o cuidado que eles exigem</h2>
+  </div>
+
+  <div class="concept">
+    <strong>UPDATE — alterar registros existentes</strong>
+    O comando <span class="inline-code">UPDATE</span> modifica os valores de uma ou mais linhas já existentes na tabela. Você especifica quais colunas mudam (<span class="inline-code">SET</span>) e quais linhas são afetadas (<span class="inline-code">WHERE</span>).
+  </div>
+
+  <div class="sql-syntax">
+<span class="sql">UPDATE</span> <span class="ph">nome_da_tabela</span>
+<span class="sql">SET</span> <span class="ph">coluna1</span> = <span class="ph">novo_valor1</span>, <span class="ph">coluna2</span> = <span class="ph">novo_valor2</span>
+<span class="sql">WHERE</span> <span class="ph">coluna</span> = <span class="ph">valor</span>
+  </div>
+
+  <div class="concept">
+    <strong>DELETE — remover registros</strong>
+    O comando <span class="inline-code">DELETE</span> remove linhas inteiras da tabela. Diferente do UPDATE, ele não precisa especificar colunas — só quais linhas remover.
+  </div>
+
+  <div class="sql-syntax">
+<span class="sql">DELETE FROM</span> <span class="ph">nome_da_tabela</span>
+<span class="sql">WHERE</span> <span class="ph">coluna</span> = <span class="ph">valor</span>
+  </div>
+
+  <div class="danger">
+    <div class="danger-title">⚠ O perigo real: UPDATE e DELETE sem WHERE</div>
+    <div class="danger-body">
+      Repare que nas duas sintaxes acima, o <span class="inline-code">WHERE</span> aparece como se fosse opcional na gramática do SQL — e tecnicamente é. Mas se você escrever <span class="inline-code">DELETE FROM produtos</span> sem nenhum WHERE, o banco entende isso como "delete TODAS as linhas da tabela produtos" — e executa, sem perguntar, sem confirmação. O mesmo vale para UPDATE: sem WHERE, TODAS as linhas recebem o novo valor.
+      <br><br>
+      Esse é um dos erros mais comuns — e mais destrutivos — que desenvolvedores cometem, até os experientes. Hoje você vai ver esse comportamento acontecendo de propósito, num ambiente seguro, para nunca esquecer.
+    </div>
+  </div>
+
+  <!-- MANUAL -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Manual — UPDATE e DELETE no código</h2>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Ver o perigo na prática — num banco de teste</div>
+        <div class="step-subtitle">Demonstração controlada antes de escrever qualquer rota</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Antes de tocar nas rotas do projeto, vamos ver o efeito de um DELETE sem WHERE — usando o <strong>DB Browser</strong>, que você já conhece do E11, e <strong>sem nenhuma consequência real</strong> para o seu banco de produção.</p>
+
+      <ol class="steps-list">
+        <li>Baixe o <span class="inline-code">banco.db</span> atual do Codespace (botão direito no VS Code → Download)</li>
+        <li>Abra essa cópia no DB Browser, na aba <strong>Execute SQL</strong></li>
+        <li>Digite (substituindo pelo nome da sua tabela): <span class="inline-code">DELETE FROM produtos;</span> — repare que não há WHERE</li>
+        <li>Execute (▶ ou Ctrl+Enter) e em seguida rode <span class="inline-code">SELECT * FROM produtos;</span></li>
+      </ol>
+
+      <div class="expected">
+        <div class="expected-label">✓ O que você vai ver</div>
+        A tabela inteira aparece vazia. Todos os registros, de uma vez, sem aviso. Isso aconteceu nesta cópia baixada — não afeta o banco real do Codespace, que continua intacto.
+      </div>
+
+      <div class="warn"><strong>Feche essa cópia sem salvar mudanças no arquivo original</strong> Não é necessário fazer mais nada com esse arquivo baixado — ele já cumpriu o papel de demonstração. Pode descartá-lo.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Criar a rota PUT com SQL</div>
+        <div class="step-subtitle">UPDATE sempre acompanhado de WHERE</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>No arquivo de rotas, substitua a rota PUT (que ainda usa <span class="inline-code">array.findIndex()</span>) pela versão com SQL:</p>
+
+      <pre><span class="var">router</span>.<span class="fn">put</span>(<span class="str">'/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) =&gt; {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+    <span class="kw">const</span> { <span class="var">nome</span>, <span class="var">preco</span> } = <span class="var">req</span>.<span class="prop">body</span>
+
+    <span class="cm">// Verificar se o registro existe antes de atualizar</span>
+    <span class="kw">const</span> <span class="var">existe</span> = <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos WHERE id = ?'</span>).<span class="fn">get</span>(<span class="var">id</span>)
+    <span class="kw">if</span> (<span class="op">!</span><span class="var">existe</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Não encontrado'</span> })
+
+    <span class="cm">// UPDATE sempre com WHERE — nunca esqueça desta linha</span>
+    <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'UPDATE produtos SET nome = ?, preco = ? WHERE id = ?'</span>)
+      .<span class="fn">run</span>(<span class="var">nome</span>, <span class="var">preco</span>, <span class="var">id</span>)
+
+    <span class="cm">// Buscar e devolver o registro já atualizado</span>
+    <span class="kw">const</span> <span class="var">produtoAtualizado</span> = <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos WHERE id = ?'</span>).<span class="fn">get</span>(<span class="var">id</span>)
+    <span class="var">res</span>.<span class="fn">json</span>(<span class="var">produtoAtualizado</span>)
+  } <span class="kw">catch</span> (<span class="var">err</span>) {
+    <span class="fn">next</span>(<span class="var">err</span>)
+  }
+})</pre>
+
+      <div class="concept">
+        <strong>Por que verificar a existência antes de fazer o UPDATE?</strong>
+        Diferente do array, onde o <span class="inline-code">findIndex()</span> já te dizia se o item existia, o <span class="inline-code">UPDATE ... WHERE id = ?</span> simplesmente não faz nada se nenhuma linha bater com o WHERE — sem gerar erro. Por isso fazemos um SELECT primeiro: assim conseguimos retornar 404 corretamente quando o ID não existe, em vez de responder 200 com um "sucesso" que não atualizou nada de fato.
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Testar o PUT no Postman</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>PUT em <span class="inline-code">/seuRecurso/1</span> (ou outro ID existente) com novos dados no body (raw → JSON).</p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 200</div>
+        <pre>{ "id": 1, "nome": "Nome Atualizado", "preco": 59.9 }</pre>
+        Faça um GET na lista completa em seguida para confirmar que o dado mudou — e continua lá mesmo reiniciando o servidor.
+      </div>
+      <div class="error-box"><strong>PUT retorna 404 para um ID que existe</strong> O mesmo problema clássico de sempre: o ID está chegando como string sem conversão. Confirme que <span class="inline-code">Number(req.params.id)</span> está presente.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Criar a rota DELETE com SQL</div>
+        <div class="step-subtitle">A mesma disciplina: sempre verificar, sempre usar WHERE</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <pre><span class="var">router</span>.<span class="fn">delete</span>(<span class="str">'/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) =&gt; {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+
+    <span class="kw">const</span> <span class="var">existe</span> = <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos WHERE id = ?'</span>).<span class="fn">get</span>(<span class="var">id</span>)
+    <span class="kw">if</span> (<span class="op">!</span><span class="var">existe</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Não encontrado'</span> })
+
+    <span class="cm">// DELETE sempre com WHERE — nunca esqueça desta linha</span>
+    <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'DELETE FROM produtos WHERE id = ?'</span>).<span class="fn">run</span>(<span class="var">id</span>)
+
+    <span class="var">res</span>.<span class="fn">status</span>(<span class="num">204</span>).<span class="fn">send</span>()
+  } <span class="kw">catch</span> (<span class="var">err</span>) {
+    <span class="fn">next</span>(<span class="var">err</span>)
+  }
+})</pre>
+
+      <div class="tip"><strong>O padrão se repete</strong> Note que PUT e DELETE seguem exatamente a mesma estrutura: verificar existência → executar a operação com WHERE → responder adequadamente. Esse padrão consistente facilita memorizar e revisar código depois.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Testar o DELETE e fechar o ciclo de testes</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>DELETE em <span class="inline-code">/seuRecurso/1</span> no Postman.</p>
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado — status 204</div>
+        Sem body na resposta. Faça um GET na lista completa — o item não aparece mais. Reinicie o servidor e confirme: ele continua ausente (porque foi removido do banco de verdade, não apenas da memória).
+      </div>
+
+      <p><strong>Checklist final do encontro:</strong> teste as quatro operações em sequência no Postman — POST (cria) → GET (lista, item aparece) → PUT (atualiza) → GET por ID (confirma mudança) → DELETE → GET (lista, item sumiu). Esse é o seu CRUD completo, 100% no banco de dados.</p>
+    </div>
+  </div>
+
+  <!-- PROJETO -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:14px">Os passos acima já são a aplicação direta no projeto. Confirme os pontos abaixo.</div>
+
+    <div class="project-task">
+      <span class="project-task-num">✓</span>
+      <strong>PUT atualizando no banco, com verificação prévia e WHERE</strong>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">✓</span>
+      <strong>DELETE removendo do banco, com verificação prévia e WHERE</strong>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">✓</span>
+      <strong>Nenhuma rota do projeto usa mais array em memória</strong><br>
+      <span style="font-size:13.5px">Revise o arquivo de rotas inteiro — se ainda houver alguma referência a <span class="inline-code">array.find</span>, <span class="inline-code">array.push</span> ou similar, ela precisa ser migrada também.</span>
+    </div>
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px">Se você já terminou, estas duas explorações trazem recursos SQL bastante usados no dia a dia.</p>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">1</span> Busca parcial com LIKE</div>
+      <div class="extra-item-body">
+        <p>O filtro por query param que você já tem busca por igualdade exata (<span class="inline-code">WHERE genero = ?</span>). Para uma busca de texto parcial — como uma caixa de busca que encontra "Harry" dentro de "Harry Potter" — o SQL tem o operador <span class="inline-code">LIKE</span>, combinado com o símbolo <span class="inline-code">%</span> (que significa "qualquer coisa aqui").</p>
+        <p><strong>Como fazer:</strong></p>
+        <ol class="steps-list">
+          <li>Adicione um novo query param, por exemplo <span class="inline-code">busca</span></li>
+          <li>Monte o valor do placeholder com os símbolos de porcentagem em volta: <span class="inline-code">`%${busca}%`</span></li>
+          <li>Use <span class="inline-code">LIKE ?</span> no lugar de <span class="inline-code">= ?</span> no WHERE</li>
+        </ol>
+        <pre><span class="kw">if</span> (<span class="var">busca</span>) {
+  <span class="kw">const</span> <span class="var">resultados</span> = <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos WHERE nome LIKE ?'</span>)
+    .<span class="fn">all</span>(<span class="str">`%<span class="op">${</span><span class="var">busca</span><span class="op">}</span>%`</span>)
+  <span class="kw">return</span> <span class="var">res</span>.<span class="fn">json</span>(<span class="var">resultados</span>)
+}</pre>
+        <p>Teste com <span class="inline-code">?busca=ana</span> — deve encontrar qualquer produto que tenha "ana" em qualquer parte do nome, em qualquer posição.</p>
+      </div>
+    </div>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">2</span> Ordenar resultados com ORDER BY</div>
+      <div class="extra-item-body">
+        <p>Por padrão, o SELECT retorna os registros numa ordem que não é garantida. O <span class="inline-code">ORDER BY</span> permite ordenar por qualquer coluna, em ordem crescente (<span class="inline-code">ASC</span>, padrão) ou decrescente (<span class="inline-code">DESC</span>).</p>
+        <p><strong>Como fazer:</strong></p>
+        <pre><span class="cm">// Do mais barato para o mais caro</span>
+<span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos ORDER BY preco ASC'</span>).<span class="fn">all</span>()
+
+<span class="cm">// Do mais caro para o mais barato</span>
+<span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT * FROM produtos ORDER BY preco DESC'</span>).<span class="fn">all</span>()</pre>
+        <p>Experimente adicionar um query param <span class="inline-code">ordenar</span> que aceite <span class="inline-code">asc</span> ou <span class="inline-code">desc</span>, e monte a query SQL dinamicamente com base nesse valor.</p>
+        <div class="warn"><strong>Cuidado ao montar SQL dinâmico com ORDER BY</strong> Diferente de valores normais, o ASC/DESC não pode ser passado como <span class="inline-code">?</span> (placeholder) — o SQL não aceita parâmetros nessa posição. Nesse caso específico, valide o valor manualmente antes de inserir na string (ex: só aceite exatamente as strings "asc" ou "desc", rejeitando qualquer outra coisa) para não abrir brecha de SQL Injection.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px">Para quem quer ir além do encontro de hoje</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Soft delete — deletar sem realmente apagar</div>
+      <div class="horizonte-item-what">Em muitos sistemas profissionais, o DELETE nunca remove a linha de verdade — em vez disso, adiciona-se uma coluna como <span class="inline-code">deletado_em</span>, e o "delete" só preenche essa data. As consultas (SELECT) passam a ignorar linhas com essa coluna preenchida. Essa técnica se chama <strong>soft delete</strong>, e existe porque dados raramente devem ser perdidos para sempre — é comum precisar recuperar algo "deletado" por engano, ou manter histórico para auditoria.</div>
+      <div class="horizonte-item-link">→ Pesquise "soft delete pattern" para ver implementações em diferentes linguagens</div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Migrations — versionando mudanças na estrutura do banco</div>
+      <div class="horizonte-item-what">Quando você precisou adicionar uma coluna nova no E11 (no desafio do "Quer ir além"), teve que apagar o banco inteiro e recriar. Em produção, isso é inaceitável — apagaria todos os dados reais dos usuários. Ferramentas de <strong>migration</strong> (como as que vêm com Prisma ou Knex) resolvem isso: cada alteração na estrutura do banco vira um arquivo versionado e reversível, aplicado sem perder os dados existentes.</div>
+      <div class="horizonte-item-link">→ <a href="https://www.prisma.io/docs/orm/prisma-migrate" target="_blank" style="color:#60a5fa">Prisma Migrate — documentação</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E13: UPDATE e DELETE - CRUD completo com SQL"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">PUT atualizando com UPDATE + WHERE</li>
+          <li style="color:#cbd5e1">DELETE removendo com DELETE + WHERE</li>
+          <li style="color:#cbd5e1">CRUD 100% persistente, sem array</li>
+          <li style="color:#cbd5e1">Risco de operações sem WHERE compreendido na prática</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 14</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Você já fez o essencial de conectar banco ao Express nestes dois encontros. O E14 formaliza esse módulo de conexão e prepara o terreno para os relacionamentos entre tabelas, que chegam no E16.</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div id="nfqbdoh05e" style="display: block;"><template shadowrootmode="closed"><div id="mhcabanvjf"><style type="text/css">
+  @import 'chrome-extension://gidejehfgombmkfflghejpncblgfkagj/app.css';
+</style>
+<div id="cuponomia" data-v-app=""><div></div></div>
+</div></template></div></body></html>
