@@ -1,4 +1,4 @@
-const agendamentoModel = require("../models/agendamentos.model");
+const agendamentoModel = require("../repository/agendamentos.repository");
 
 const listar = (req, res, next) => {
   try {

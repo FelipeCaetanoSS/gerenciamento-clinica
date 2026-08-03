@@ -1,13 +1,8 @@
-const pacientes = [
-  { id: 1, nome: "Ana", idade: 26, sexo: "F" },
-  { id: 2, nome: "Carlos", idade: 37, sexo: "M" },
-  { id: 3, nome: "Mariana", idade: 29, sexo: "F" },
-];
 
-let proximoId = 4;
+const prisma = require("../lib/client")
 
-const listarTodos = (filtros) => {
-  let resultado = pacientes;
+const listarTodos = async (filtros) => {
+  let resultado = await prisma.paciente;
   const { busca, sexo } = filtros;
 
   if (busca) {
@@ -30,8 +25,10 @@ const buscarPorId = (id) => {
 };
 
 const criar = (dados) => {
-  const novoPaciente = { id: proximoId++, ...dados };
-  pacientes.push(novoPaciente);
+  const novoPaciente = prisma.paciente.create({
+
+  })
+
   return novoPaciente;
 };
 

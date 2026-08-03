@@ -1,9 +1,4 @@
-const medicos = [
-  { id: 1, nome: "Maria", crm: 123456, idade: 46, sexo: "F" },
-  { id: 2, nome: "Miguel", crm: 654321, idade: 49, sexo: "M" },
-];
-
-let proximoId = 3;
+const prisma = require("../lib/client")
 
 const listarTodos = (filtros) => {
   let resultado = medicos;

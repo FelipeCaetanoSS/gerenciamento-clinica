@@ -11,5 +11,121 @@ datasource db {
   provider = "sqlite"
 }
 
+model Admin{
+  id    Int    @id @default(autoincrement())
+  nome String
+  idade Int   
+  sexo String 
+  rg String  @unique
+  cpf Int @unique
+  telefone Int
+  ativo Boolean
+}
 
+model Recepcionista{
+  id    Int    @id @default(autoincrement())
+  nome String
+  idade Int   
+  sexo String 
+  rg String  @unique
+  cpf Int @unique
+  telefone Int
+  ativo Boolean
+}
 
+model Medico{
+  id    Int    @id @default(autoincrement())
+  nome String
+  crm Int
+  idade Int   
+  sexo String 
+  rg String  @unique
+  cpf Int @unique
+  telefone Int
+  ativo Boolean
+  agendamento Agendamento[]
+  receita Receita[]
+  consulta Consulta[]
+}
+
+model Paciente{
+  id    Int    @id @default(autoincrement())
+  nome String
+  idade Int   
+  sexo String 
+  cpf Int @unique
+  email String 
+  localnasc String
+  estadoCivil String
+  tipoSanguineo String 
+  peso Int
+  altura Float
+  alergia String
+  medicamento String
+  observacao String
+  agendamentos Agendamento[]
+  consulta Consulta[]
+  convenio Convenio[]
+}
+
+model Agendamento{
+  id    Int    @id @default(autoincrement())
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
+  medico Medico @relation(fields: [medicoId], references: [id])
+  medicoId Int
+  data DateTime 
+}
+
+model Consulta{
+  id    Int    @id @default(autoincrement())
+  data DateTime
+  status String
+  motivo String
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
+  medico Medico @relation(fields: [medicoId], references: [id])
+  medicoId Int
+}
+
+model Receita{
+  id    Int    @id @default(autoincrement())
+  medico Medico @relation(fields: [medicoId], references: [id])
+  medicoId Int
+  medicamento String
+  dosagem String
+  dias  String 
+  observacao String
+}
+
+model Notificacao{
+  id    Int    @id @default(autoincrement())
+  titulo String
+  mensagem String
+  lida String 
+  data DateTime
+}
+
+model Convenio{
+  id    Int    @id @default(autoincrement())
+  nome String
+  numCarteirinha String
+  validade DateTime
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
+}
+
+model Exame{
+  id    Int    @id @default(autoincrement())
+  data DateTime
+  observacao String
+}
+
+model Prontuario{
+  id    Int    @id @default(autoincrement())
+}
+
+model Endereco{
+  id    Int    @id @default(autoincrement())
+
+}

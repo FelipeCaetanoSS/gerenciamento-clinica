@@ -1,10 +1,4 @@
-const agendamentos = [
-  { id: 1, pacienteId: 1, medicoId: 1, dia: "2026-06-15", horario: "09:00" },
-  { id: 2, pacienteId: 2, medicoId: 2, dia: "2026-06-15", horario: "10:30" },
-  { id: 3, pacienteId: 3, medicoId: 1, dia: "2026-06-15", horario: "11:00" },
-];
-
-let proximoId = 4;
+const prisma = require("../lib/client")
 
 const listarTodos = (filtros) => {
   let resultado = agendamentos;
