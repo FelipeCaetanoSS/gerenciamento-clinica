@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 07 — Organização do Código | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-active{background:#1d4ed8;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.expected{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:12px 0}
+.expected-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#15803d;margin-bottom:8px}
+.expected pre{background:#1a2e1a;margin:0;border-radius:6px;font-size:12.5px}
+.error-box{background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#991b1b;line-height:1.7}
+.error-box strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#dc2626;margin-bottom:5px}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+.project-section{background:#fff;border:2px solid #1d4ed8;border-radius:12px;padding:22px 26px;margin-top:36px}
+.project-section-title{font-size:17px;font-weight:700;color:#1e3b70;margin-bottom:14px}
+.project-task{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:8px;padding:13px 17px;margin:10px 0;font-size:14.5px;color:#374151;line-height:1.7}
+.project-task-num{background:#1d4ed8;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;vertical-align:middle}
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:12px}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+.note{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#475569;line-height:1.65}
+/* File tree */
+.file-tree{background:#0f172a;border-radius:8px;padding:16px 20px;margin:12px 0;font-family:'Courier New',monospace;font-size:13px;color:#94a3b8;line-height:2}
+.ft-dir{color:#86efac}.ft-file{color:#e2e8f0}.ft-new{color:#fbbf24}.ft-comment{color:#64748b;font-style:italic}
+/* Before/after */
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.ba-box{border-radius:8px;overflow:hidden}
+.ba-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:7px 14px}
+.ba-before .ba-label{background:#fef2f2;color:#dc2626}
+.ba-after .ba-label{background:#f0fdf4;color:#15803d}
+.ba-box pre{border-radius:0;margin:0;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 07 DE 34</div>
+  <h1>Organização do Código — Express Router</h1>
+  <h2>Refatorar o projeto sem quebrar nada: rotas em arquivos separados, index.js limpo</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 Express Router · routes/ · module.exports · require</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01–06</span>Base + middleware</div>
+      <div class="pb-step pb-active"><span class="pb-num">07</span>Organização</div>
+      <div class="pb-step pb-future"><span class="pb-num">08</span>Erros</div>
+      <div class="pb-step pb-future"><span class="pb-num">09</span>.env</div>
+      <div class="pb-step pb-future"><span class="pb-num">10</span>Sprint</div>
+      <div class="pb-step pb-future"><span class="pb-num">…</span>…</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que você vai construir hoje</div>
+    <div class="context-body">
+      Seu <span class="inline-code">index.js</span> está crescendo. Com o CRUD completo e o middleware, ele já tem dezenas de linhas e vai continuar crescendo. Em projetos reais com múltiplos recursos, um único arquivo com tudo fica impossível de manter.
+      <br><br>
+      Hoje você vai <strong>refatorar</strong> o projeto: mover as rotas para arquivos separados usando o Express Router, sem quebrar nada que já funciona. O resultado final é um projeto com a mesma funcionalidade de antes — mas organizado como se vê em empresas.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Rotas do projeto em arquivo separado dentro de routes/</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>index.js limpo — só configuração e importações</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>API funcionando identicamente ao que estava antes</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Estrutura pronta para receber banco de dados e autenticação</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div><div class="step-title">Abrir o Codespace, iniciar o servidor e liberar a porta</div></div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace, inicie o servidor e torne a porta pública:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <p>Painel <strong>Ports</strong> → botão direito na porta 3000 → <strong>Port Visibility → Public</strong>. Confirme que um GET no Postman retorna seus dados corretamente — você vai testar novamente ao final da refatoração para garantir que tudo continua funcionando.</p>
+    </div>
+  </div>
+
+  <!-- CONCEITOS -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Por que organizar e o que é o Express Router</h2>
+  </div>
+
+  <div class="concept">
+    <strong>O problema que vamos resolver</strong>
+    Um projeto com um único recurso já tem ~60 linhas de rotas. Com dois recursos são ~120. Com autenticação, validações e mais recursos, o index.js chega facilmente a 300-400 linhas — um arquivo difícil de navegar, difícil de manter e difícil de trabalhar em equipe. A solução padrão é separar as rotas de cada recurso em seu próprio arquivo.
+  </div>
+
+  <div class="concept">
+    <strong>O que é o Express Router</strong>
+    O Express Router é como uma "mini-aplicação" dentro da sua aplicação. Com ele, você cria um objeto <span class="inline-code">router</span> que funciona exatamente como o <span class="inline-code">app</span> — registra rotas com <span class="inline-code">router.get()</span>, <span class="inline-code">router.post()</span>, etc. A diferença é que o router é exportado do arquivo e registrado no <span class="inline-code">index.js</span> com um prefixo de caminho. Tudo que estava em <span class="inline-code">app.get('/produtos', ...)</span> vira <span class="inline-code">router.get('/', ...)</span> — o prefixo <span class="inline-code">/produtos</span> fica no <span class="inline-code">index.js</span>.
+  </div>
+
+  <div class="before-after">
+    <div class="ba-box ba-before">
+      <div class="ba-label">Antes — tudo no index.js</div>
+      <pre style="font-size:11.5px">app.get(<span class="str">'/produtos'</span>, ...)
+app.post(<span class="str">'/produtos'</span>, ...)
+app.get(<span class="str">'/produtos/:id'</span>, ...)
+app.put(<span class="str">'/produtos/:id'</span>, ...)
+app.delete(<span class="str">'/produtos/:id'</span>, ...)</pre>
+    </div>
+    <div class="ba-box ba-after">
+      <div class="ba-label">Depois — routes/produtos.js</div>
+      <pre style="font-size:11.5px">router.get(<span class="str">'/'</span>, ...)
+router.post(<span class="str">'/'</span>, ...)
+router.get(<span class="str">'/:id'</span>, ...)
+router.put(<span class="str">'/:id'</span>, ...)
+router.delete(<span class="str">'/:id'</span>, ...)</pre>
+    </div>
+  </div>
+
+  <div class="note">Quando você registra o router com <span class="inline-code">app.use('/produtos', router)</span>, o Express automaticamente adiciona o prefixo <span class="inline-code">/produtos</span> a todas as rotas do router. Por isso dentro do arquivo de rotas usamos apenas <span class="inline-code">/</span> e <span class="inline-code">/:id</span> — sem repetir o nome do recurso.</div>
+
+  <!-- MANUAL -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Manual — refatorando o projeto passo a passo</h2>
+  </div>
+
+  <div class="warn">
+    <strong>Regra de ouro da refatoração</strong>
+    Não delete as rotas antigas do index.js até o novo arquivo estar funcionando e testado. Trabalhe em paralelo: crie o novo arquivo, teste, confirme que funciona — só então remova as rotas do index.js.
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Criar a pasta routes/ e o arquivo de rotas</div>
+        <div class="step-subtitle">A estrutura de pastas que o projeto vai ter daqui em diante</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Na barra lateral do VS Code, clique com o botão direito na raiz do projeto → <strong>New Folder</strong> → nomeie <span class="inline-code">routes</span>.</p>
+      <p>Dentro da pasta <span class="inline-code">routes/</span>, crie um novo arquivo com o nome do seu recurso principal. Exemplos: <span class="inline-code">produtos.js</span>, <span class="inline-code">agendamentos.js</span>, <span class="inline-code">tarefas.js</span>.</p>
+
+      <div class="expected">
+        <div class="expected-label">✓ Estrutura do projeto após este passo</div>
+        <div class="file-tree">
+<span class="ft-dir">📁 seu-projeto/</span>
+├── <span class="ft-new">📁 routes/</span>
+│   └── <span class="ft-new">📄 seuRecurso.js</span>  <span class="ft-comment">← arquivo recém-criado</span>
+├── <span class="ft-file">📄 index.js</span>
+├── <span class="ft-file">📄 .gitignore</span>
+└── <span class="ft-file">📄 package.json</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Configurar o Express Router no novo arquivo</div>
+        <div class="step-subtitle">Criar o router e mover os dados para o novo arquivo</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o arquivo recém-criado em <span class="inline-code">routes/</span>. As primeiras linhas definem o router — o mecanismo que vai substituir o <span class="inline-code">app</span> para registrar as rotas:</p>
+
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">router</span> = <span class="var">express</span>.<span class="fn">Router</span>()
+
+<span class="cm">// Dados temporários (o array do seu recurso)</span>
+<span class="cm">// Cole aqui o array que estava no index.js</span>
+<span class="kw">const</span> <span class="var">itens</span> = [
+  <span class="cm">// seus dados de exemplo</span>
+]
+
+<span class="cm">// As rotas virão aqui nos próximos passos</span>
+
+<span class="var">module</span>.<span class="prop">exports</span> = <span class="var">router</span></pre>
+
+      <p>A última linha — <span class="inline-code">module.exports = router</span> — exporta o router para que o <span class="inline-code">index.js</span> possa importá-lo. Deve ser sempre a última linha do arquivo.</p>
+
+      <div class="tip"><strong>Por que mover o array para cá?</strong> Os dados pertencem ao contexto das rotas daquele recurso. Quando as rotas estiverem aqui, elas precisam acessar o array — então o array fica no mesmo arquivo. Quando migrarmos para banco de dados no Bloco 3, o array será substituído pelas queries SQL, também aqui.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Mover as rotas do index.js para o arquivo de rotas</div>
+        <div class="step-subtitle">Substituir app. por router. e remover o prefixo dos caminhos</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Copie cada rota do <span class="inline-code">index.js</span> para o novo arquivo, fazendo duas mudanças em cada uma:</p>
+      <ul class="check-list">
+        <li>Substitua <span class="inline-code">app.</span> por <span class="inline-code">router.</span></li>
+        <li>Remova o prefixo do recurso do caminho: <span class="inline-code">'/produtos'</span> vira <span class="inline-code">'/'</span> e <span class="inline-code">'/produtos/:id'</span> vira <span class="inline-code">'/:id'</span></li>
+      </ul>
+
+      <p>Exemplo completo do arquivo de rotas após mover tudo:</p>
+
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">router</span> = <span class="var">express</span>.<span class="fn">Router</span>()
+
+<span class="kw">const</span> <span class="var">produtos</span> = [
+  { <span class="prop">id</span>: <span class="num">1</span>, <span class="prop">nome</span>: <span class="str">'Produto A'</span>, <span class="prop">preco</span>: <span class="num">29.90</span> },
+  { <span class="prop">id</span>: <span class="num">2</span>, <span class="prop">nome</span>: <span class="str">'Produto B'</span>, <span class="prop">preco</span>: <span class="num">49.90</span> }
+]
+
+<span class="cm">// GET / → lista todos  (era GET /produtos no index.js)</span>
+<span class="var">router</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">produtos</span>)
+})
+
+<span class="cm">// GET /:id → busca por ID  (era GET /produtos/:id)</span>
+<span class="var">router</span>.<span class="fn">get</span>(<span class="str">'/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">produto</span> = <span class="var">produtos</span>.<span class="fn">find</span>(<span class="var">p</span> => <span class="var">p</span>.<span class="prop">id</span> === <span class="var">id</span>)
+  <span class="kw">if</span> (<span class="op">!</span><span class="var">produto</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Não encontrado'</span> })
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">produto</span>)
+})
+
+<span class="cm">// POST / → cria novo  (era POST /produtos)</span>
+<span class="var">router</span>.<span class="fn">post</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> { <span class="var">nome</span>, <span class="var">preco</span> } = <span class="var">req</span>.<span class="prop">body</span>
+  <span class="kw">const</span> <span class="var">novo</span> = { <span class="prop">id</span>: <span class="var">produtos</span>.<span class="prop">length</span> <span class="op">+</span> <span class="num">1</span>, <span class="var">nome</span>, <span class="var">preco</span> }
+  <span class="var">produtos</span>.<span class="fn">push</span>(<span class="var">novo</span>)
+  <span class="var">res</span>.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>(<span class="var">novo</span>)
+})
+
+<span class="cm">// PUT /:id → atualiza  (era PUT /produtos/:id)</span>
+<span class="var">router</span>.<span class="fn">put</span>(<span class="str">'/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">index</span> = <span class="var">produtos</span>.<span class="fn">findIndex</span>(<span class="var">p</span> => <span class="var">p</span>.<span class="prop">id</span> === <span class="var">id</span>)
+  <span class="kw">if</span> (<span class="var">index</span> === <span class="op">-</span><span class="num">1</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Não encontrado'</span> })
+  <span class="kw">const</span> { <span class="var">nome</span>, <span class="var">preco</span> } = <span class="var">req</span>.<span class="prop">body</span>
+  <span class="var">produtos</span>[<span class="var">index</span>] = { <span class="var">id</span>, <span class="var">nome</span>, <span class="var">preco</span> }
+  <span class="var">res</span>.<span class="fn">json</span>(<span class="var">produtos</span>[<span class="var">index</span>])
+})
+
+<span class="cm">// DELETE /:id → remove  (era DELETE /produtos/:id)</span>
+<span class="var">router</span>.<span class="fn">delete</span>(<span class="str">'/:id'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="kw">const</span> <span class="var">id</span> = <span class="fn">Number</span>(<span class="var">req</span>.<span class="prop">params</span>.<span class="prop">id</span>)
+  <span class="kw">const</span> <span class="var">index</span> = <span class="var">produtos</span>.<span class="fn">findIndex</span>(<span class="var">p</span> => <span class="var">p</span>.<span class="prop">id</span> === <span class="var">id</span>)
+  <span class="kw">if</span> (<span class="var">index</span> === <span class="op">-</span><span class="num">1</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ <span class="prop">erro</span>: <span class="str">'Não encontrado'</span> })
+  <span class="var">produtos</span>.<span class="fn">splice</span>(<span class="var">index</span>, <span class="num">1</span>)
+  <span class="var">res</span>.<span class="fn">status</span>(<span class="num">204</span>).<span class="fn">send</span>()
+})
+
+<span class="var">module</span>.<span class="prop">exports</span> = <span class="var">router</span></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Importar e registrar o router no index.js</div>
+        <div class="step-subtitle">Conectar o arquivo de rotas ao servidor principal</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Abra o <span class="inline-code">index.js</span> e adicione o import e o registro do router. Coloque após os middlewares e antes do <span class="inline-code">app.listen</span>:</p>
+
+      <pre><span class="cm">// Importar o arquivo de rotas</span>
+<span class="kw">const</span> <span class="var">produtosRoutes</span> = <span class="fn">require</span>(<span class="str">'./routes/produtos'</span>)
+
+<span class="cm">// Registrar com o prefixo do recurso</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="str">'/produtos'</span>, <span class="var">produtosRoutes</span>)</pre>
+
+      <p>O <span class="inline-code">./routes/produtos</span> é o caminho relativo ao <span class="inline-code">index.js</span>. O <span class="inline-code">./</span> significa "na mesma pasta que este arquivo" — então o Node vai procurar em <span class="inline-code">routes/produtos.js</span>.</p>
+
+      <div class="tip"><strong>A linha app.use() com o router funciona igual ao middleware</strong> O <span class="inline-code">app.use('/produtos', produtosRoutes)</span> é tecnicamente um middleware também — ele intercepta toda requisição que começa com <span class="inline-code">/produtos</span> e delega para o router. Tudo é middleware no Express.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Testar no Postman — tudo deve funcionar igual</div>
+        <div class="step-subtitle">A refatoração é transparente: o comportamento não muda</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Com as rotas antigas ainda no <span class="inline-code">index.js</span> (ainda não deletamos), teste o CRUD completo no Postman. As URLs são exatamente as mesmas de antes:</p>
+      <ul class="check-list">
+        <li>GET <span class="inline-code">/produtos</span> → lista todos</li>
+        <li>POST <span class="inline-code">/produtos</span> → cria novo</li>
+        <li>GET <span class="inline-code">/produtos/1</span> → busca por ID</li>
+        <li>PUT <span class="inline-code">/produtos/1</span> → atualiza</li>
+        <li>DELETE <span class="inline-code">/produtos/1</span> → remove</li>
+      </ul>
+
+      <div class="expected">
+        <div class="expected-label">✓ Resultado esperado</div>
+        Todas as rotas respondem corretamente — exatamente como antes da refatoração. Se algo não funcionar, resolva antes de avançar para o próximo passo.
+      </div>
+
+      <div class="error-box"><strong>Cannot GET /produtos — 404 em todas as rotas</strong> O router não foi registrado no index.js ou o require está com o caminho errado. Confirme que a linha <span class="inline-code">app.use('/produtos', produtosRoutes)</span> está no index.js e que o caminho <span class="inline-code">./routes/produtos</span> corresponde ao arquivo criado.</div>
+      <div class="error-box"><strong>Erro "Cannot find module './routes/produtos'"</strong> O nome do arquivo ou o caminho está diferente. Verifique: o arquivo está dentro de <span class="inline-code">routes/</span>? O nome no require bate com o nome do arquivo?</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Limpar o index.js — remover as rotas antigas</div>
+        <div class="step-subtitle">Só após confirmar que o novo arquivo funciona</div>
+      </div>
+    </div>
+    <div class="step-body">
+      <p>Agora que o novo arquivo de rotas está testado e funcionando, remova as rotas do <span class="inline-code">index.js</span>. Remova também o array de dados que foi movido para o arquivo de rotas.</p>
+
+      <p>O <span class="inline-code">index.js</span> final deve ficar assim — limpo e focado em configuração:</p>
+
+      <pre><span class="kw">const</span> <span class="var">express</span> = <span class="fn">require</span>(<span class="str">'express'</span>)
+<span class="kw">const</span> <span class="var">app</span> = <span class="fn">express</span>()
+<span class="kw">const</span> <span class="var">PORT</span> = <span class="var">process</span>.<span class="prop">env</span>.<span class="prop">PORT</span> <span class="op">||</span> <span class="num">3000</span>
+
+<span class="cm">// Middlewares</span>
+<span class="var">app</span>.<span class="fn">use</span>(<span class="var">express</span>.<span class="fn">json</span>())
+<span class="var">app</span>.<span class="fn">use</span>((<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) => {
+  <span class="kw">const</span> <span class="var">horario</span> = <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleTimeString</span>(<span class="str">'pt-BR'</span>)
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`[<span class="op">${</span><span class="var">horario</span><span class="op">}</span>] <span class="op">${</span><span class="var">req</span>.<span class="prop">method</span><span class="op">}</span> <span class="op">${</span><span class="var">req</span>.<span class="prop">path</span><span class="op">}</span>`</span>)
+  <span class="fn">next</span>()
+})
+
+<span class="cm">// Rotas</span>
+<span class="kw">const</span> <span class="var">produtosRoutes</span> = <span class="fn">require</span>(<span class="str">'./routes/produtos'</span>)
+<span class="var">app</span>.<span class="fn">use</span>(<span class="str">'/produtos'</span>, <span class="var">produtosRoutes</span>)
+
+<span class="cm">// Rota raiz (opcional — informações do projeto)</span>
+<span class="var">app</span>.<span class="fn">get</span>(<span class="str">'/'</span>, (<span class="var">req</span>, <span class="var">res</span>) => {
+  <span class="var">res</span>.<span class="fn">json</span>({ <span class="prop">projeto</span>: <span class="str">'Meu Projeto'</span>, <span class="prop">status</span>: <span class="str">'online'</span> })
+})
+
+<span class="var">app</span>.<span class="fn">listen</span>(<span class="var">PORT</span>, () => {
+  <span class="var">console</span>.<span class="fn">log</span>(<span class="str">`Servidor rodando em http://localhost:<span class="op">${</span><span class="var">PORT</span><span class="op">}</span>`</span>)
+})</pre>
+
+      <p>Salve e teste no Postman mais uma vez — tudo deve continuar funcionando.</p>
+    </div>
+  </div>
+
+  <!-- PROJETO -->
+  <div class="project-section">
+    <div class="project-section-title">🚀 Aplique no seu Projeto</div>
+    <div style="font-size:14.5px;color:#374151;line-height:1.75;margin-bottom:14px">
+      Você já está fazendo no projeto. Os passos acima são a aplicação no projeto — não há uma etapa separada. Ao concluir o Passo 6, seu projeto estará refatorado.
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">✓</span>
+      <strong>Verifique a estrutura final do seu projeto</strong><br>
+      <span style="font-size:13.5px">O projeto deve ter: pasta <span class="inline-code">routes/</span> com o arquivo do seu recurso, <span class="inline-code">index.js</span> limpo (só middlewares, imports de rotas e app.listen), e todas as rotas respondendo no Postman como antes.</span>
+    </div>
+
+    <div class="project-task">
+      <span class="project-task-num">✓</span>
+      <strong>Confirme que o middleware de log ainda funciona</strong><br>
+      <span style="font-size:13.5px">Faça requisições no Postman e verifique que o log continua aparecendo no terminal. O middleware no index.js deve interceptar as requisições que chegam pelo router do mesmo jeito.</span>
+    </div>
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <ul class="check-list">
+      <li><strong>Crie um segundo arquivo de rotas:</strong> Se seu projeto tem um segundo recurso (ex: usuários, categorias), crie <span class="inline-code">routes/usuarios.js</span> com rotas básicas e registre no index.js. Veja como o index.js continua limpo mesmo com dois recursos.</li>
+      <li><strong>Router com caminho base:</strong> Experimente criar um router para a rota raiz do projeto: <span class="inline-code">routes/info.js</span> com informações do projeto, e registre com <span class="inline-code">app.use('/', infoRoutes)</span>. Mova a rota <span class="inline-code">GET /</span> do index.js para lá.</li>
+    </ul>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px">Para quem quer ir além do encontro de hoje</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Controllers — separando a lógica das rotas</div>
+      <div class="horizonte-item-what">Hoje separamos as rotas do index.js. O próximo passo natural é separar a <em>lógica</em> das rotas também. Um arquivo <span class="inline-code">controllers/produtos.js</span> conteria as funções (listar, buscar, criar, atualizar, deletar), e o arquivo de rotas apenas registraria quais funções respondem a quais caminhos. Isso é o padrão <strong>MVC (Model-View-Controller)</strong> simplificado — amplamente usado no mercado e o que você vai encontrar na maioria dos projetos Node.js profissionais.</div>
+      <div class="horizonte-item-link">→ <a href="https://developer.mozilla.org/pt-BR/docs/Glossary/MVC" target="_blank" style="color:#60a5fa">MDN — O que é MVC</a></div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">NestJS — organização por convenção</div>
+      <div class="horizonte-item-what">O Express é um framework minimalista: ele dá ferramentas, mas não impõe estrutura. O <strong>NestJS</strong> é um framework construído em cima do Express (ou Fastify) que impõe uma estrutura de pastas bem definida — modules, controllers, services, decorators. É o framework mais usado em projetos Node.js empresariais que precisam de uma base sólida desde o início. Se você continuar em backend depois desta UC, vai encontrar NestJS com frequência.</div>
+      <div class="horizonte-item-link">→ <a href="https://nestjs.com" target="_blank" style="color:#60a5fa">nestjs.com — documentação oficial</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E07: rotas separadas com Express Router"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que construímos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">Pasta routes/ com arquivo de rotas do projeto</li>
+          <li style="color:#cbd5e1">Express Router configurado e exportado</li>
+          <li style="color:#cbd5e1">index.js limpo — só configuração</li>
+          <li style="color:#cbd5e1">API funcionando igual após refatoração</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 08</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Tratamento de erros — try/catch, status codes corretos para cada tipo de erro, e middleware global de erros do Express. O projeto vai parar de travar quando algo der errado e vai devolver mensagens claras.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

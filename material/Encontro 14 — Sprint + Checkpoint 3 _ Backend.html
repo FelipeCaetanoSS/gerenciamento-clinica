@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)https://juniorll.github.io/materiais-backend/encontro_14_material.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encontro 14 — Sprint + Checkpoint 3 | Backend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;background:#f5f5f2}
+.cover{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 55%,#1d4ed8 100%);color:#fff;padding:52px 48px;min-height:200px}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:4px 14px;font-size:12.5px;letter-spacing:.5px;margin-bottom:20px;font-family:monospace}
+.cover h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:400;opacity:.75;margin-bottom:22px}
+.cover-meta{display:flex;gap:28px;font-size:13px;opacity:.7;flex-wrap:wrap}
+.container{max-width:860px;margin:0 auto;padding:0 28px 72px}
+.progress{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px 22px;margin-top:28px}
+.progress-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin-bottom:12px}
+.progress-bar{display:flex;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.pb-step{flex:1;padding:8px 6px;text-align:center;font-size:10.5px;border-right:1px solid #e2e8f0}
+.pb-step:last-child{border-right:none}
+.pb-done{background:#dcfce7;color:#14532d}
+.pb-checkpoint{background:#f59e0b;color:#fff;font-weight:700}
+.pb-future{background:#f9fafb;color:#9ca3af}
+.pb-num{font-weight:700;font-size:12px;display:block;margin-bottom:1px}
+.context{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px 26px;margin-top:20px}
+.context-title{font-size:16px;font-weight:700;color:#1e3b70;margin-bottom:10px}
+.context-body{font-size:14.5px;color:#374151;line-height:1.75}
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.goal-item{background:#f8faff;border:1px solid #dbeafe;border-radius:8px;padding:10px 14px;font-size:13.5px;color:#1e3a8a}
+.goal-item strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:3px}
+.checkpoint-banner{background:linear-gradient(135deg,#78350f,#d97706);color:#fff;border-radius:12px;padding:18px 24px;margin-top:20px;display:flex;align-items:center;gap:16px}
+.checkpoint-icon{font-size:32px;flex-shrink:0}
+.checkpoint-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.checkpoint-body{font-size:13.5px;opacity:.9;line-height:1.6}
+.sec-header{margin-top:44px;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #1d4ed8}
+.sec-header h2{font-size:20px;font-weight:700;color:#1e3b70;display:flex;align-items:center;gap:10px}
+.sec-number{background:#1d4ed8;color:#fff;border-radius:6px;padding:2px 10px;font-size:14px;font-weight:700}
+.concept{background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:14px;color:#1e3a8a;line-height:1.75}
+.concept strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#2563eb;margin-bottom:6px}
+.step{background:#fff;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.step-header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid #f3f4f6;background:#fafafa}
+.step-num{background:#1d4ed8;color:#fff;border-radius:8px;min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.step-title{font-size:16px;font-weight:700;color:#1a1a1a}
+.step-subtitle{font-size:13px;color:#6b7280;margin-top:2px}
+.step-body{padding:18px 22px}
+.step-body p{font-size:14.5px;color:#374151;margin-bottom:12px;line-height:1.75}
+.step-body p:last-child{margin-bottom:0}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:18px 22px;overflow-x:auto;font-size:13px;line-height:1.8;margin:12px 0;font-family:'Courier New',Courier,monospace}
+.inline-code{background:#eef2ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:13px;font-family:'Courier New',monospace}
+.cm{color:#64748b}.kw{color:#93c5fd}.fn{color:#86efac}.str{color:#fca5a5}.num{color:#fbbf24}.op{color:#67e8f9}.var{color:#c4b5fd}.prop{color:#fdba74}
+.tip{background:#f5f3ff;border-left:4px solid #8b5cf6;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#4c1d95;line-height:1.7}
+.tip strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#7c3aed;margin-bottom:5px}
+.warn{background:#fefce8;border-left:4px solid #eab308;border-radius:0 8px 8px 0;padding:13px 17px;margin:12px 0;font-size:13.5px;color:#713f12;line-height:1.7}
+.warn strong{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#92400e;margin-bottom:5px}
+/* Checklist */
+.checklist-card{background:#fff;border:2px solid #f59e0b;border-radius:12px;padding:22px 26px;margin-top:28px}
+.checklist-title{font-size:16px;font-weight:700;color:#92400e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #fde68a;font-size:14px;color:#374151;line-height:1.6}
+.check-item:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border:2px solid #d97706;border-radius:4px;flex-shrink:0;margin-top:2px}
+.check-method{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:monospace;margin-right:6px;white-space:nowrap}
+.m-get{background:#dcfce7;color:#14532d}
+.m-post{background:#fef9c3;color:#854d0e}
+.m-put{background:#dbeafe;color:#1e3a8a}
+.m-del{background:#fee2e2;color:#991b1b}
+.check-status{font-size:11.5px;color:#6b7280;margin-left:4px}
+/* Extra */
+.extra{background:#fff;border:2px dashed #d1d5db;border-radius:12px;padding:22px 26px;margin-top:28px}
+.extra-title{font-size:15px;font-weight:700;color:#374151;margin-bottom:14px}
+.extra-item{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:14px}
+.extra-item:last-child{margin-bottom:0}
+.extra-item-title{font-size:14.5px;font-weight:700;color:#1f2937;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.extra-item-num{background:#6b7280;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex-shrink:0}
+.extra-item-body{font-size:13.5px;color:#374151;line-height:1.7}
+.horizonte{background:#0f172a;border-radius:12px;padding:24px 28px;margin-top:28px}
+.horizonte-badge{display:inline-block;background:#f59e0b;color:#0f172a;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.horizonte-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+.horizonte-item:last-child{margin-bottom:0}
+.horizonte-item-title{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:6px}
+.horizonte-item-what{font-size:13.5px;color:#94a3b8;line-height:1.65;margin-bottom:8px}
+.horizonte-item-link{font-size:13px;color:#60a5fa}
+.closing{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:26px 28px;margin-top:36px}
+.closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.closing-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 16px}
+.closing-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:8px}
+.git-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13.5px}
+.git-badge{background:#1d4ed8;color:#fff;border-radius:4px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:2px;flex-shrink:0}
+ul.check-list{list-style:none;padding:0;margin:10px 0}
+ul.check-list li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:14px;color:#374151;line-height:1.65}
+ul.check-list li::before{content:"✓";color:#16a34a;font-weight:700;flex-shrink:0;margin-top:1px}
+ol.steps-list{padding-left:22px;margin:10px 0}
+ol.steps-list li{margin-bottom:8px;font-size:14.5px;color:#374151;line-height:1.7}
+</style>
+<style type="text/css"></style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><style>.vue-notification-group{display:block;position:fixed;z-index:5000}.vue-notification-wrapper{display:block;overflow:hidden;width:100%;margin:0;padding:0}.notification-title{font-weight:600}.vue-notification-template{display:block;box-sizing:border-box;background:#fff;text-align:left}.vue-notification{display:block;box-sizing:border-box;text-align:left;font-size:12px;padding:10px;margin:0 5px 5px;color:#fff;background:#44a4fc;border-left:5px solid #187FE7}.vue-notification.warn{background:#ffb648;border-left-color:#f48a06}.vue-notification.error{background:#e54d42;border-left-color:#b82e24}.vue-notification.success{background:#68cd86;border-left-color:#42a85f}.vn-fade-enter-active,.vn-fade-leave-active,.vn-fade-move{transition:all .5s}.vn-fade-enter-from,.vn-fade-leave-to{opacity:0}</style><link type="text/css" rel="stylesheet" href="./Encontro 14 — Sprint + Checkpoint 3 _ Backend_files/css2"><link type="text/css" rel="stylesheet" href="./Encontro 14 — Sprint + Checkpoint 3 _ Backend_files/css2"></head>
+<body>
+
+<div class="cover">
+  <div class="cover-badge">MATERIAL DO ESTUDANTE · ENCONTRO 14 DE 34 · ✦ CHECKPOINT 3</div>
+  <h1>Sprint + Checkpoint 3 — CRUD com Banco Completo</h1>
+  <h2>Consolidando tudo dos Encontros 11, 12 e 13 antes de avançar para relacionamentos</h2>
+  <div class="cover-meta">
+    <span>📚 Codificação para Backend</span>
+    <span>⏱ 4 horas</span>
+    <span>🛠 Revisão · SQL · Checkpoint 3</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress">
+    <div class="progress-label">Progresso da UC</div>
+    <div class="progress-bar">
+      <div class="pb-step pb-done"><span class="pb-num">01–10</span>Blocos 1 e 2</div>
+      <div class="pb-step pb-done"><span class="pb-num">11</span>Banco de dados</div>
+      <div class="pb-step pb-done"><span class="pb-num">12</span>SQL Parte 1</div>
+      <div class="pb-step pb-done"><span class="pb-num">13</span>SQL Parte 2</div>
+      <div class="pb-step pb-checkpoint"><span class="pb-num">14</span>Sprint ✦</div>
+      <div class="pb-step pb-future"><span class="pb-num">15+</span>Relacionamentos…</div>
+    </div>
+  </div>
+
+  <div class="checkpoint-banner">
+    <div class="checkpoint-icon">🏁</div>
+    <div>
+      <div class="checkpoint-title">Checkpoint 3 — ao final deste encontro</div>
+      <div class="checkpoint-body">Você vai demonstrar ao professor o CRUD completo do seu projeto rodando 100% no banco de dados real — sem nenhum array em memória restante. Não é uma prova: é a confirmação de que a base está sólida antes de avançarmos para relacionamentos entre tabelas.</div>
+    </div>
+  </div>
+
+  <div class="context">
+    <div class="context-title">🎯 O que vai acontecer hoje</div>
+    <div class="context-body">
+      Nos últimos três encontros você fez bastante coisa: criou o banco (E11), migrou GET e POST para SQL real (E12), e completou com PUT e DELETE (E13). Hoje não tem manual com conteúdo novo — é dia de <strong>sprint</strong>: revisar, fortalecer e garantir que tudo está sólido antes de avançarmos para relacionamentos entre tabelas, que é o próximo grande conceito do bloco.
+    </div>
+    <div class="goal-grid">
+      <div class="goal-item"><strong>Ao final você terá</strong>Confirmação de que nenhuma rota usa array em memória</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>CRUD completo testado e validado no Postman</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>Checkpoint 3 concluído com o professor</div>
+      <div class="goal-item"><strong>Ao final você terá</strong>(Se quiser) refinamentos extras no banco do projeto</div>
+    </div>
+  </div>
+
+  <!-- RETOMAR -->
+  <div class="sec-header">
+    <h2><span class="sec-number">0</span> Retomar o projeto</h2>
+  </div>
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">↩</div>
+      <div><div class="step-title">Abrir o Codespace, iniciar o servidor e liberar a porta</div></div>
+    </div>
+    <div class="step-body">
+      <p>Abra o Codespace, inicie o servidor e torne a porta pública:</p>
+      <pre><span class="fn">npm</span> run <span class="var">dev</span></pre>
+      <p>Painel <strong>Ports</strong> → botão direito na porta 3000 → <strong>Port Visibility → Public</strong>.</p>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="sec-header">
+    <h2><span class="sec-number">1</span> Checklist do CRUD com Banco — o que revisar</h2>
+  </div>
+
+  <p style="font-size:14.5px;color:#374151;line-height:1.8;margin-bottom:16px">Percorra os pontos abaixo no seu projeto. Esse é o roteiro que o professor vai usar no Checkpoint 3.</p>
+
+  <div class="checklist-card">
+    <div class="checklist-title">☑ Checklist do Checkpoint 3</div>
+
+    <div class="check-item"><div class="check-box"></div><div>O arquivo de rotas do seu recurso <strong>não tem nenhum</strong> <span class="inline-code">array.find</span>, <span class="inline-code">array.push</span>, <span class="inline-code">array.splice</span> ou similar — tudo usa <span class="inline-code">db.prepare()</span></div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-post">POST</span> com dados válidos → 201 + item criado com ID gerado pelo banco</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-get">GET</span> lista completa → 200 + array com os itens persistidos</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-get">GET</span> por ID existente → 200 + item específico</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-get">GET</span> por ID inexistente → 404 + mensagem de erro</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-put">PUT</span> com ID existente → 200 + item atualizado, com WHERE no SQL</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-put">PUT</span> com ID inexistente → 404</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-del">DELETE</span> com ID existente → 204, com WHERE no SQL</div></div>
+    <div class="check-item"><div class="check-box"></div><div><span class="check-method m-del">DELETE</span> com ID inexistente → 404</div></div>
+    <div class="check-item"><div class="check-box"></div><div><strong>Teste de persistência:</strong> insira um dado, reinicie o servidor (Ctrl+C, npm run dev), e confirme que ele continua lá</div></div>
+    <div class="check-item"><div class="check-box"></div><div>Todas as rotas usam <span class="inline-code">?</span> como placeholder — nenhuma concatenação direta de valores no SQL</div></div>
+  </div>
+
+  <div class="warn"><strong>Algum item não está completo?</strong> Use a primeira parte do sprint para resolver — volte ao material dos encontros E11, E12 ou E13 se precisar relembrar algum passo. O professor está disponível para ajudar a destravar qualquer ponto.</div>
+
+  <!-- SPRINT -->
+  <div class="sec-header">
+    <h2><span class="sec-number">2</span> Sprint — tempo de desenvolvimento autônomo</h2>
+  </div>
+
+  <div class="concept">
+    <strong>Como usar este tempo</strong>
+    Sugestão de ordem: primeiro complete qualquer item pendente do checklist; depois, se tudo já estiver pronto, avance para a seção <strong>Quer ir além?</strong> abaixo, que traz dois refinamentos que deixam o banco do seu projeto mais robusto sem sair do escopo do que já aprendemos.
+  </div>
+
+  <!-- EXTRA -->
+  <div class="extra">
+    <div class="extra-title">⭐ Quer ir além? (opcional)</div>
+    <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px">Se o checklist já está completo, estas duas explorações consolidam o que você aprendeu sobre SQL nos últimos três encontros.</p>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">1</span> Contar registros com COUNT</div>
+      <div class="extra-item-body">
+        <p>Às vezes você só precisa saber <em>quantos</em> registros existem, sem precisar trazer todos eles. O SQL tem uma função para isso: <span class="inline-code">COUNT(*)</span>, que retorna o número de linhas que combinam com a consulta.</p>
+        <p><strong>Como fazer:</strong></p>
+        <ol class="steps-list">
+          <li>Crie uma rota nova, por exemplo <span class="inline-code">GET /seuRecurso/total</span></li>
+          <li>Use <span class="inline-code">SELECT COUNT(*) as total FROM seuRecurso</span> com <span class="inline-code">.get()</span> — já que o resultado é uma única linha</li>
+          <li><strong>Atenção:</strong> essa rota precisa vir <em>antes</em> de <span class="inline-code">GET /:id</span> no arquivo, senão "total" seria interpretado como um ID (mesmo problema de ordem de rotas que vocês já viram no E04)</li>
+        </ol>
+        <pre><span class="var">router</span>.<span class="fn">get</span>(<span class="str">'/total'</span>, (<span class="var">req</span>, <span class="var">res</span>, <span class="var">next</span>) =&gt; {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> <span class="var">resultado</span> = <span class="var">db</span>.<span class="fn">prepare</span>(<span class="str">'SELECT COUNT(*) as total FROM produtos'</span>).<span class="fn">get</span>()
+    <span class="var">res</span>.<span class="fn">json</span>(<span class="var">resultado</span>) <span class="cm">// { total: 5 }</span>
+  } <span class="kw">catch</span> (<span class="var">err</span>) { <span class="fn">next</span>(<span class="var">err</span>) }
+})</pre>
+      </div>
+    </div>
+
+    <div class="extra-item">
+      <div class="extra-item-title"><span class="extra-item-num">2</span> Garantir unicidade com UNIQUE</div>
+      <div class="extra-item-body">
+        <p>Algumas colunas não devem se repetir — um e-mail, um código de produto. O SQLite tem a restrição <span class="inline-code">UNIQUE</span>, que impede dois registros com o mesmo valor naquela coluna.</p>
+        <p><strong>Como fazer (se fizer sentido para o seu recurso):</strong></p>
+        <ol class="steps-list">
+          <li>No <span class="inline-code">database.js</span>, adicione <span class="inline-code">UNIQUE</span> depois do tipo da coluna que deve ser única</li>
+          <li>Apague o <span class="inline-code">banco.db</span> e reinicie o servidor para recriar a tabela com a nova restrição (mesma situação do E11)</li>
+          <li>Teste tentando criar dois registros com o mesmo valor naquela coluna — o segundo deve falhar</li>
+        </ol>
+        <pre><span class="cm">// Exemplo: impedir dois produtos com o mesmo código</span>
+<span class="var">db</span>.<span class="fn">exec</span>(<span class="str">`
+  CREATE TABLE IF NOT EXISTS produtos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    codigo TEXT UNIQUE NOT NULL,
+    nome TEXT NOT NULL,
+    preco REAL NOT NULL
+  )
+`</span>)</pre>
+        <p>Ao testar uma inserção duplicada, o banco lança um erro — que o seu try/catch já está preparado para capturar e devolver via middleware de erros (E08), mostrando que tudo que você construiu até aqui se conecta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HORIZONTE -->
+  <div class="horizonte">
+    <div class="horizonte-badge">✦ Horizonte</div>
+    <div style="font-size:16px;font-weight:700;color:#f8fafc;margin-bottom:6px">Para quem quer ir além de hoje</div>
+    <div style="font-size:13px;color:#94a3b8;margin-bottom:18px;line-height:1.6">Estes tópicos <strong>não são cobrados</strong> e <strong>não entram no projeto</strong>.</div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Índices — acelerando buscas em tabelas grandes</div>
+      <div class="horizonte-item-what">Quando uma tabela tem milhares ou milhões de linhas, buscar por uma coluna específica pode ficar lento — o banco precisa "olhar" linha por linha. Um <strong>índice</strong> (criado com <span class="inline-code">CREATE INDEX</span>) é uma estrutura auxiliar que acelera buscas em colunas específicas, parecida com o índice remissivo no final de um livro. A coluna <span class="inline-code">id</span> com PRIMARY KEY já ganha um índice automaticamente — mas colunas usadas com frequência em WHERE (como um e-mail de login) se beneficiam de índices próprios.</div>
+      <div class="horizonte-item-link">→ <a href="https://www.sqlite.org/lang_createindex.html" target="_blank" style="color:#60a5fa">SQLite — CREATE INDEX</a></div>
+    </div>
+
+    <div class="horizonte-item">
+      <div class="horizonte-item-title">Ferramentas de administração de banco em produção</div>
+      <div class="horizonte-item-what">O DB Browser que vocês usam é ótimo para desenvolvimento local. Em produção, equipes costumam usar ferramentas como <strong>TablePlus</strong>, <strong>DBeaver</strong> ou os painéis administrativos integrados de plataformas como Railway e Supabase — que permitem inspecionar, consultar e até editar dados de bancos rodando remotamente, com mais recursos de segurança e colaboração entre equipe.</div>
+      <div class="horizonte-item-link">→ <a href="https://tableplus.com/" target="_blank" style="color:#60a5fa">tableplus.com</a></div>
+    </div>
+  </div>
+
+  <!-- FECHAMENTO -->
+  <div class="closing">
+    <div style="font-size:17px;font-weight:700;color:#93c5fd;margin-bottom:14px">✅ Fechamento — Checkpoint 3 e git commit</div>
+    <div class="closing-grid">
+      <div class="closing-card">
+        <div class="closing-card-title">Comandos Git</div>
+        <div class="git-step"><span class="git-badge">1</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git add .</span></div></div>
+        <div class="git-step"><span class="git-badge">2</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git commit -m "E14: consolidação do CRUD com banco - Checkpoint 3"</span></div></div>
+        <div class="git-step"><span class="git-badge">3</span><div><span class="inline-code" style="background:rgba(255,255,255,.1);color:#93c5fd">git push</span></div></div>
+      </div>
+      <div class="closing-card">
+        <div class="closing-card-title">O que consolidamos hoje</div>
+        <ul class="check-list" style="margin:0">
+          <li style="color:#cbd5e1">CRUD 100% no banco, sem arrays</li>
+          <li style="color:#cbd5e1">Persistência testada e confirmada</li>
+          <li style="color:#cbd5e1">Checkpoint 3 concluído com o professor</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:18px;padding:14px 18px;background:rgba(29,78,216,.2);border:1px solid rgba(29,78,216,.4);border-radius:8px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#93c5fd;margin-bottom:6px">No Encontro 15</div>
+      <div style="font-size:14px;color:#cbd5e1;line-height:1.7">Relacionamentos — como tabelas se conectam entre si. Você vai aprender chave estrangeira (Foreign Key) e JOIN, e modelar o primeiro relacionamento do seu projeto.</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div id="nfqbdoh05e" style="display: block;"><template shadowrootmode="closed"><div id="9c4shifoiy"><style type="text/css">
+  @import 'chrome-extension://gidejehfgombmkfflghejpncblgfkagj/app.css';
+</style>
+<div id="cuponomia" data-v-app=""><div></div></div>
+</div></template></div></body></html>
