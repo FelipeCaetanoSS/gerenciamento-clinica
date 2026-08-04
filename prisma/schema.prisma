@@ -119,6 +119,8 @@ model Exame{
 
 model Prontuario{
   id    Int    @id @default(autoincrement())
+  data DateTime
+  observacao String
   receita Receita @relation(fields: [receitaId], references: [id])
   receitaId Int
   paciente Paciente @relation(fields: [pacienteId], references: [id])
