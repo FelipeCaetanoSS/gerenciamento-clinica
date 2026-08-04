@@ -23,10 +23,20 @@ const buscarPorId = (id) => {
   return medicos.find((m) => m.id === id);
 };
 
-const criar = (dados) => {
-  const novoMedico = { id: proximoId++, ...dados };
-  medicos.push(novoMedico);
-  return novoMedico;
+const criar = async (dados) => {
+
+  const novoMedico = await prisma.usuario.create({
+      data: {  
+        nome: nome,
+        crm: crm,
+        senha: senhaHash,
+        idade: idade,
+        sexo: sexo,
+        telefone: telefone,
+        rg: rg,
+        cpf: cpf,
+      }
+    })
 };
 
 const atualizar = (id, dados) => {

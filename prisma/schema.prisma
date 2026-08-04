@@ -11,8 +11,10 @@ datasource db {
   provider = "sqlite"
 }
 
-model Admin{
+model Usuario{
   id    Int    @id @default(autoincrement())
+  email String 
+  senha String
   nome String
   idade Int   
   sexo String 
@@ -20,41 +22,25 @@ model Admin{
   cpf Int @unique
   telefone Int
   ativo Boolean
+  role  Role
 }
 
-model Recepcionista{
-  id    Int    @id @default(autoincrement())
-  nome String
-  idade Int   
-  sexo String 
-  rg String  @unique
-  cpf Int @unique
-  telefone Int
-  ativo Boolean
+enum Role {
+  RECEPCIONISTA
+  ADMIN
 }
 
 model Medico{
   id    Int    @id @default(autoincrement())
-  nome String
   crm Int
-  idade Int   
-  sexo String 
-  rg String  @unique
-  cpf Int @unique
-  telefone Int
-  ativo Boolean
   agendamento Agendamento[]
   receita Receita[]
   consulta Consulta[]
+  exame Exame[]
 }
 
 model Paciente{
   id    Int    @id @default(autoincrement())
-  nome String
-  idade Int   
-  sexo String 
-  cpf Int @unique
-  email String 
   localnasc String
   estadoCivil String
   tipoSanguineo String 
@@ -63,9 +49,12 @@ model Paciente{
   alergia String
   medicamento String
   observacao String
-  agendamentos Agendamento[]
-  consulta Consulta[]
+  agendamento Agendamento[]
   convenio Convenio[]
+  receita Receita[]
+  consulta Consulta[]
+  exame Exame[]
+  prontuario Prontuario[]
 }
 
 model Agendamento{
@@ -92,10 +81,13 @@ model Receita{
   id    Int    @id @default(autoincrement())
   medico Medico @relation(fields: [medicoId], references: [id])
   medicoId Int
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
   medicamento String
   dosagem String
   dias  String 
   observacao String
+  prontuario Prontuario[]
 }
 
 model Notificacao{
@@ -119,13 +111,24 @@ model Exame{
   id    Int    @id @default(autoincrement())
   data DateTime
   observacao String
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
+  medico Medico @relation(fields: [medicoId], references: [id])
+  medicoId Int
 }
 
 model Prontuario{
   id    Int    @id @default(autoincrement())
+  receita Receita @relation(fields: [receitaId], references: [id])
+  receitaId Int
+  paciente Paciente @relation(fields: [pacienteId], references: [id])
+  pacienteId Int
 }
 
 model Endereco{
   id    Int    @id @default(autoincrement())
-
+  rua String 
+  cidade String 
+  bairro String
+  numero Int
 }

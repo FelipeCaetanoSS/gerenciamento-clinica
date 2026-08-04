@@ -16,11 +16,13 @@ const indexRoute = require("./routes/index.router");
 const agendamentosRoute = require("./routes/agendamentos.router");
 const medicosRoute = require("./routes/medicos.router");
 const pacientesRoute = require("./routes/pacientes.router");
+const authRoute = require("./routes/auth.router");
 
 app.use("/", indexRoute);
 app.use("/agendamentos", agendamentosRoute);
 app.use("/medicos", medicosRoute);
 app.use("/pacientes", pacientesRoute);
+app.use("/auth", authRoute);
 app.get("/saude", (req, res) => {
   res.json({
     status: "ok",

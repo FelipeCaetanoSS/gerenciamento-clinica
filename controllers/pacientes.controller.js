@@ -1,4 +1,4 @@
-const pacienteModel = require("../models/pacientes.model");
+const pacienteModel = require("../repository/pacientes.repository");
 
 const listar = (req, res, next) => {
   try {

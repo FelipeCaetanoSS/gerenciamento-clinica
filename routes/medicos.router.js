@@ -8,9 +8,6 @@ router.get("/", medicoController.listar);
 // GET /medicos/:id
 router.get("/:id", medicoController.buscarPorId);
 
-// POST /medicos
-router.post("/", medicoController.criar);
-
 // PUT /medicos/:id
 router.put("/:id", medicoController.atualizar);
 

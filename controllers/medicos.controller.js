@@ -1,4 +1,5 @@
-const medicoModel = require("../models/medicos.model");
+const medicoModel = require("../repository/medicos.repository");
+const argon2 = require('argon2');
 
 const listar = (req, res, next) => {
   try {
@@ -24,23 +25,6 @@ const buscarPorId = (req, res, next) => {
   }
 };
 
-const criar = (req, res, next) => {
-  try {
-    // Padronizando a propriedade 'medico' para 'nome'
-    const { nome, crm, idade, sexo } = req.body;
-
-    if (!nome || !crm || !idade || !sexo) {
-      return res
-        .status(400)
-        .json({ erro: "nome, crm, idade e sexo são obrigatórios" });
-    }
-
-    const novoMedico = medicoModel.criar({ nome, crm, idade, sexo });
-    res.status(201).json(novoMedico);
-  } catch (err) {
-    next(err);
-  }
-};
 
 const atualizar = (req, res, next) => {
   try {
@@ -77,7 +61,6 @@ const remover = (req, res, next) => {
 module.exports = {
   listar,
   buscarPorId,
-  criar,
   atualizar,
   remover,
 };
