@@ -21,13 +21,15 @@ model Usuario{
   rg String  @unique
   cpf Int @unique
   telefone Int
-  ativo Boolean
+  ativo Boolean @default(true)
   role  Role
 }
 
 enum Role {
   RECEPCIONISTA
   ADMIN
+  MEDICO
+  PACIENTE
 }
 
 model Medico{
@@ -48,7 +50,7 @@ model Paciente{
   altura Float
   alergia String
   medicamento String
-  observacao String
+  observacao String?
   agendamento Agendamento[]
   convenio Convenio[]
   receita Receita[]

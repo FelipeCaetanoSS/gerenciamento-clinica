@@ -24,12 +24,12 @@ const buscarPorId = (id) => {
 };
 
 const criar = async (dados) => {
-
   const novoMedico = await prisma.usuario.create({
       data: {  
         nome: nome,
         crm: crm,
-        senha: senhaHash,
+        email: email,
+        senha: senha,
         idade: idade,
         sexo: sexo,
         telefone: telefone,

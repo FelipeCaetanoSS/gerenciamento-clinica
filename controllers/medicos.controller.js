@@ -25,7 +25,6 @@ const buscarPorId = (req, res, next) => {
   }
 };
 
-
 const atualizar = (req, res, next) => {
   try {
     const id = Number(req.params.id);
