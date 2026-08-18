@@ -1,20 +1,12 @@
-const prisma = require("../lib/client")
+const prisma = require("../lib/client");
 
-const listarTodos = (filtros) => {
-  let resultado = medicos;
-  const { busca, sexo } = filtros;
-
-  if (busca) {
-    resultado = resultado.filter((m) =>
-      (m.nome || "").toLowerCase().includes(busca.toLowerCase()),
-    );
-  }
-
-  if (sexo) {
-    resultado = resultado.filter(
-      (m) => m.sexo.toUpperCase() === sexo.toUpperCase(),
-    );
-  }
+const listarTodos = async (filtros) => {
+  let resultado = await prisma.medico.findMany({
+  where: {
+    Role: "MEDICO",
+    
+  },
+});
 
   return resultado;
 };

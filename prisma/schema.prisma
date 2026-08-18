@@ -18,7 +18,7 @@ model Usuario{
   nome String
   idade Int   
   sexo String 
-  rg String  @unique
+  rg  String  @unique
   cpf Int @unique
   telefone Int
   ativo Boolean @default(true)

@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const cors = require('cors'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors());
 
 // Routes
 const indexRoute = require("./routes/index.router");
@@ -17,11 +19,11 @@ const agendamentosRoute = require("./routes/agendamentos.router");
 const medicosRoute = require("./routes/medicos.router");
 const pacientesRoute = require("./routes/pacientes.router");
 const authRoute = require("./routes/auth.router");
-const middleware = require("./middleware/auth.middleware")
+const middleware = require("./middleware/auth.middleware");
 
 app.use("/", indexRoute);
 app.use("/auth", authRoute);
-app.use(middleware.verficarAuth());
+app.use(middleware.verificarAuth);
 app.use("/agendamentos", agendamentosRoute);
 app.use("/medicos", medicosRoute);
 app.use("/pacientes", pacientesRoute);

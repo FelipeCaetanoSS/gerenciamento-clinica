@@ -6,6 +6,7 @@ const listar = (req, res, next) => {
     const medicos = medicoModel.listarTodos(req.query);
     res.status(200).json(medicos);
   } catch (err) {
+    console.log("erro:", err);
     next(err);
   }
 };
