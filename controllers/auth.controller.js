@@ -1,4 +1,3 @@
-const { medico } = require("../lib/client");
 const medicoModel = require("../repository/medicos.repository");
 const pacienteModel = require("../repository/pacientes.repository");
 const usuarioModel = require("../repository/usuarios.repository");
@@ -6,78 +5,115 @@ const prisma = require("../lib/client");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 
-const registrar = async (req, res, next) =>{
-  const argon2 = require('argon2');
-    const { 
-      // Dados específicos do ADMIN ou RECEPCIONISTA
-      nome, email, senhaPlana, idade, sexo, telefone, cpf, rg, role,
-      // Dados específicos do MÉDICO
+async function gerarHashSenha(senhaPlana) {
+  return argon2.hash(senhaPlana, {
+    type: argon2.argon2id,
+    memoryCost: 2 ** 16,
+    timeCost: 3,
+    parallelism: 1,
+  });
+}
+
+const registrar = async (req, res, next) => {
+  try {
+    const {
+      nome,
+      email,
+      senhaPlana,
+      idade,
+      sexo,
+      telefone,
+      cpf,
+      rg,
+      role,
       crm,
-      // Dados específicos do PACIENTE
-      localnasc, estadoCivil, tipoSanguineo, peso, altura, alergia, medicamento, observacao
+      localnasc,
+      estadoCivil,
+      tipoSanguineo,
+      peso,
+      altura,
+      alergia,
+      medicamento,
+      observacao,
     } = req.body;
 
-    const senha = await argon2.hash(senhaPlana, {
-      type: argon2.argon2id,
-      memoryCost: 2 ** 16,
-      timeCost: 3,
-      parallelism: 1
-      });
-    
-  switch (role) {
-    case 'ADMIN':
-      try{
-        if (!nome || !idade || !senhaPlana || !sexo || !cpf || !email || !rg || !telefone || !role) {
-          return res
-            .status(400)
-            .json({ erro: "campos em branco ou não preenchidos são obrigatórios"});
-          }
-        const novoUsuario = usuarioModel.criar({ nome, email, senha, idade, sexo, telefone, cpf, rg, role});
-        res.status(201).json(novoUsuario);
+    if (!nome || !idade || !senhaPlana || !sexo || !cpf || !email || !rg || !telefone || !role) {
+      return res
+        .status(400)
+        .json({ erro: "campos em branco ou não preenchidos são obrigatórios" });
+    }
 
-        } catch (err) {
-          next(err);
+    const senha = await gerarHashSenha(senhaPlana);
+
+    switch (role) {
+      case "ADMIN":
+      case "RECEPCIONISTA": {
+        const novoUsuario = await usuarioModel.criar({
+          nome,
+          email,
+          senha,
+          idade,
+          sexo,
+          telefone,
+          cpf,
+          rg,
+          role,
+        });
+
+        return res.status(201).json(novoUsuario);
+      }
+
+      case "MEDICO": {
+        if (!crm) {
+          return res.status(400).json({ erro: "crm é obrigatório para medicos" });
         }
-      
-      break;
 
-    case 'RECEPCIONISTA':
-      if (!nome || !idade || !senhaPlana || !sexo || !cpf || !email || !rg || !telefone || !role) {
-          return res
-            .status(400)
-            .json({ erro: "campos em branco ou não preenchidos são obrigatórios" });
-          }
-        const novaRecepcionista = usuarioModel.criar({ nome, email, senha, idade, sexo, telefone, cpf, rg, role});
-        res.status(201).json(novaRecepcionista);
-      break;
+        const novoMedico = await medicoModel.criar({
+          nome,
+          email,
+          senha,
+          idade,
+          sexo,
+          telefone,
+          cpf,
+          rg,
+          crm,
+        });
 
-    case 'MEDICO':
-      if (!nome || !idade || senhaPlana || !sexo || !cpf || !email ||  !rg || !crm || !telefone || !role) {
-          return res
-            .status(400)
-            .json({ erro: "campos em branco ou não preenchidos são obrigatórios" });
-          }
-        const novoMedico = medicoModel.criar({ nome, email, senha, idade, sexo, telefone, cpf, rg, crm, role});
-        res.status(201).json(novoMedico);
-      break;
+        return res.status(201).json(novoMedico);
+      }
 
-    case 'PACIENTE':
-      if (!nome || !idade || senhaPlana || !sexo || !cpf || !email ||  !rg ||  !telefone || !role || !localnasc||  !estadoCivil||  !tipoSanguineo||  !peso||  !altura||  !alergia||  !medicamento) {
-          return res
-            .status(400)
-            .json({ erro: "campos em branco ou não preenchidos são obrigatórios" });
-        }
-        const novoPaciente = pacienteModel.criar({ nome, email, senha, idade, sexo, telefone, cpf, rg, role, localnasc, estadoCivil, tipoSanguineo, peso, altura, alergia, medicamento, observacao});
-        res.status(201).json(novoPaciente);
-      break;
+      case "PACIENTE": {
+        const novoPaciente = await pacienteModel.criar({
+          nome,
+          email,
+          senha,
+          idade,
+          sexo,
+          telefone,
+          cpf,
+          rg,
+          localnasc,
+          estadoCivil,
+          tipoSanguineo,
+          peso,
+          altura,
+          alergia,
+          medicamento,
+          observacao,
+        });
 
-    default:
-      return res.status(400).json({
-        erro: 'Role inválido'
-      });
-    } 
-  };
-  
+        return res.status(201).json(novoPaciente);
+      }
+
+      default:
+        return res.status(400).json({ erro: "Role inválido" });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
 const login = async (req, res, next) => {
   try {
     const { email, senha } = req.body;
@@ -87,20 +123,17 @@ const login = async (req, res, next) => {
         email,
       },
     });
-    
+
     if (!usuario) {
       return res.status(401).json({
         erro: "Credenciais inválidas",
       });
     }
 
-    const senhaValida = await argon2.verify(
-      usuario.senha,
-      senha
-    );
+    const senhaValida = await argon2.verify(usuario.senha, senha);
 
     if (!senhaValida) {
-      return res.status(401).json({ erro: 'Credenciais inválidas' });
+      return res.status(401).json({ erro: "Credenciais inválidas" });
     }
 
     const token = jwt.sign(
@@ -111,13 +144,17 @@ const login = async (req, res, next) => {
 
     return res.status(200).json({
       token,
+      usuario: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        role: usuario.role,
+      },
     });
-
   } catch (error) {
     next(error);
   }
 };
-
 
 module.exports = {
   registrar,

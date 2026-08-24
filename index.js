@@ -23,6 +23,7 @@ const middleware = require("./middleware/auth.middleware");
 
 app.use("/", indexRoute);
 app.use("/auth", authRoute);
+app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use(middleware.verificarAuth);
 app.use("/agendamentos", agendamentosRoute);
 app.use("/medicos", medicosRoute);
@@ -34,7 +35,6 @@ app.get("/saude", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== "production") {
     const horario = new Date().toLocaleTimeString("pt-BR");
@@ -53,8 +53,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ erro: mensagem });
 });
 
-// Exporta o app para ser usado em outros arquivos (como testes)
-// E só inicia o servidor se este arquivo for executado diretamente
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);

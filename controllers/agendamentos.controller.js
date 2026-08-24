@@ -1,21 +1,21 @@
 const agendamentoModel = require("../repository/agendamentos.repository");
 
-const listar = (req, res, next) => {
+const listar = async (req, res, next) => {
   try {
-    const agendamentos = agendamentoModel.listarTodos(req.query);
+    const agendamentos = await agendamentoModel.listarTodos(req.query);
     res.status(200).json(agendamentos);
   } catch (err) {
     next(err);
   }
 };
 
-const buscarPorId = (req, res, next) => {
+const buscarPorId = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const agendamento = agendamentoModel.buscarPorId(id);
+    const agendamento = await agendamentoModel.buscarPorId(id);
 
     if (!agendamento) {
-      return res.status(404).json({ erro: "Agendamento não encontrado" });
+      return res.status(404).json({ erro: "Agendamento nao encontrado" });
     }
 
     res.json(agendamento);
@@ -24,37 +24,36 @@ const buscarPorId = (req, res, next) => {
   }
 };
 
-const criar = (req, res, next) => {
+const criar = async (req, res, next) => {
   try {
     const { pacienteId, medicoId, dia, horario } = req.body;
 
     if (!pacienteId || !medicoId || !dia || !horario) {
       return res
         .status(400)
-        .json({ erro: "pacienteId, medicoId, dia e horario são obrigatórios" });
+        .json({ erro: "pacienteId, medicoId, dia e horario sao obrigatorios" });
     }
 
-    const novoAgendamento = agendamentoModel.criar({
+    const novoAgendamento = await agendamentoModel.criar({
       pacienteId,
       medicoId,
       dia,
       horario,
     });
+
     res.status(201).json(novoAgendamento);
   } catch (err) {
     next(err);
   }
 };
 
-const atualizar = (req, res, next) => {
+const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const dados = req.body;
-
-    const agendamentoAtualizado = agendamentoModel.atualizar(id, dados);
+    const agendamentoAtualizado = await agendamentoModel.atualizar(id, req.body);
 
     if (!agendamentoAtualizado) {
-      return res.status(404).json({ erro: "Agendamento não encontrado" });
+      return res.status(404).json({ erro: "Agendamento nao encontrado" });
     }
 
     res.json(agendamentoAtualizado);
@@ -63,13 +62,13 @@ const atualizar = (req, res, next) => {
   }
 };
 
-const remover = (req, res, next) => {
+const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = agendamentoModel.remover(id);
+    const sucesso = await agendamentoModel.remover(id);
 
     if (!sucesso) {
-      return res.status(404).json({ erro: "Agendamento não encontrado" });
+      return res.status(404).json({ erro: "Agendamento nao encontrado" });
     }
 
     res.status(204).send();

@@ -1,46 +1,97 @@
-const prisma = require("../lib/client")
+const prisma = require("../lib/client");
 
-const listarTodos = (filtros) => {
-  let resultado = agendamentos;
+const includePacienteMedico = {
+  paciente: {
+    include: {
+      usuario: true,
+    },
+  },
+  medico: {
+    include: {
+      usuario: true,
+    },
+  },
+};
+
+function montarData(dia, horario) {
+  return new Date(`${dia}T${horario}:00`);
+}
+
+const listarTodos = (filtros = {}) => {
   const { dia, medicoId } = filtros;
-
-  if (dia) {
-    resultado = resultado.filter((a) =>
-      a.dia.toLowerCase().includes(dia.toLowerCase()),
-    );
-  }
+  const where = {};
 
   if (medicoId) {
-    resultado = resultado.filter((a) => a.medicoId === Number(medicoId));
+    where.medicoId = Number(medicoId);
   }
 
-  return resultado;
+  if (dia) {
+    const inicio = new Date(`${dia}T00:00:00`);
+    const fim = new Date(`${dia}T23:59:59.999`);
+    where.data = {
+      gte: inicio,
+      lte: fim,
+    };
+  }
+
+  return prisma.agendamento.findMany({
+    where,
+    include: includePacienteMedico,
+    orderBy: { data: "asc" },
+  });
 };
 
 const buscarPorId = (id) => {
-  return agendamentos.find((a) => a.id === id);
+  return prisma.agendamento.findUnique({
+    where: { id },
+    include: includePacienteMedico,
+  });
 };
 
 const criar = (dados) => {
-  const novoAgendamento = { id: proximoId++, ...dados };
-  agendamentos.push(novoAgendamento);
-  return novoAgendamento;
+  return prisma.agendamento.create({
+    data: {
+      pacienteId: Number(dados.pacienteId),
+      medicoId: Number(dados.medicoId),
+      data: montarData(dados.dia, dados.horario),
+    },
+    include: includePacienteMedico,
+  });
 };
 
-const atualizar = (id, dados) => {
-  const index = agendamentos.findIndex((a) => a.id === id);
-  if (index === -1) return null;
+const atualizar = async (id, dados) => {
+  const agendamento = await prisma.agendamento.findUnique({
+    where: { id },
+  });
 
-  agendamentos[index] = { ...agendamentos[index], ...dados, id };
-  return agendamentos[index];
+  if (!agendamento) return null;
+
+  return prisma.agendamento.update({
+    where: { id },
+    data: {
+      ...(dados.pacienteId !== undefined ? { pacienteId: Number(dados.pacienteId) } : {}),
+      ...(dados.medicoId !== undefined ? { medicoId: Number(dados.medicoId) } : {}),
+      ...(dados.dia && dados.horario ? { data: montarData(dados.dia, dados.horario) } : {}),
+    },
+    include: includePacienteMedico,
+  });
 };
 
-const remover = (id) => {
-  const index = agendamentos.findIndex((a) => a.id === id);
-  if (index === -1) return false;
+const remover = async (id) => {
+  const agendamento = await prisma.agendamento.findUnique({
+    where: { id },
+  });
 
-  agendamentos.splice(index, 1);
+  if (!agendamento) return false;
+
+  await prisma.agendamento.delete({ where: { id } });
   return true;
 };
 
-module.exports = { listarTodos, buscarPorId, criar, atualizar, remover };
+module.exports = {
+  listarTodos,
+  buscarPorId,
+  criar,
+  atualizar,
+  remover,
+};

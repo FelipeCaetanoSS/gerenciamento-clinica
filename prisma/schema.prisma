@@ -13,16 +13,18 @@ datasource db {
 
 model Usuario{
   id    Int    @id @default(autoincrement())
-  email String 
+  email String
   senha String
   nome String
-  idade Int   
-  sexo String 
+  idade Int
+  sexo String
   rg  String  @unique
   cpf Int @unique
   telefone Int
   ativo Boolean @default(true)
   role  Role
+  medico Medico?
+  paciente Paciente?
 }
 
 enum Role {
@@ -35,6 +37,9 @@ enum Role {
 model Medico{
   id    Int    @id @default(autoincrement())
   crm Int
+  especialidade String?
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
+  usuarioId Int? @unique
   agendamento Agendamento[]
   receita Receita[]
   consulta Consulta[]
@@ -43,14 +48,16 @@ model Medico{
 
 model Paciente{
   id    Int    @id @default(autoincrement())
-  localnasc String
-  estadoCivil String
-  tipoSanguineo String 
-  peso Int
-  altura Float
-  alergia String
-  medicamento String
+  localnasc String?
+  estadoCivil String?
+  tipoSanguineo String?
+  peso Int?
+  altura Float?
+  alergia String?
+  medicamento String?
   observacao String?
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
+  usuarioId Int? @unique
   agendamento Agendamento[]
   convenio Convenio[]
   receita Receita[]

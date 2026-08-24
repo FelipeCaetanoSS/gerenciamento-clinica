@@ -1,18 +1,18 @@
 const pacienteModel = require("../repository/pacientes.repository");
 
-const listar = (req, res, next) => {
+const listar = async (req, res, next) => {
   try {
-    const pacientes = pacienteModel.listarTodos(req.query);
+    const pacientes = await pacienteModel.listarTodos(req.query);
     res.status(200).json(pacientes);
   } catch (err) {
     next(err);
   }
 };
 
-const buscarPorId = (req, res, next) => {
+const buscarPorId = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const paciente = pacienteModel.buscarPorId(id);
+    const paciente = await pacienteModel.buscarPorId(id);
 
     if (!paciente) {
       return res.status(404).json({ erro: "Paciente não encontrado" });
@@ -24,32 +24,34 @@ const buscarPorId = (req, res, next) => {
   }
 };
 
-const criar = (req, res, next) => {
+const criar = async (req, res, next) => {
   try {
-    const { nome, idade, sexo } = req.body;
+    const { nome, cpf, telefone, sexo } = req.body;
 
-    if (!nome || !idade || !sexo) {
+    if (!nome || !cpf || !telefone) {
       return res
         .status(400)
-        .json({ erro: "nome, idade e sexo são obrigatórios" });
+        .json({ erro: "nome, cpf e telefone são obrigatorios" });
     }
 
-    const novoPaciente = pacienteModel.criar({ nome, idade, sexo });
+    const novoPaciente = await pacienteModel.criar({
+      ...req.body,
+      sexo: sexo || "Não informado",
+    });
+
     res.status(201).json(novoPaciente);
   } catch (err) {
     next(err);
   }
 };
 
-const atualizar = (req, res, next) => {
+const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const dados = req.body;
-
-    const pacienteAtualizado = pacienteModel.atualizar(id, dados);
+    const pacienteAtualizado = await pacienteModel.atualizar(id, req.body);
 
     if (!pacienteAtualizado) {
-      return res.status(404).json({ erro: "Paciente não encontrado" });
+      return res.status(404).json({ erro: "Paciente nâo encontrado" });
     }
 
     res.json(pacienteAtualizado);
@@ -58,10 +60,10 @@ const atualizar = (req, res, next) => {
   }
 };
 
-const remover = (req, res, next) => {
+const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = pacienteModel.remover(id);
+    const sucesso = await pacienteModel.remover(id);
 
     if (!sucesso) {
       return res.status(404).json({ erro: "Paciente não encontrado" });

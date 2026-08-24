@@ -1,23 +1,21 @@
 const medicoModel = require("../repository/medicos.repository");
-const argon2 = require('argon2');
 
-const listar = (req, res, next) => {
+const listar = async (req, res, next) => {
   try {
-    const medicos = medicoModel.listarTodos(req.query);
+    const medicos = await medicoModel.listarTodos(req.query);
     res.status(200).json(medicos);
   } catch (err) {
-    console.log("erro:", err);
     next(err);
   }
 };
 
-const buscarPorId = (req, res, next) => {
+const buscarPorId = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const medico = medicoModel.buscarPorId(id);
+    const medico = await medicoModel.buscarPorId(id);
 
     if (!medico) {
-      return res.status(404).json({ erro: "Médico não encontrado" });
+      return res.status(404).json({ erro: "Medico não encontrado" });
     }
 
     res.json(medico);
@@ -26,15 +24,30 @@ const buscarPorId = (req, res, next) => {
   }
 };
 
-const atualizar = (req, res, next) => {
+const criar = async (req, res, next) => {
+  try {
+    const { nome, crm, telefone } = req.body;
+
+    if (!nome || !crm || !telefone) {
+      return res
+        .status(400)
+        .json({ erro: "nome, crm e telefone são obrigatórios" });
+    }
+
+    const novoMedico = await medicoModel.criar(req.body);
+    res.status(201).json(novoMedico);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const dados = req.body;
-
-    const medicoAtualizado = medicoModel.atualizar(id, dados);
+    const medicoAtualizado = await medicoModel.atualizar(id, req.body);
 
     if (!medicoAtualizado) {
-      return res.status(404).json({ erro: "Médico não encontrado" });
+      return res.status(404).json({ erro: "Medico não encontrado" });
     }
 
     res.json(medicoAtualizado);
@@ -43,13 +56,13 @@ const atualizar = (req, res, next) => {
   }
 };
 
-const remover = (req, res, next) => {
+const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = medicoModel.remover(id);
+    const sucesso = await medicoModel.remover(id);
 
     if (!sucesso) {
-      return res.status(404).json({ erro: "Médico não encontrado" });
+      return res.status(404).json({ erro: "Medico não encontrado" });
     }
 
     res.status(204).send();
@@ -61,6 +74,7 @@ const remover = (req, res, next) => {
 module.exports = {
   listar,
   buscarPorId,
+  criar,
   atualizar,
   remover,
 };

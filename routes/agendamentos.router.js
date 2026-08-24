@@ -9,7 +9,7 @@ router.get("/", agendamentoController.listar);
 router.get("/:id", agendamentoController.buscarPorId);
 
 // POST /agendamentos
-router.post("/", agendamentoController.criar);
+router.post("/novo", agendamentoController.criar);
 
 // PUT /agendamentos/:id
 router.put("/:id", agendamentoController.atualizar);

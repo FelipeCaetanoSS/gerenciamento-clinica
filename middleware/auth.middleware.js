@@ -1,7 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 function verificarAuth(req, res, next) {
-  const token = req.headers["authorization"].replace("Bearer ", "");
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ erro: "Token nao informado" });
+  }
+
+  const token = authHeader.replace("Bearer ", "");
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
