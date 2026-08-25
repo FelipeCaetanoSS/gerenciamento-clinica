@@ -19,15 +19,16 @@ const agendamentosRoute = require("./routes/agendamentos.router");
 const medicosRoute = require("./routes/medicos.router");
 const pacientesRoute = require("./routes/pacientes.router");
 const authRoute = require("./routes/auth.router");
+const notificacoesRoute = require("./routes/notificacoes.router");
 const middleware = require("./middleware/auth.middleware");
 
 app.use("/", indexRoute);
 app.use("/auth", authRoute);
-app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use(middleware.verificarAuth);
 app.use("/agendamentos", agendamentosRoute);
 app.use("/medicos", medicosRoute);
 app.use("/pacientes", pacientesRoute);
+app.use("/notificacoes", notificacoesRoute);
 app.get("/saude", (req, res) => {
   res.json({
     status: "ok",
@@ -35,6 +36,7 @@ app.get("/saude", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== "production") {
     const horario = new Date().toLocaleTimeString("pt-BR");

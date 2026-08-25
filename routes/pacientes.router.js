@@ -9,7 +9,7 @@ router.get("/", pacienteController.listar);
 router.get("/:id", pacienteController.buscarPorId);
 
 // POST /pacientes
-router.post("/", pacienteController.criar);
+router.post("/criar", pacienteController.criar);
 
 // PUT /pacientes/:id
 router.put("/:id", pacienteController.atualizar);

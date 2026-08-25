@@ -72,7 +72,8 @@ model Agendamento{
   pacienteId Int
   medico Medico @relation(fields: [medicoId], references: [id])
   medicoId Int
-  data DateTime 
+  data DateTime
+  status String @default("agendado")
 }
 
 model Consulta{
