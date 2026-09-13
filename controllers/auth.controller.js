@@ -1,7 +1,6 @@
-const medicoModel = require("../repository/medicos.repository");
 const pacienteModel = require("../repository/pacientes.repository");
-const usuarioModel = require("../repository/usuarios.repository");
 const prisma = require("../lib/client");
+const { temValor } = require("../lib/validacao");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 
@@ -12,6 +11,10 @@ async function gerarHashSenha(senhaPlana) {
     timeCost: 3,
     parallelism: 1,
   });
+}
+
+function normalizarRole(role) {
+  return String(role || "").trim().toUpperCase();
 }
 
 const registrar = async (req, res, next) => {
@@ -26,7 +29,6 @@ const registrar = async (req, res, next) => {
       cpf,
       rg,
       role,
-      crm,
       localnasc,
       estadoCivil,
       tipoSanguineo,
@@ -37,78 +39,48 @@ const registrar = async (req, res, next) => {
       observacao,
     } = req.body;
 
-    if (!nome || !idade || !senhaPlana || !sexo || !cpf || !email || !rg || !telefone || !role) {
+    if (
+      !temValor(nome) ||
+      !temValor(idade) ||
+      !temValor(senhaPlana) ||
+      !temValor(sexo) ||
+      !temValor(cpf) ||
+      !temValor(email) ||
+      !temValor(rg) ||
+      !temValor(telefone) ||
+      !temValor(role)
+    ) {
       return res
         .status(400)
-        .json({ erro: "campos em branco ou não preenchidos são obrigatórios" });
+        .json({ erro: "campos em branco ou nao preenchidos sao obrigatorios" });
+    }
+
+    if (normalizarRole(role) !== "PACIENTE") {
+      return res.status(403).json({ erro: "Cadastro publico permitido apenas para pacientes" });
     }
 
     const senha = await gerarHashSenha(senhaPlana);
 
-    switch (role) {
-      case "ADMIN":
-      case "RECEPCIONISTA": {
-        const novoUsuario = await usuarioModel.criar({
-          nome,
-          email,
-          senha,
-          idade,
-          sexo,
-          telefone,
-          cpf,
-          rg,
-          role,
-        });
+    const novoPaciente = await pacienteModel.criar({
+      nome,
+      email,
+      senha,
+      idade,
+      sexo,
+      telefone,
+      cpf,
+      rg,
+      localnasc,
+      estadoCivil,
+      tipoSanguineo,
+      peso,
+      altura,
+      alergia,
+      medicamento,
+      observacao,
+    });
 
-        return res.status(201).json(novoUsuario);
-      }
-
-      case "MEDICO": {
-        if (!crm) {
-          return res.status(400).json({ erro: "crm é obrigatório para medicos" });
-        }
-
-        const novoMedico = await medicoModel.criar({
-          nome,
-          email,
-          senha,
-          idade,
-          sexo,
-          telefone,
-          cpf,
-          rg,
-          crm,
-        });
-
-        return res.status(201).json(novoMedico);
-      }
-
-      case "PACIENTE": {
-        const novoPaciente = await pacienteModel.criar({
-          nome,
-          email,
-          senha,
-          idade,
-          sexo,
-          telefone,
-          cpf,
-          rg,
-          localnasc,
-          estadoCivil,
-          tipoSanguineo,
-          peso,
-          altura,
-          alergia,
-          medicamento,
-          observacao,
-        });
-
-        return res.status(201).json(novoPaciente);
-      }
-
-      default:
-        return res.status(400).json({ erro: "Role inválido" });
-    }
+    return res.status(201).json(novoPaciente);
   } catch (err) {
     next(err);
   }
@@ -126,18 +98,22 @@ const login = async (req, res, next) => {
 
     if (!usuario) {
       return res.status(401).json({
-        erro: "Credenciais inválidas",
+        erro: "Credenciais invalidas",
       });
+    }
+
+    if (usuario.ativo === false) {
+      return res.status(403).json({ erro: "Usuario inativo" });
     }
 
     const senhaValida = await argon2.verify(usuario.senha, senha);
 
     if (!senhaValida) {
-      return res.status(401).json({ erro: "Credenciais inválidas" });
+      return res.status(401).json({ erro: "Credenciais invalidas" });
     }
 
     const token = jwt.sign(
-      { id: usuario.id, email: usuario.email },
+      { id: usuario.id, email: usuario.email, role: usuario.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );

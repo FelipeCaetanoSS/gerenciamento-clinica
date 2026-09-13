@@ -1,8 +1,40 @@
+const path = require("path");
+const fs = require("fs");
 const pacienteModel = require("../repository/pacientes.repository");
+
+const uploadBaseDir = path.resolve(__dirname, "..", "uploads");
+
+function caminhoUpload(file) {
+  if (!file?.path) return null;
+
+  return path.relative(process.cwd(), file.path).replace(/\\/g, "/");
+}
+
+function caminhoSeguroUpload(caminhoRelativo) {
+  if (!caminhoRelativo) return null;
+
+  const caminhoNormalizado = String(caminhoRelativo).replace(/\\/g, "/");
+  const caminhoSemUploads = caminhoNormalizado.startsWith("uploads/")
+    ? caminhoNormalizado.slice("uploads/".length)
+    : caminhoNormalizado;
+  const caminhoAbsoluto = path.resolve(uploadBaseDir, caminhoSemUploads);
+
+  if (caminhoAbsoluto !== uploadBaseDir && !caminhoAbsoluto.startsWith(`${uploadBaseDir}${path.sep}`)) {
+    return null;
+  }
+
+  return caminhoAbsoluto;
+}
 
 const listar = async (req, res, next) => {
   try {
-    const pacientes = await pacienteModel.listarTodos(req.query);
+    const filtros = { ...req.query };
+
+    if (req.usuario?.role === "PACIENTE") {
+      filtros.usuarioId = Number(req.usuario.id);
+    }
+
+    const pacientes = await pacienteModel.listarTodos(filtros);
     res.status(200).json(pacientes);
   } catch (err) {
     next(err);
@@ -19,6 +51,139 @@ const buscarPorId = async (req, res, next) => {
     }
 
     res.json(paciente);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const buscarPorCPF = async (req, res, next) => {
+  try {
+    const cpf = req.params.cpf;
+    const cpfNumerico = Number(String(cpf || "").replace(/\D/g, ""));
+
+    if (!cpfNumerico) {
+      return res.status(400).json({ erro: "CPF invalido" });
+    }
+
+    const paciente = await pacienteModel.buscarPorCPF(cpfNumerico);
+
+    if (!paciente) {
+      return res.status(404).json({ erro: "Paciente não encontrado" });
+    }
+
+    res.json(paciente);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const listarProntuario = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ erro: "Paciente invalido" });
+    }
+
+    const registros = await pacienteModel.listarProntuario(id);
+    res.json(registros);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const criarProntuario = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ erro: "Paciente invalido" });
+    }
+
+    const registro = await pacienteModel.criarProntuario(id, req.body);
+
+    if (!registro) {
+      return res.status(404).json({ erro: "Paciente nao encontrado" });
+    }
+
+    res.status(201).json(registro);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const adicionarExame = async (req, res, next) => {
+  try {
+    const pacienteId = Number(req.params.id);
+    const prontuarioId = Number(req.params.prontuarioId);
+
+    if (!pacienteId || !prontuarioId) {
+      return res.status(400).json({ erro: "Paciente ou prontuario invalido" });
+    }
+
+    const resultado = await pacienteModel.adicionarExame(pacienteId, prontuarioId, req.body);
+
+    if (!resultado) {
+      return res.status(404).json({ erro: "Paciente ou prontuario nao encontrado" });
+    }
+
+    res.status(201).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const adicionarAnexoExame = async (req, res, next) => {
+  try {
+    const pacienteId = Number(req.params.id);
+    const prontuarioId = Number(req.params.prontuarioId);
+    const exameId = Number(req.params.exameId);
+
+    if (!pacienteId || !prontuarioId || !exameId) {
+      return res.status(400).json({ erro: "Parametros invalidos" });
+    }
+
+    const arquivoUrl = caminhoUpload(req.file) || req.body?.imagem || req.body?.imageUrl;
+
+    if (!arquivoUrl) {
+      return res.status(400).json({ erro: "Arquivo e obrigatorio" });
+    }
+
+    const resultado = await pacienteModel.adicionarAnexoExame(pacienteId, prontuarioId, exameId, arquivoUrl);
+
+    if (!resultado) {
+      return res.status(404).json({ erro: "Exame nao encontrado" });
+    }
+
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const abrirAnexoExame = async (req, res, next) => {
+  try {
+    const pacienteId = Number(req.params.id);
+    const prontuarioId = Number(req.params.prontuarioId);
+    const exameId = Number(req.params.exameId);
+
+    if (!pacienteId || !prontuarioId || !exameId) {
+      return res.status(400).json({ erro: "Parametros invalidos" });
+    }
+
+    const anexo = await pacienteModel.buscarAnexoExame(pacienteId, prontuarioId, exameId);
+
+    if (!anexo) {
+      return res.status(404).json({ erro: "Anexo nao encontrado" });
+    }
+
+    const caminhoArquivo = caminhoSeguroUpload(anexo.caminho);
+
+    if (!caminhoArquivo || !fs.existsSync(caminhoArquivo)) {
+      return res.status(404).json({ erro: "Anexo nao encontrado" });
+    }
+
+    res.sendFile(caminhoArquivo);
   } catch (err) {
     next(err);
   }
@@ -63,13 +228,13 @@ const atualizar = async (req, res, next) => {
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = await pacienteModel.remover(id);
+    const pacienteRemovido = await pacienteModel.remover(id);
 
-    if (!sucesso) {
+    if (!pacienteRemovido) {
       return res.status(404).json({ erro: "Paciente não encontrado" });
     }
 
-    res.status(204).send();
+    res.json(pacienteRemovido);
   } catch (err) {
     next(err);
   }
@@ -78,6 +243,12 @@ const remover = async (req, res, next) => {
 module.exports = {
   listar,
   buscarPorId,
+  buscarPorCPF,
+  listarProntuario,
+  criarProntuario,
+  adicionarExame,
+  adicionarAnexoExame,
+  abrirAnexoExame,
   criar,
   atualizar,
   remover,

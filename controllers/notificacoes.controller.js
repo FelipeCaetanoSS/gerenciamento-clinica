@@ -2,8 +2,12 @@ const notificacoesModel = require("../repository/notificacoes.repository");
 
 const criar = async (req, res, next) => {
   try {
-    const notificacoes = await notificacoesModel.criarNotificacao(req.body);
-    res.status(200).json(notificacoes);
+    const dados = {
+      ...req.body,
+      ...(req.usuario?.id ? { usuarioId: req.usuario.id } : {}),
+    };
+    const notificacoes = await notificacoesModel.criarNotificacao(dados);
+    res.status(201).json(notificacoes);
   } catch (err) {
     next(err);
   }
@@ -11,7 +15,13 @@ const criar = async (req, res, next) => {
 
 const listar = async (req, res, next) => {
   try {
-    const notificacoes = await notificacoesModel.listarTodos(req.query);
+    const filtros = { ...req.query };
+
+    if (req.usuario?.role === "PACIENTE") {
+      filtros.usuarioId = Number(req.usuario.id);
+    }
+
+    const notificacoes = await notificacoesModel.listarTodos(filtros);
     res.status(200).json(notificacoes);
   } catch (err) {
     next(err);
@@ -20,7 +30,7 @@ const listar = async (req, res, next) => {
 
 const visualizarTodas = async (req, res, next) => {
   try {
-    const notificacoes = await notificacoesModel.visualizarTodos(req.body);
+    const notificacoes = await notificacoesModel.visualizarTodos();
 
     if (!notificacoes) {
       return res.status(404).json({ erro: "Notificação não encontrada" });

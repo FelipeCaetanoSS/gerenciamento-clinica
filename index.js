@@ -4,6 +4,7 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require('cors'); 
+const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,15 +21,11 @@ const medicosRoute = require("./routes/medicos.router");
 const pacientesRoute = require("./routes/pacientes.router");
 const authRoute = require("./routes/auth.router");
 const notificacoesRoute = require("./routes/notificacoes.router");
+const usuariosRoute = require("./routes/usuarios.router");
 const middleware = require("./middleware/auth.middleware");
 
 app.use("/", indexRoute);
 app.use("/auth", authRoute);
-app.use(middleware.verificarAuth);
-app.use("/agendamentos", agendamentosRoute);
-app.use("/medicos", medicosRoute);
-app.use("/pacientes", pacientesRoute);
-app.use("/notificacoes", notificacoesRoute);
 app.get("/saude", (req, res) => {
   res.json({
     status: "ok",
@@ -36,8 +33,22 @@ app.get("/saude", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+app.use("/agendamentos", middleware.verificarAuth, agendamentosRoute);
+app.use("/medicos", middleware.verificarAuth, medicosRoute);
+app.use("/pacientes", middleware.verificarAuth, pacientesRoute);
+app.use("/notificacoes", middleware.verificarAuth, notificacoesRoute);
+app.use("/usuarios", middleware.verificarAuth, middleware.verificarAdmin, usuariosRoute);
 app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError || err.isUploadError) {
+    const mensagem =
+      err.code === "LIMIT_FILE_SIZE"
+        ? "Arquivo muito grande. O limite e 5MB."
+        : err.message;
+
+    return res.status(err.status || 400).json({ erro: mensagem });
+  }
+
   if (process.env.NODE_ENV !== "production") {
     const horario = new Date().toLocaleTimeString("pt-BR");
     console.log(`[${horario}] ${req.method} ${req.path}`);

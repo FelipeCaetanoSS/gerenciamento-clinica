@@ -2,7 +2,16 @@ const agendamentoModel = require("../repository/agendamentos.repository");
 
 const listar = async (req, res, next) => {
   try {
-    const agendamentos = await agendamentoModel.listarTodos(req.query);
+    const filtros = { ...req.query };
+
+    if (req.usuario?.role === "MEDICO") {
+      delete filtros.medicoId;
+      filtros.medicoUsuarioId = Number(req.usuario.id);
+    } else if (req.usuario?.role === "PACIENTE") {
+      filtros.pacienteUsuarioId = Number(req.usuario.id);
+    }
+
+    const agendamentos = await agendamentoModel.listarTodos(filtros);
     res.status(200).json(agendamentos);
   } catch (err) {
     next(err);
@@ -62,6 +71,26 @@ const atualizar = async (req, res, next) => {
   }
 };
 
+const finalizar = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({ erro: "Agendamento invalido" });
+    }
+
+    const resultado = await agendamentoModel.finalizar(id, req.body);
+
+    if (!resultado) {
+      return res.status(404).json({ erro: "Agendamento nao encontrado" });
+    }
+
+    res.json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -82,5 +111,6 @@ module.exports = {
   buscarPorId,
   criar,
   atualizar,
+  finalizar,
   remover,
 };

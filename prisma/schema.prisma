@@ -25,6 +25,7 @@ model Usuario{
   role  Role
   medico Medico?
   paciente Paciente?
+  notificacao Notificacao[]
 }
 
 enum Role {
@@ -37,29 +38,41 @@ enum Role {
 model Medico{
   id    Int    @id @default(autoincrement())
   crm Int
+  crmUf String?
   especialidade String?
+  diasAtendimento String?
+  horarioInicio String?
+  horarioFim String?
+  duracaoConsulta String?
+  duracaoConsultaMinutos Int?
+  maxConsultasDia Int?
   usuario Usuario? @relation(fields: [usuarioId], references: [id])
   usuarioId Int? @unique
   agendamento Agendamento[]
   receita Receita[]
   consulta Consulta[]
   exame Exame[]
+  prontuario Prontuario[]
 }
 
 model Paciente{
   id    Int    @id @default(autoincrement())
   localnasc String?
+  DataNasc DateTime?
   estadoCivil String?
   tipoSanguineo String?
-  peso Int?
+  peso Float?
   altura Float?
   alergia String?
   medicamento String?
   observacao String?
+  deficiencia String?
+  doencas String?
   usuario Usuario? @relation(fields: [usuarioId], references: [id])
   usuarioId Int? @unique
   agendamento Agendamento[]
   convenio Convenio[]
+  endereco Endereco?
   receita Receita[]
   consulta Consulta[]
   exame Exame[]
@@ -104,8 +117,12 @@ model Notificacao{
   id    Int    @id @default(autoincrement())
   titulo String
   mensagem String
-  lida String 
+  tipo String?
+  categoria String?
+  lida Boolean @default(false)
   data DateTime
+  usuarioId Int?
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
 }
 
 model Convenio{
@@ -119,28 +136,42 @@ model Convenio{
 
 model Exame{
   id    Int    @id @default(autoincrement())
-  data DateTime
-  observacao String
+  nome String?
+  data DateTime @default(now())
+  observacao String?
+  imagem String?
   paciente Paciente @relation(fields: [pacienteId], references: [id])
   pacienteId Int
   medico Medico @relation(fields: [medicoId], references: [id])
   medicoId Int
+  prontuario Prontuario? @relation(fields: [prontuarioId], references: [id])
+  prontuarioId Int?
+  anexoImagem String?
 }
 
 model Prontuario{
   id    Int    @id @default(autoincrement())
   data DateTime
   observacao String
-  receita Receita @relation(fields: [receitaId], references: [id])
-  receitaId Int
+  medicamento String?
+  dosagem String?
+  dias String?
+  observacaoReceita String?
+  medico Medico? @relation(fields: [medicoId], references: [id])
+  medicoId Int?
+  receita Receita? @relation(fields: [receitaId], references: [id])
+  receitaId Int?
   paciente Paciente @relation(fields: [pacienteId], references: [id])
   pacienteId Int
+  exames Exame[]
 }
 
 model Endereco{
   id    Int    @id @default(autoincrement())
-  rua String 
-  cidade String 
-  bairro String
-  numero Int
+  rua String? 
+  cidade String? 
+  bairro String?
+  numero Int?
+  paciente Paciente? @relation(fields: [pacienteId], references: [id])
+  pacienteId Int? @unique
 }

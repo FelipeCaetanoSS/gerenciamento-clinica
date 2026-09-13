@@ -1,8 +1,16 @@
 const medicoModel = require("../repository/medicos.repository");
+const {
+  camposObrigatorios,
+  mensagemCamposObrigatorios,
+} = require("../lib/validacao");
 
 const listar = async (req, res, next) => {
   try {
-    const medicos = await medicoModel.listarTodos(req.query);
+    const filtros = {
+      ...req.query,
+      ...(req.usuario?.role === "MEDICO" ? { usuarioId: Number(req.usuario.id) } : {}),
+    };
+    const medicos = await medicoModel.listarTodos(filtros);
     res.status(200).json(medicos);
   } catch (err) {
     next(err);
@@ -26,12 +34,12 @@ const buscarPorId = async (req, res, next) => {
 
 const criar = async (req, res, next) => {
   try {
-    const { nome, crm, telefone } = req.body;
+    const camposFaltando = camposObrigatorios(req.body, ["nome", "crm", "rg", "telefone", "email"]);
 
-    if (!nome || !crm || !telefone) {
+    if (camposFaltando.length > 0) {
       return res
         .status(400)
-        .json({ erro: "nome, crm e telefone são obrigatórios" });
+        .json({ erro: mensagemCamposObrigatorios(camposFaltando) });
     }
 
     const novoMedico = await medicoModel.criar(req.body);
@@ -59,13 +67,13 @@ const atualizar = async (req, res, next) => {
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = await medicoModel.remover(id);
+    const medicoRemovido = await medicoModel.remover(id);
 
-    if (!sucesso) {
+    if (!medicoRemovido) {
       return res.status(404).json({ erro: "Medico não encontrado" });
     }
 
-    res.status(204).send();
+    res.json(medicoRemovido);
   } catch (err) {
     next(err);
   }
