@@ -53,13 +53,22 @@ const listarTodos = (filtros = {}) => {
   );
 };
 
-const visualizarTodos = async () => {
+const visualizarTodos = async (filtros = {}) => {
+  const { usuarioId } = filtros;
+  const where = {
+    lida: false,
+    ...(usuarioId ? { usuarioId: Number(usuarioId) } : {}),
+  };
+
   await prisma.notificacao.updateMany({
-    where: { lida: false },
+    where,
     data: { lida: true },
   });
 
   const notificacoes = await prisma.notificacao.findMany({
+    where: {
+      ...(usuarioId ? { usuarioId: Number(usuarioId) } : {}),
+    },
     orderBy: { data: "desc" },
   });
 
@@ -83,12 +92,14 @@ const visualizarTodos = async () => {
   }));
 };
 
-const visualizarId = async (id) => {
+const visualizarId = async (id, filtros = {}) => {
+  const { usuarioId } = filtros;
   const notificacao = await prisma.notificacao.findUnique({
     where: { id: Number(id) },
   });
 
   if (!notificacao) return null;
+  if (usuarioId && Number(notificacao.usuarioId) !== Number(usuarioId)) return null;
 
   const atualizada = await prisma.notificacao.update({
     where: { id: Number(id) },

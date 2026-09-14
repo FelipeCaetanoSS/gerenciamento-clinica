@@ -30,7 +30,13 @@ const listar = async (req, res, next) => {
 
 const visualizarTodas = async (req, res, next) => {
   try {
-    const notificacoes = await notificacoesModel.visualizarTodos();
+    const filtros = {};
+
+    if (req.usuario?.role === "PACIENTE") {
+      filtros.usuarioId = Number(req.usuario.id);
+    }
+
+    const notificacoes = await notificacoesModel.visualizarTodos(filtros);
 
     if (!notificacoes) {
       return res.status(404).json({ erro: "Notificação não encontrada" });
@@ -44,7 +50,13 @@ const visualizarTodas = async (req, res, next) => {
 
 const visualizarUnica = async (req, res, next) => {
   try {
-    const notificacao = await notificacoesModel.visualizarId(req.params.id);
+    const filtros = {};
+
+    if (req.usuario?.role === "PACIENTE") {
+      filtros.usuarioId = Number(req.usuario.id);
+    }
+
+    const notificacao = await notificacoesModel.visualizarId(req.params.id, filtros);
 
     if (!notificacao) {
       return res.status(404).json({ erro: "Notificação não encontrada" });

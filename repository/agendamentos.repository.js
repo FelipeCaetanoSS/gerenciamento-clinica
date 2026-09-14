@@ -55,6 +55,13 @@ function descricaoAgendamento(agendamento) {
   return { paciente, medico, data };
 }
 
+function dadosNotificacaoPaciente(agendamento) {
+  return {
+    usuarioId: agendamento?.paciente?.usuarioId,
+    tipo: "appointment",
+  };
+}
+
 function erroHorarioIndisponivel() {
   const erro = new Error("Horario indisponivel para este medico ou paciente");
   erro.status = 409;
@@ -148,6 +155,7 @@ const criar = async (dados) => {
 
   const descricao = descricaoAgendamento(agendamento);
   await criarNotificacaoSegura({
+    ...dadosNotificacaoPaciente(agendamento),
     titulo: "Novo agendamento",
     mensagem: `${descricao.paciente} foi agendado com ${descricao.medico}${descricao.data ? ` em ${descricao.data}` : ""}.`,
   });
@@ -189,6 +197,7 @@ const atualizar = async (id, dados) => {
   if (dados.status !== undefined && statusCancelado(dados.status) && !statusCancelado(agendamento.status)) {
     const descricao = descricaoAgendamento(atualizado);
     await criarNotificacaoSegura({
+      ...dadosNotificacaoPaciente(atualizado),
       titulo: "Agendamento cancelado",
       mensagem: `${descricao.paciente} teve a consulta cancelada${descricao.data ? ` de ${descricao.data}` : ""}.`,
     });
@@ -232,6 +241,7 @@ const finalizar = async (id, dados = {}) => {
 
   const descricao = descricaoAgendamento(agendamentoAtualizado);
   await criarNotificacaoSegura({
+    ...dadosNotificacaoPaciente(agendamentoAtualizado),
     titulo: "Consulta finalizada",
     mensagem: `${descricao.paciente} teve prontuario registrado por ${descricao.medico}.`,
   });

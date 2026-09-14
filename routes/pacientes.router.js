@@ -8,7 +8,7 @@ const {
 } = require("../middleware/auth.middleware");
 
 // GET /pacientes
-router.get("/", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteController.listar);
+router.get("/", verificarPerfis("ADMIN", "RECEPCIONISTA", "PACIENTE"), pacienteController.listar);
 
 // GET /pacientes/cpf/:cpf
 router.get("/cpf/:cpf", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteController.buscarPorCPF);
@@ -38,7 +38,8 @@ router.post(
 // POST /pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo
 router.post(
   "/:id/prontuario/:prontuarioId/exames/:exameId/anexo",
-  verificarPerfis("ADMIN", "RECEPCIONISTA"),
+  verificarPerfis("ADMIN", "RECEPCIONISTA", "PACIENTE"),
+  verificarPacienteProprio,
   upload.single("anexo"),
   pacienteController.adicionarAnexoExame
 );
