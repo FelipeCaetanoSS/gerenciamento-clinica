@@ -1,21 +1,9 @@
 const pacienteModel = require("../repository/pacientes.repository");
 const prisma = require("../lib/client");
 const { temValor } = require("../lib/validacao");
-const argon2 = require("argon2");
+const { verificarSenha } = require("../lib/senha");
+const { normalizarRole } = require("../lib/normalizacao");
 const jwt = require("jsonwebtoken");
-
-async function gerarHashSenha(senhaPlana) {
-  return argon2.hash(senhaPlana, {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-  });
-}
-
-function normalizarRole(role) {
-  return String(role || "").trim().toUpperCase();
-}
 
 const registrar = async (req, res, next) => {
   try {
@@ -59,12 +47,10 @@ const registrar = async (req, res, next) => {
       return res.status(403).json({ erro: "Cadastro publico permitido apenas para pacientes" });
     }
 
-    const senha = await gerarHashSenha(senhaPlana);
-
     const novoPaciente = await pacienteModel.criar({
       nome,
       email,
-      senha,
+      senhaPlana,
       idade,
       sexo,
       telefone,
@@ -106,7 +92,7 @@ const login = async (req, res, next) => {
       return res.status(403).json({ erro: "Usuario inativo" });
     }
 
-    const senhaValida = await argon2.verify(usuario.senha, senha);
+    const senhaValida = await verificarSenha(usuario.senha, senha);
 
     if (!senhaValida) {
       return res.status(401).json({ erro: "Credenciais invalidas" });
@@ -125,6 +111,7 @@ const login = async (req, res, next) => {
         nome: usuario.nome,
         email: usuario.email,
         role: usuario.role,
+        senhaTemporaria: usuario.senhaTemporaria === true,
       },
     });
   } catch (error) {

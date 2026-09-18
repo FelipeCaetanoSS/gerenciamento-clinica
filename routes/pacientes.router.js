@@ -3,12 +3,13 @@ const router = express.Router();
 const pacienteController = require("../controllers/pacientes.controller");
 const upload = require("../middleware/upload.middleware");
 const {
+  verificarPacienteRelacionadoAoMedico,
   verificarPacienteProprio,
   verificarPerfis,
 } = require("../middleware/auth.middleware");
 
 // GET /pacientes
-router.get("/", verificarPerfis("ADMIN", "RECEPCIONISTA", "PACIENTE"), pacienteController.listar);
+router.get("/", verificarPerfis("ADMIN", "RECEPCIONISTA", "MEDICO", "PACIENTE"), pacienteController.listar);
 
 // GET /pacientes/cpf/:cpf
 router.get("/cpf/:cpf", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteController.buscarPorCPF);
@@ -16,8 +17,9 @@ router.get("/cpf/:cpf", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteContr
 // GET /pacientes/:id/prontuario
 router.get(
   "/:id/prontuario",
-  verificarPerfis("ADMIN", "RECEPCIONISTA", "PACIENTE"),
+  verificarPerfis("ADMIN", "RECEPCIONISTA", "MEDICO", "PACIENTE"),
   verificarPacienteProprio,
+  verificarPacienteRelacionadoAoMedico,
   pacienteController.listarProntuario
 );
 
@@ -33,6 +35,15 @@ router.post(
   "/:id/prontuario/:prontuarioId/exames",
   verificarPerfis("ADMIN", "RECEPCIONISTA"),
   pacienteController.adicionarExame
+);
+
+// POST /pacientes/:id/prontuario/:prontuarioId/receita/download
+router.post(
+  "/:id/prontuario/:prontuarioId/receita/download",
+  verificarPerfis("ADMIN", "RECEPCIONISTA", "MEDICO", "PACIENTE"),
+  verificarPacienteProprio,
+  verificarPacienteRelacionadoAoMedico,
+  pacienteController.baixarReceitaProntuario
 );
 
 // POST /pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo
@@ -63,7 +74,7 @@ router.get(
 // POST /pacientes
 router.post("/", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteController.criar);
 
-// POST /pacientes/criar
+// POST /pacientes/criar (compatibilidade)
 router.post("/criar", verificarPerfis("ADMIN", "RECEPCIONISTA"), pacienteController.criar);
 
 // PUT /pacientes/:id

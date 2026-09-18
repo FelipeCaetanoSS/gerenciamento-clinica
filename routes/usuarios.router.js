@@ -1,23 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../controllers/usuarios.controller");
+const middleware = require("../middleware/auth.middleware");
 
 // GET /usuarios
-router.get("/", usuarioController.listar);
+router.get("/", middleware.verificarAdmin, usuarioController.listar);
 
 // GET /usuarios/:id
-router.get("/:id", usuarioController.buscarPorId);
+router.get("/:id", middleware.verificarAdmin, usuarioController.buscarPorId);
 
 // POST /usuarios
-router.post("/", usuarioController.criar);
+router.post("/", middleware.verificarAdmin, usuarioController.criar);
 
 // PUT /usuarios/:id
-router.put("/:id", usuarioController.atualizar);
+router.put("/:id", middleware.verificarAdmin, usuarioController.atualizar);
 
 // PATCH /usuarios/:id
 router.patch("/:id", usuarioController.atualizar);
 
 // DELETE /usuarios/:id
-router.delete("/:id", usuarioController.remover);
+router.delete("/:id", middleware.verificarAdmin, usuarioController.remover);
 
 module.exports = router;

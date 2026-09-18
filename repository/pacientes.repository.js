@@ -1,28 +1,30 @@
-const argon2 = require("argon2");
 const prisma = require("../lib/client");
 const notificacoesModel = require("./notificacoes.repository");
+const { dataOuNull, texto, textoOuNull } = require("../lib/normalizacao");
+const { onzeDigitosNumericos } = require("../lib/validacao");
+const { hashSenha, senhaTemporaria } = require("../lib/senha");
+const { dadosAuditoria, dadosAuditoriaRelacao, dadosDesativacaoRelacao, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includeUsuario = {
   usuario: true,
   convenio: true,
   endereco: true,
   exame: true,
+  ...includeAlteradoPor,
 };
 
-function onlyDigits(value) {
-  return Number(String(value || "").replace(/\D/g, "")) || 0;
-}
-
-function dataOuNull(value) {
-  if (value === undefined || value === null || value === "") return null;
-
-  const data = new Date(value);
-  return Number.isNaN(data.getTime()) ? null : data;
-}
-
-function textoOuNull(value) {
-  return value === undefined || value === null || value === "" ? null : String(value);
-}
+const includeProntuarioDetalhado = {
+  medico: {
+    include: {
+      usuario: true,
+    },
+  },
+  receita: true,
+  exames: {
+    include: includeAlteradoPor,
+  },
+  ...includeAlteradoPor,
+};
 
 function normalizarEndereco(endereco) {
   if (!endereco || typeof endereco !== "object") return null;
@@ -56,31 +58,6 @@ function normalizarConvenios(convenio) {
     .filter(item => item.nome);
 }
 
-function mapProntuario(registro) {
-  const receita = registro.receita;
-  const medico = receita?.medico;
-  const doctor = medico?.usuario?.nome || "Medico";
-
-  const prescription = receita
-    ? [
-        receita.medicamento ? `Medicamento: ${receita.medicamento}` : "",
-        receita.dosagem ? `Dosagem: ${receita.dosagem}` : "",
-        receita.dias ? `Duracao: ${receita.dias}` : "",
-      ].filter(Boolean).join("\n")
-    : "";
-
-  return {
-    id: registro.id,
-    date: registro.data?.toISOString().slice(0, 10) || "",
-    doctor,
-    specialty: medico?.especialidade || "",
-    complaints: registro.observacao || receita?.observacao || "Consulta registrada",
-    diagnosis: registro.observacao || "",
-    prescription,
-    notes: receita?.observacao || "",
-  };
-}
-
 function abrirUrlExame(pacienteId, prontuarioId, exameId) {
   return `/pacientes/${pacienteId}/prontuario/${prontuarioId}/exames/${exameId}/anexo/abrir`;
 }
@@ -94,24 +71,78 @@ function mapExameProntuario(exame, pacienteId, prontuarioId) {
     observacao: exame.observacao || "",
     temAnexo,
     abrirUrl: temAnexo ? abrirUrlExame(pacienteId, prontuarioId, exame.id) : null,
+    ultimaAlteracao: withUltimaAlteracao(exame)?.ultimaAlteracao || null,
   };
 }
 
-async function hashSenha(senha) {
-  return argon2.hash(senha || "123456", {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-  });
+function prontuarioTemPrescricao(prontuario = {}) {
+  const prescricao = camposPrescricaoProntuario(prontuario);
+
+  return Boolean(
+    prescricao.medicamento ||
+    prescricao.dosagem ||
+    prescricao.dias ||
+    prescricao.observacaoReceita
+  );
 }
 
-const listarTodos = (filtros = {}) => {
-  const { busca, sexo, usuarioId } = filtros;
+function camposPrescricaoProntuario(prontuario = {}) {
+  return {
+    medicamento: textoOuVazio(prontuario.medicamento || prontuario.receita?.medicamento),
+    dosagem: textoOuVazio(prontuario.dosagem || prontuario.receita?.dosagem),
+    dias: textoOuVazio(prontuario.dias || prontuario.receita?.dias),
+    observacaoReceita: textoOuVazio(prontuario.observacaoReceita || prontuario.receita?.observacao),
+  };
+}
 
-  return prisma.paciente.findMany({
+function montarTextoPrescricao(prontuario = {}) {
+  const prescricao = camposPrescricaoProntuario(prontuario);
+
+  return [
+    prescricao.medicamento ? `Medicamento: ${prescricao.medicamento}` : "",
+    prescricao.dosagem ? `Dosagem: ${prescricao.dosagem}` : "",
+    prescricao.dias ? `Duracao: ${prescricao.dias}` : "",
+    prescricao.observacaoReceita ? `Observacoes: ${prescricao.observacaoReceita}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function mapProntuarioDetalhado(registro, pacienteId) {
+  const registroComAuditoria = withUltimaAlteracao(registro);
+  const { receita, receitaId, ...registroPublico } = registroComAuditoria;
+  const prescricao = camposPrescricaoProntuario(registro);
+
+  return {
+    ...registroPublico,
+    id: registro.id,
+    medicoId: registro.medicoId,
+    data: registro.data?.toISOString().slice(0, 10) || "",
+    observacao: registro.observacao || "",
+    medicamento: prescricao.medicamento,
+    dosagem: prescricao.dosagem,
+    dias: prescricao.dias,
+    observacaoReceita: prescricao.observacaoReceita,
+    prescription: montarTextoPrescricao(registro),
+    prescricaoBaixadaPeloPaciente: Boolean(registro.prescricaoBaixadaPeloPaciente),
+    prescricaoDownloadPacienteEm: registro.prescricaoDownloadPacienteEm?.toISOString() || null,
+    exames: (registro.exames || []).map((e) => mapExameProntuario(e, pacienteId, registro.id)),
+  };
+}
+
+const listarTodos = async (filtros = {}) => {
+  const { busca, sexo, usuarioId, medicoUsuarioId } = filtros;
+
+  const pacientes = await prisma.paciente.findMany({
     where: {
       ...(usuarioId ? { usuarioId: Number(usuarioId) } : {}),
+      ...(medicoUsuarioId ? {
+        agendamento: {
+          some: {
+            medico: {
+              usuarioId: Number(medicoUsuarioId),
+            },
+          },
+        },
+      } : {}),
       usuario: {
         ...(sexo ? { sexo } : {}),
         ...(busca ? { nome: { contains: busca } } : {}),
@@ -120,21 +151,24 @@ const listarTodos = (filtros = {}) => {
     include: includeUsuario,
     orderBy: { id: "desc" },
   });
+
+  return pacientes.map(withUltimaAlteracao);
 };
 
-const buscarPorId = (id) => {
-  return prisma.paciente.findUnique({
+const buscarPorId = async (id) => {
+  const paciente = await prisma.paciente.findUnique({
     where: { id },
     include: includeUsuario,
   });
+
+  return withUltimaAlteracao(paciente);
 };
 
 const buscarPorCPF = async (cpf) => {
-  const cpfNumerico = onlyDigits(cpf);
-  if (!cpfNumerico) return null;
+  const cpfNormalizado = onzeDigitosNumericos(cpf, "CPF");
 
   const usuario = await prisma.usuario.findUnique({
-    where: { cpf: cpfNumerico },
+    where: { cpf: cpfNormalizado },
     select: {
       id: true,
       nome: true,
@@ -187,29 +221,11 @@ const listarProntuario = async (pacienteId) => {
 
   const registros = await prisma.prontuario.findMany({
     where: { pacienteId: id },
-    include: {
-      medico: {
-        include: {
-          usuario: true,
-        },
-      },
-      receita: true,
-      exames: true,
-    },
-    orderBy: { data: "desc" },
+    include: includeProntuarioDetalhado,
+    orderBy: [{ data: "desc" }, { id: "desc" }],
   });
 
-  return registros.map((r) => ({
-    id: r.id,
-    medicoId: r.medicoId,
-    data: r.data?.toISOString().slice(0, 10) || "",
-    observacao: r.observacao || "",
-    medicamento: r.medicamento || r.receita?.medicamento || "",
-    dosagem: r.dosagem || r.receita?.dosagem || "",
-    dias: r.dias || r.receita?.dias || "",
-    observacaoReceita: r.observacaoReceita || r.receita?.observacao || "",
-    exames: (r.exames || []).map((e) => mapExameProntuario(e, id, r.id)),
-  }));
+  return registros.map((r) => mapProntuarioDetalhado(r, id));
 };
 
 function dataProntuario(value) {
@@ -220,7 +236,7 @@ function dataProntuario(value) {
 }
 
 function textoOuVazio(value) {
-  return value === undefined || value === null ? "" : String(value).trim();
+  return texto(value);
 }
 
 async function criarNotificacaoSegura(dados) {
@@ -231,7 +247,7 @@ async function criarNotificacaoSegura(dados) {
   }
 }
 
-const criarProntuario = async (pacienteId, dados = {}) => {
+const criarProntuario = async (pacienteId, dados = {}, usuarioAlteracaoId) => {
   const id = Number(pacienteId);
   const medicoId = Number(dados.medicoId);
 
@@ -239,7 +255,7 @@ const criarProntuario = async (pacienteId, dados = {}) => {
 
   const paciente = await prisma.paciente.findUnique({
     where: { id },
-    select: { id: true, usuario: { select: { nome: true } } },
+    select: { id: true, usuarioId: true, usuario: { select: { nome: true } } },
   });
 
   if (!paciente) return null;
@@ -263,28 +279,17 @@ const criarProntuario = async (pacienteId, dados = {}) => {
   const examesData = Array.isArray(dados.exames) ? dados.exames : [];
 
   const registro = await prisma.$transaction(async (tx) => {
-    const receita = await tx.receita.create({
-      data: {
-        pacienteId: id,
-        medicoId,
-        medicamento: textoOuVazio(dados.medicamento),
-        dosagem: textoOuVazio(dados.dosagem),
-        dias: textoOuVazio(dados.dias),
-        observacao: textoOuVazio(dados.observacaoReceita),
-      },
-    });
-
     const prontuario = await tx.prontuario.create({
       data: {
         pacienteId: id,
         medicoId,
-        receitaId: receita.id,
         data: dataProntuario(dados.data),
         observacao: textoOuVazio(dados.observacao) || "Consulta registrada",
         medicamento: textoOuVazio(dados.medicamento),
         dosagem: textoOuVazio(dados.dosagem),
         dias: textoOuVazio(dados.dias),
         observacaoReceita: textoOuVazio(dados.observacaoReceita),
+        ...dadosAuditoria(usuarioAlteracaoId),
       },
     });
 
@@ -296,57 +301,45 @@ const criarProntuario = async (pacienteId, dados = {}) => {
           pacienteId: id,
           medicoId,
           prontuarioId: prontuario.id,
+          ...dadosAuditoria(usuarioAlteracaoId),
         })),
       });
     }
 
     return tx.prontuario.findUnique({
       where: { id: prontuario.id },
-      include: {
-  exames: true,
-      },
+      include: includeProntuarioDetalhado,
     });
   });
 
-  const resultado = {
-    id: registro.id,
-    medicoId: registro.medicoId,
-    data: registro.data?.toISOString().slice(0, 10) || "",
-    observacao: registro.observacao || "",
-    medicamento: registro.medicamento || "",
-    dosagem: registro.dosagem || "",
-    dias: registro.dias || "",
-    observacaoReceita: registro.observacaoReceita || "",
-    exames: (registro.exames || []).map((e) => ({
-      id: e.id,
-      nome: e.nome || "Exame",
-      observacao: e.observacao || "",
-    })),
-  };
+  const resultado = mapProntuarioDetalhado(registro, id);
 
   if (dados.notificar !== false) {
     await criarNotificacaoSegura({
       titulo: "Prontuario registrado",
       mensagem: `Novo registro adicionado ao prontuario de ${paciente.usuario?.nome || "paciente"}.`,
-      usuarioId: id,
+      usuarioId: paciente.usuarioId,
+      tipo: "prontuario",
+      categoria: "medical_record",
     });
   }
 
   return resultado;
 };
 
-const criar = async (dados) => {
+const criar = async (dados, usuarioAlteracaoId = dados.usuarioAlteracaoId) => {
   const endereco = normalizarEndereco(dados.endereco);
   const convenios = normalizarConvenios(dados.convenio);
   const usuarioData = {
     nome: dados.nome,
     email: dados.email,
-    senha: (await hashSenha(dados.senhaPlana)),
+    senha: dados.senha || (await hashSenha(dados.senhaPlana)),
+    senhaTemporaria: senhaTemporaria(dados),
     idade: Number(dados.idade) || 0,
     sexo: dados.sexo || "Nao informado",
     rg: dados.rg || `RG-${Date.now()}`,
-    cpf: onlyDigits(dados.cpf),
-    telefone: onlyDigits(dados.telefone),
+    cpf: onzeDigitosNumericos(dados.cpf, "CPF"),
+    telefone: onzeDigitosNumericos(dados.telefone, "Telefone"),
     role: "PACIENTE",
   };
 
@@ -368,12 +361,13 @@ const criar = async (dados) => {
       },
       ...(endereco ? { endereco: { create: endereco } } : {}),
       ...(convenios.length > 0 ? { convenio: { create: convenios } } : {}),
+      ...dadosAuditoriaRelacao(usuarioAlteracaoId),
     },
     include: includeUsuario,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const atualizar = async (id, dados) => {
+const atualizar = async (id, dados, usuarioAlteracaoId) => {
   const paciente = await prisma.paciente.findUnique({
     where: { id },
     select: { usuarioId: true },
@@ -421,6 +415,7 @@ const atualizar = async (id, dados) => {
           }
         : {}),
       ...convenioAtualizado,
+      ...dadosAuditoriaRelacao(usuarioAlteracaoId),
       ...(paciente.usuarioId
         ? {
             usuario: {
@@ -430,18 +425,18 @@ const atualizar = async (id, dados) => {
                 ...(dados.idade !== undefined ? { idade: Number(dados.idade) || 0 } : {}),
                 ...(dados.sexo !== undefined ? { sexo: dados.sexo } : {}),
                 ...(dados.rg !== undefined ? { rg: dados.rg } : {}),
-                ...(dados.cpf !== undefined ? { cpf: onlyDigits(dados.cpf) } : {}),
-                ...(dados.telefone !== undefined ? { telefone: onlyDigits(dados.telefone) } : {}),
+                ...(dados.cpf !== undefined ? { cpf: onzeDigitosNumericos(dados.cpf, "CPF") } : {}),
+                ...(dados.telefone !== undefined ? { telefone: onzeDigitosNumericos(dados.telefone, "Telefone") } : {}),
               },
             },
           }
         : {}),
     },
     include: includeUsuario,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const remover = async (id) => {
+const remover = async (id, usuarioAlteracaoId) => {
   const paciente = await prisma.paciente.findUnique({
     where: { id },
     select: { usuarioId: true },
@@ -451,18 +446,12 @@ const remover = async (id) => {
 
   return prisma.paciente.update({
     where: { id },
-    data: {
-      usuario: {
-        update: {
-          ativo: false,
-        },
-      },
-    },
+    data: dadosDesativacaoRelacao(usuarioAlteracaoId),
     include: includeUsuario,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const adicionarExame = async (pacienteId, prontuarioId, dados) => {
+const adicionarExame = async (pacienteId, prontuarioId, dados, usuarioAlteracaoId) => {
   const id = Number(pacienteId);
   const prontuarioNum = Number(prontuarioId);
 
@@ -477,7 +466,7 @@ const adicionarExame = async (pacienteId, prontuarioId, dados) => {
 
   const prontuario = await prisma.prontuario.findUnique({
     where: { id: prontuarioNum },
-    select: { id: true },
+    select: { id: true, medicoId: true },
   });
 
   if (!prontuario) return null;
@@ -489,23 +478,62 @@ const adicionarExame = async (pacienteId, prontuarioId, dados) => {
       pacienteId: id,
       medicoId: prontuario.medicoId || 1,
       prontuarioId: prontuarioNum,
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
   });
 
   const prontuarioAtualizado = await prisma.prontuario.findUnique({
     where: { id: prontuarioNum },
-    include: { exames: true },
+    include: includeProntuarioDetalhado,
   });
 
   return {
-    prontuario: {
-      id: prontuarioAtualizado.id,
-      exames: (prontuarioAtualizado.exames || []).map((e) => mapExameProntuario(e, id, prontuarioNum)),
-    },
+    prontuario: mapProntuarioDetalhado(prontuarioAtualizado, id),
   };
 };
 
-const adicionarAnexoExame = async (pacienteId, prontuarioId, exameId, imagemUrl) => {
+const baixarReceitaProntuario = async (pacienteId, prontuarioId, usuarioAlteracaoId) => {
+  const id = Number(pacienteId);
+  const prontuarioNum = Number(prontuarioId);
+
+  if (!id || !prontuarioNum) return null;
+
+  const prontuario = await prisma.prontuario.findUnique({
+    where: { id: prontuarioNum },
+    include: {
+      receita: true,
+    },
+  });
+
+  if (!prontuario || prontuario.pacienteId !== id) return null;
+
+  if (!prontuarioTemPrescricao(prontuario)) {
+    const erro = new Error("Prontuario nao possui receita para download");
+    erro.status = 409;
+    throw erro;
+  }
+
+  const baixadoEm = new Date();
+  const prontuarioAtualizado = await prisma.prontuario.update({
+    where: { id: prontuarioNum },
+    data: {
+      prescricaoBaixadaPeloPaciente: true,
+      prescricaoDownloadPacienteEm: baixadoEm,
+      ...dadosAuditoria(usuarioAlteracaoId),
+    },
+    include: includeProntuarioDetalhado,
+  });
+
+  const prontuarioMapeado = mapProntuarioDetalhado(prontuarioAtualizado, id);
+
+  return {
+    prontuario: prontuarioMapeado,
+    prescricaoBaixadaPeloPaciente: true,
+    prescricaoDownloadPacienteEm: prontuarioMapeado.prescricaoDownloadPacienteEm,
+  };
+};
+
+const adicionarAnexoExame = async (pacienteId, prontuarioId, exameId, imagemUrl, usuarioAlteracaoId) => {
   const id = Number(pacienteId);
   const prontuarioNum = Number(prontuarioId);
   const exameNum = Number(exameId);
@@ -525,26 +553,22 @@ const adicionarAnexoExame = async (pacienteId, prontuarioId, exameId, imagemUrl)
     data: {
       imagem: imagemUrl,
       anexoImagem: imagemUrl,
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
   });
 
   if (exame.prontuarioId) {
     const prontuario = await prisma.prontuario.findUnique({
       where: { id: exame.prontuarioId },
-      include: { exames: true },
+      include: includeProntuarioDetalhado,
     });
 
     return {
-      prontuario: {
-        id: prontuario.id,
-        exames: (prontuario.exames || []).map((e) => ({
-          ...mapExameProntuario(e, id, prontuario.id),
-        })),
-      },
+      prontuario: mapProntuarioDetalhado(prontuario, id),
     };
   }
 
-  return exameAtualizado;
+  return withUltimaAlteracao(exameAtualizado);
 };
 
 const buscarAnexoExame = async (pacienteId, prontuarioId, exameId) => {
@@ -589,6 +613,7 @@ module.exports = {
   atualizar,
   remover,
   adicionarExame,
+  baixarReceitaProntuario,
   adicionarAnexoExame,
   buscarAnexoExame,
 };

@@ -22,6 +22,9 @@ router.get(
 );
 
 // POST /medicos
+router.post("/", verificarPerfis("ADMIN"), medicoController.criar);
+
+// POST /medicos/novo (compatibilidade)
 router.post("/novo", verificarPerfis("ADMIN"), medicoController.criar);
 
 // PUT /medicos/:id

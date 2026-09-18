@@ -1,10 +1,14 @@
-const argon2 = require("argon2");
 const prisma = require("../lib/client");
+const { booleano, normalizarRole } = require("../lib/normalizacao");
+const { onzeDigitosNumericos } = require("../lib/validacao");
+const { hashSenha, verificarSenha } = require("../lib/senha");
+const { dadosAuditoria, dadosDesativacao, usuarioAuditoriaSelect, withUltimaAlteracao } = require("./auditoria.repository");
 
 const usuarioSelect = {
   id: true,
   email: true,
   nome: true,
+  senhaTemporaria: true,
   idade: true,
   sexo: true,
   rg: true,
@@ -12,35 +16,19 @@ const usuarioSelect = {
   telefone: true,
   ativo: true,
   role: true,
+  alteradoPorId: true,
+  alteradoEm: true,
+  alteradoPor: {
+    select: usuarioAuditoriaSelect,
+  },
 };
-
-function onlyDigits(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  return digits ? Number(digits) : 0;
-}
-
-function toBoolean(value) {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value === 1;
-  if (typeof value === "string") return ["true", "1", "sim", "s"].includes(value.toLowerCase());
-  return Boolean(value);
-}
-
-async function hashSenha(senhaPlana) {
-  return argon2.hash(senhaPlana, {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-  });
-}
 
 const listarTodos = (filtros = {}) => {
   const { busca, sexo, role } = filtros;
 
   return prisma.usuario.findMany({
     where: {
-      ...(role ? { role: String(role).toUpperCase() } : {}),
+      ...(role ? { role: normalizarRole(role) } : {}),
       ...(sexo ? { sexo: { equals: sexo } } : {}),
       ...(busca
         ? {
@@ -52,35 +40,37 @@ const listarTodos = (filtros = {}) => {
     },
     select: usuarioSelect,
     orderBy: { nome: "asc" },
-  });
+  }).then((usuarios) => usuarios.map(withUltimaAlteracao));
 };
 
 const buscarPorId = (id) => {
   return prisma.usuario.findUnique({
     where: { id },
     select: usuarioSelect,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const criar = async (dados) => {
+const criar = async (dados, usuarioAlteracaoId) => {
   return prisma.usuario.create({
     data: {
       nome: dados.nome,
       email: dados.email,
       senha: dados.senha || (await hashSenha(dados.senhaPlana)),
+      senhaTemporaria: dados.senhaTemporaria === true,
       idade: Number(dados.idade) || 0,
       sexo: dados.sexo,
-      telefone: onlyDigits(dados.telefone),
-      cpf: onlyDigits(dados.cpf),
+      telefone: onzeDigitosNumericos(dados.telefone, "Telefone"),
+      cpf: onzeDigitosNumericos(dados.cpf, "CPF"),
       rg: dados.rg,
-      role: String(dados.role || "").toUpperCase(),
-      ...(dados.ativo !== undefined ? { ativo: toBoolean(dados.ativo) } : {}),
+      role: normalizarRole(dados.role),
+      ...(dados.ativo !== undefined ? { ativo: booleano(dados.ativo) } : {}),
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
     select: usuarioSelect,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const atualizar = async (id, dados) => {
+const atualizar = async (id, dados, usuarioAlteracaoId) => {
   const usuario = await prisma.usuario.findUnique({
     where: { id },
     select: { id: true },
@@ -95,17 +85,43 @@ const atualizar = async (id, dados) => {
       ...(dados.email !== undefined ? { email: dados.email } : {}),
       ...(dados.idade !== undefined ? { idade: Number(dados.idade) || 0 } : {}),
       ...(dados.sexo !== undefined ? { sexo: dados.sexo } : {}),
-      ...(dados.telefone !== undefined ? { telefone: onlyDigits(dados.telefone) } : {}),
-      ...(dados.cpf !== undefined ? { cpf: onlyDigits(dados.cpf) } : {}),
+      ...(dados.telefone !== undefined ? { telefone: onzeDigitosNumericos(dados.telefone, "Telefone") } : {}),
+      ...(dados.cpf !== undefined ? { cpf: onzeDigitosNumericos(dados.cpf, "CPF") } : {}),
       ...(dados.rg !== undefined ? { rg: dados.rg } : {}),
-      ...(dados.role !== undefined ? { role: String(dados.role).toUpperCase() } : {}),
-      ...(dados.ativo !== undefined ? { ativo: toBoolean(dados.ativo) } : {}),
+      ...(dados.role !== undefined ? { role: normalizarRole(dados.role) } : {}),
+      ...(dados.ativo !== undefined ? { ativo: booleano(dados.ativo) } : {}),
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
     select: usuarioSelect,
-  });
+  }).then(withUltimaAlteracao);
 };
 
-const remover = async (id) => {
+const alterarSenha = async (id, dados, usuarioAlteracaoId) => {
+  const usuario = await prisma.usuario.findUnique({
+    where: { id },
+    select: { id: true, senha: true },
+  });
+
+  if (!usuario) return { status: "not_found" };
+
+  const senhaValida = await verificarSenha(usuario.senha, dados.senhaAtual);
+
+  if (!senhaValida) return { status: "invalid_password" };
+
+  const usuarioAtualizado = await prisma.usuario.update({
+    where: { id },
+    data: {
+      senha: await hashSenha(dados.novaSenha),
+      senhaTemporaria: false,
+      ...dadosAuditoria(usuarioAlteracaoId),
+    },
+    select: usuarioSelect,
+  }).then(withUltimaAlteracao);
+
+  return { status: "updated", usuario: usuarioAtualizado };
+};
+
+const remover = async (id, usuarioAlteracaoId) => {
   const usuario = await prisma.usuario.findUnique({
     where: { id },
     select: { id: true },
@@ -115,9 +131,9 @@ const remover = async (id) => {
 
   return prisma.usuario.update({
     where: { id },
-    data: { ativo: false },
+    data: dadosDesativacao(usuarioAlteracaoId),
     select: usuarioSelect,
-  });
+  }).then(withUltimaAlteracao);
 };
 
 module.exports = {
@@ -125,6 +141,7 @@ module.exports = {
   buscarPorId,
   criar,
   atualizar,
+  alterarSenha,
   remover,
   usuarioSelect,
 };

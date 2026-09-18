@@ -15,17 +15,27 @@ model Usuario{
   id    Int    @id @default(autoincrement())
   email String
   senha String
+  senhaTemporaria Boolean @default(false)
   nome String
   idade Int
   sexo String
   rg  String  @unique
-  cpf Int @unique
-  telefone Int
+  cpf String @unique
+  telefone String
   ativo Boolean @default(true)
   role  Role
   medico Medico?
   paciente Paciente?
   notificacao Notificacao[]
+  alteradoPor Usuario? @relation("UsuarioAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
+  usuariosAlterados Usuario[] @relation("UsuarioAlteradoPor")
+  pacientesAlterados Paciente[] @relation("PacienteAlteradoPor")
+  medicosAlterados Medico[] @relation("MedicoAlteradoPor")
+  agendamentosAlterados Agendamento[] @relation("AgendamentoAlteradoPor")
+  prontuariosAlterados Prontuario[] @relation("ProntuarioAlteradoPor")
+  examesAlterados Exame[] @relation("ExameAlteradoPor")
 }
 
 enum Role {
@@ -53,6 +63,9 @@ model Medico{
   consulta Consulta[]
   exame Exame[]
   prontuario Prontuario[]
+  alteradoPor Usuario? @relation("MedicoAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
 }
 
 model Paciente{
@@ -77,6 +90,9 @@ model Paciente{
   consulta Consulta[]
   exame Exame[]
   prontuario Prontuario[]
+  alteradoPor Usuario? @relation("PacienteAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
 }
 
 model Agendamento{
@@ -87,6 +103,9 @@ model Agendamento{
   medicoId Int
   data DateTime
   status String @default("agendado")
+  alteradoPor Usuario? @relation("AgendamentoAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
 }
 
 model Consulta{
@@ -147,6 +166,9 @@ model Exame{
   prontuario Prontuario? @relation(fields: [prontuarioId], references: [id])
   prontuarioId Int?
   anexoImagem String?
+  alteradoPor Usuario? @relation("ExameAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
 }
 
 model Prontuario{
@@ -157,6 +179,8 @@ model Prontuario{
   dosagem String?
   dias String?
   observacaoReceita String?
+  prescricaoBaixadaPeloPaciente Boolean @default(false)
+  prescricaoDownloadPacienteEm DateTime?
   medico Medico? @relation(fields: [medicoId], references: [id])
   medicoId Int?
   receita Receita? @relation(fields: [receitaId], references: [id])
@@ -164,6 +188,9 @@ model Prontuario{
   paciente Paciente @relation(fields: [pacienteId], references: [id])
   pacienteId Int
   exames Exame[]
+  alteradoPor Usuario? @relation("ProntuarioAlteradoPor", fields: [alteradoPorId], references: [id])
+  alteradoPorId Int?
+  alteradoEm DateTime?
 }
 
 model Endereco{

@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "nodemon index.js",
+    "postinstall": "prisma generate",
     "start": "node index.js",
     "test": "jest"
   },
@@ -25,7 +26,6 @@
   "homepage": "https://github.com/FelipeCaetanoSS/gerenciamento-clinica#readme",
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.9.1",
-    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "argon2": "^0.45.1",
     "cors": "^2.8.6",
@@ -35,7 +35,6 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.11.0",
     "multer": "^2.3.0",
-    "pg": "^8.22.0",
     "prisma": "^7.9.1"
   },
   "devDependencies": {

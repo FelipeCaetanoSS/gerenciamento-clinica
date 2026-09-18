@@ -1,21 +1,19 @@
 require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
-const argon2 = require("argon2");
+const { hashSenha } = require("../lib/senha");
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-async function hashSenha(senha) {
-  return argon2.hash(senha, {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-  });
+function dataRelativa(dias, hora = "09:00") {
+  const data = new Date();
+  data.setDate(data.getDate() + dias);
+  const dia = data.toISOString().slice(0, 10);
+  return new Date(`${dia}T${hora}:00`);
 }
 
-async function main() {
+async function limparBanco() {
   console.log("Limpando banco...");
   await prisma.$executeRawUnsafe("PRAGMA foreign_keys = OFF");
   await prisma.exame.deleteMany();
@@ -30,137 +28,154 @@ async function main() {
   await prisma.paciente.deleteMany();
   await prisma.usuario.deleteMany();
   await prisma.$executeRawUnsafe("PRAGMA foreign_keys = ON");
+}
+
+async function criarUsuario(dados, senhaPadrao) {
+  const { senhaPlana, ...dadosUsuario } = dados;
+
+  return prisma.usuario.create({
+    data: {
+      ...dadosUsuario,
+      senha: senhaPadrao,
+      senhaTemporaria: false,
+      ativo: true,
+    },
+  });
+}
+
+async function main() {
+  await limparBanco();
 
   const senhaPadrao = await hashSenha("123456");
 
   console.log("Criando usuarios...");
 
-  const admin = await prisma.usuario.create({
-    data: {
-      nome: "Admin Sistema",
-      email: "admin@clinica.com",
-      senha: senhaPadrao,
-      idade: 35,
+  const admin = await criarUsuario(
+    {
+      nome: "Felipe",
+      email: "felipe@gmail.com",
+      senhaPlana: "123456",
+      idade: 21,
       sexo: "Masculino",
-      cpf: 12345678901,
-      rg: "1234567",
-      telefone: 11999990001,
+      cpf: "12111222333",
+      rg: "15252523",
+      telefone: "43998459912",
       role: "ADMIN",
-    },
-  });
+    }, senhaPadrao
+  );
 
-  const recepcionista = await prisma.usuario.create({
-    data: {
-      nome: "Maria Recepcionista",
-      email: "recepcionista@clinica.com",
-      senha: senhaPadrao,
-      idade: 28,
+  const recepcionista = await criarUsuario(
+    {
+      nome: "Larissa Mendes",
+      email: "larissa@gmail.com",
+      idade: 29,
       sexo: "Feminino",
-      cpf: 22345678901,
-      rg: "2234567",
-      telefone: 11999990002,
+      cpf: "51231249876",
+      rg: "SP5129876",
+      telefone: "11976234511",
       role: "RECEPCIONISTA",
     },
-  });
+    senhaPadrao
+  );
 
-  const medicoUsuario1 = await prisma.usuario.create({
-    data: {
-      nome: "Dr. Carlos Silva",
-      email: "carlos@medico.com",
-      senha: senhaPadrao,
-      idade: 45,
+  const medicoUsuario1 = await criarUsuario(
+    {
+      nome: "Rafael Azevedo",
+      email: "rafael@gmail.com",
+      idade: 44,
       sexo: "Masculino",
-      cpf: 32345678901,
-      rg: "3234567",
-      telefone: 11999990003,
+      cpf: "62345198437",
+      rg: "SP6231987",
+      telefone: "11983561211",
       role: "MEDICO",
     },
-  });
+    senhaPadrao
+  );
 
-  const medicoUsuario2 = await prisma.usuario.create({
-    data: {
-      nome: "Dra. Ana Santos",
-      email: "ana@medico.com",
-      senha: senhaPadrao,
-      idade: 38,
+  const medicoUsuario2 = await criarUsuario(
+    {
+      nome: "Camila Duarte",
+      email: "camila@gmail.com",
+      idade: 39,
       sexo: "Feminino",
-      cpf: 42345678901,
-      rg: "4234567",
-      telefone: 11999990004,
+      cpf: "73456219778",
+      rg: "RJ7342198",
+      telefone: "21991134578",
       role: "MEDICO",
     },
-  });
+    senhaPadrao
+  );
 
-  const pacienteUsuario1 = await prisma.usuario.create({
-    data: {
-      nome: "Joao Paciente",
-      email: "joao@email.com",
-      senha: senhaPadrao,
-      idade: 30,
+  const pacienteUsuario1 = await criarUsuario(
+    {
+      nome: "Marcos Vinicius Rocha",
+      email: "marcos@gmail.com",
+      idade: 42,
       sexo: "Masculino",
-      cpf: 52345678901,
-      rg: "5234567",
-      telefone: 11999990005,
+      cpf: "11111111111",
+      rg: "SP8453219",
+      telefone: "11911784523",
       role: "PACIENTE",
     },
-  });
+    senhaPadrao
+  );
 
-  const pacienteUsuario2 = await prisma.usuario.create({
-    data: {
-      nome: "Maria Paciente",
-      email: "maria@email.com",
-      senha: senhaPadrao,
-      idade: 25,
+  const pacienteUsuario2 = await criarUsuario(
+    {
+      nome: "Helena Barbosa",
+      email: "helena@gmail.com",
+      idade: 31,
       sexo: "Feminino",
-      cpf: 62345678901,
-      rg: "6234567",
-      telefone: 11999990006,
+      cpf: "95678435321",
+      rg: "MG9564321",
+      telefone: "31982145672",
       role: "PACIENTE",
     },
-  });
+    senhaPadrao
+  );
 
-  const pacienteUsuario3 = await prisma.usuario.create({
-    data: {
-      nome: "Pedro Oliveira",
-      email: "pedro@email.com",
-      senha: senhaPadrao,
-      idade: 55,
+  const pacienteUsuario3 = await criarUsuario(
+    {
+      nome: "Antonio Ferreira Lima",
+      email: "antonio@gmail.com",
+      idade: 58,
       sexo: "Masculino",
-      cpf: 72345678901,
-      rg: "7234567",
-      telefone: 11999990007,
+      cpf: "16789534432",
+      rg: "PR1675432",
+      telefone: "41934876234",
       role: "PACIENTE",
     },
-  });
+    senhaPadrao
+  );
 
   console.log("Criando medicos...");
 
   const medico1 = await prisma.medico.create({
     data: {
-      crm: 12345,
+      crm: 48216,
       crmUf: "SP",
-      especialidade: "Clinico Geral",
+      especialidade: "Clinica medica",
       diasAtendimento: "Segunda,Terca,Quinta",
       horarioInicio: "08:00",
       horarioFim: "17:00",
       duracaoConsulta: "30 min",
       duracaoConsultaMinutos: 30,
-      maxConsultasDia: 16,
+      maxConsultasDia: 14,
       usuarioId: medicoUsuario1.id,
     },
   });
 
   const medico2 = await prisma.medico.create({
     data: {
-      crm: 67890,
+      crm: 59327,
       crmUf: "SP",
-      especialidade: "Pediatra",
+      especialidade: "Cardiologia",
       diasAtendimento: "Segunda,Quarta,Sexta",
       horarioInicio: "09:00",
       horarioFim: "18:00",
-      duracaoConsulta: "30 min",
-      duracaoConsultaMinutos: 30,
-      maxConsultasDia: 16,
+      duracaoConsulta: "40 min",
+      duracaoConsultaMinutos: 40,
+      maxConsultasDia: 10,
       usuarioId: medicoUsuario2.id,
     },
   });
@@ -169,25 +184,30 @@ async function main() {
 
   const paciente1 = await prisma.paciente.create({
     data: {
-      DataNasc: new Date("1996-03-15"),
+      DataNasc: new Date("1984-05-14"),
       localnasc: "Sao Paulo",
-      estadoCivil: "Solteiro",
+      estadoCivil: "Casado",
       tipoSanguineo: "O+",
-      peso: 75.5,
-      altura: 1.75,
+      peso: 84.2,
+      altura: 1.78,
+      alergia: "Dipirona",
+      medicamento: "Omeprazol 20mg quando necessario",
+      observacao: "Relata rotina de trabalho intensa e sono irregular.",
+      deficiencia: "Nenhuma",
+      doencas: JSON.stringify(["Gastrite"]),
       usuarioId: pacienteUsuario1.id,
       endereco: {
         create: {
-          rua: "Rua das Flores",
+          rua: "Rua Padre Carvalho",
           cidade: "Sao Paulo",
-          bairro: "Centro",
-          numero: 123,
+          bairro: "Pinheiros",
+          numero: 248,
         },
       },
       convenio: {
         create: {
           nome: "Unimed",
-          numCarteirinha: "UNI-123456",
+          numCarteirinha: "UNI-482193",
           validade: new Date("2027-12-31"),
         },
       },
@@ -196,27 +216,31 @@ async function main() {
 
   const paciente2 = await prisma.paciente.create({
     data: {
-      DataNasc: new Date("2001-07-22"),
-      localnasc: "Guarulhos",
+      DataNasc: new Date("1995-09-03"),
+      localnasc: "Belo Horizonte",
       estadoCivil: "Solteira",
       tipoSanguineo: "A+",
-      peso: 58.0,
-      altura: 1.62,
-      alergia: "Amoxicilina",
+      peso: 61.4,
+      altura: 1.64,
+      alergia: "",
+      medicamento: "",
+      observacao: "",
+      deficiencia: "Nenhuma",
+      doencas: JSON.stringify(["Rinite alergica"]),
       usuarioId: pacienteUsuario2.id,
       endereco: {
         create: {
-          rua: "Av. Paulista",
-          cidade: "Sao Paulo",
-          bairro: "Bela Vista",
-          numero: 456,
+          rua: "Avenida Afonso Pena",
+          cidade: "Belo Horizonte",
+          bairro: "Funcionarios",
+          numero: 1120,
         },
       },
       convenio: {
         create: {
           nome: "Bradesco Saude",
-          numCarteirinha: "BRA-789012",
-          validade: new Date("2027-06-30"),
+          numCarteirinha: "BRA-735912",
+          validade: new Date("2027-08-30"),
         },
       },
     },
@@ -224,172 +248,213 @@ async function main() {
 
   const paciente3 = await prisma.paciente.create({
     data: {
-      DataNasc: new Date("1971-11-10"),
-      localnasc: "Santos",
+      DataNasc: new Date("1968-01-22"),
+      localnasc: "Curitiba",
       estadoCivil: "Casado",
       tipoSanguineo: "B+",
-      peso: 90.0,
-      altura: 1.80,
-      medicamento: "Losartana 50mg",
-      doencas: JSON.stringify(["Hipertensao", "Diabetes Tipo 2"]),
+      peso: 88.7,
+      altura: 1.72,
+      alergia: "Nenhuma conhecida",
+      medicamento: "Losartana 50mg, Metformina 850mg",
+      observacao: "Acompanhamento regular para pressao arterial e glicemia.",
+      deficiencia: "Nenhuma",
+      doencas: JSON.stringify(["Hipertensao", "Diabetes tipo 2"]),
       usuarioId: pacienteUsuario3.id,
       endereco: {
         create: {
-          rua: "Rua da Praia",
-          cidade: "Santos",
-          bairro: "Boa Viagem",
-          numero: 789,
+          rua: "Rua Visconde de Nacar",
+          cidade: "Curitiba",
+          bairro: "Centro",
+          numero: 687,
         },
       },
       convenio: {
         create: {
-          nome: "Sulamerica",
-          numCarteirinha: "SUL-345678",
-          validade: new Date("2027-09-30"),
+          nome: "SulAmerica Saude",
+          numCarteirinha: "SUL-219684",
+          validade: new Date("2027-10-15"),
         },
       },
+    },
+  });
+
+  console.log("Criando consultas, receitas e prontuarios...");
+
+  await prisma.consulta.create({
+    data: {
+      data: dataRelativa(-10, "10:00"),
+      status: "concluida",
+      motivo: "Dor abdominal recorrente e azia apos refeicoes.",
+      pacienteId: paciente1.id,
+      medicoId: medico1.id,
+    },
+  });
+
+  await prisma.consulta.create({
+    data: {
+      data: dataRelativa(-4, "14:00"),
+      status: "concluida",
+      motivo: "Avaliacao cardiologica de rotina.",
+      pacienteId: paciente3.id,
+      medicoId: medico2.id,
+    },
+  });
+
+  const receita1 = await prisma.receita.create({
+    data: {
+      medicoId: medico1.id,
+      pacienteId: paciente1.id,
+      medicamento: "Omeprazol",
+      dosagem: "20mg",
+      dias: "14 dias",
+      observacao: "Tomar 1 capsula pela manha, em jejum.",
+    },
+  });
+
+  const receita2 = await prisma.receita.create({
+    data: {
+      medicoId: medico2.id,
+      pacienteId: paciente3.id,
+      medicamento: "Losartana",
+      dosagem: "50mg",
+      dias: "Uso continuo",
+      observacao: "Manter 1 comprimido ao dia e acompanhar pressao arterial.",
+    },
+  });
+
+  const prontuario1 = await prisma.prontuario.create({
+    data: {
+      data: dataRelativa(-10, "10:30"),
+      observacao: "Quadro compativel com gastrite leve. Orientado ajuste alimentar e retorno se houver piora.",
+      medicoId: medico1.id,
+      pacienteId: paciente1.id,
+      receitaId: receita1.id,
+      medicamento: "Omeprazol",
+      dosagem: "20mg",
+      dias: "14 dias",
+      observacaoReceita: "Evitar cafe, alcool e alimentos muito condimentados durante o tratamento.",
+    },
+  });
+
+  const prontuario2 = await prisma.prontuario.create({
+    data: {
+      data: dataRelativa(-4, "14:40"),
+      observacao: "Pressao controlada no consultorio. Solicitado acompanhamento laboratorial.",
+      medicoId: medico2.id,
+      pacienteId: paciente3.id,
+      receitaId: receita2.id,
+      medicamento: "Losartana",
+      dosagem: "50mg",
+      dias: "Uso continuo",
+      observacaoReceita: "Registrar medidas de pressao pela manha por 7 dias.",
+    },
+  });
+
+  await prisma.exame.create({
+    data: {
+      nome: "Hemograma completo",
+      observacao: "Exame solicitado para investigacao inicial e acompanhamento clinico.",
+      pacienteId: paciente1.id,
+      medicoId: medico1.id,
+      prontuarioId: prontuario1.id,
+    },
+  });
+
+  await prisma.exame.create({
+    data: {
+      nome: "Glicemia de jejum",
+      observacao: "Controle metabolico em paciente com diabetes tipo 2.",
+      pacienteId: paciente3.id,
+      medicoId: medico2.id,
+      prontuarioId: prontuario2.id,
+    },
+  });
+
+  await prisma.exame.create({
+    data: {
+      nome: "Eletrocardiograma",
+      observacao: "Avaliacao cardiologica de rotina.",
+      pacienteId: paciente3.id,
+      medicoId: medico2.id,
+      prontuarioId: prontuario2.id,
     },
   });
 
   console.log("Criando agendamentos...");
 
-  const hoje = new Date();
-  const amanha = new Date(hoje);
-  amanha.setDate(amanha.getDate() + 1);
-  const proximaSemana = new Date(hoje);
-  proximaSemana.setDate(proximaSemana.getDate() + 7);
-
-  await prisma.agendamento.create({
-    data: {
-      pacienteId: paciente1.id,
-      medicoId: medico1.id,
-      data: new Date(`${amanha.toISOString().slice(0, 10)}T08:00:00`),
-      status: "agendado",
-    },
-  });
-
-  await prisma.agendamento.create({
-    data: {
-      pacienteId: paciente2.id,
-      medicoId: medico2.id,
-      data: new Date(`${amanha.toISOString().slice(0, 10)}T09:00:00`),
-      status: "confirmado",
-    },
-  });
-
-  await prisma.agendamento.create({
-    data: {
-      pacienteId: paciente3.id,
-      medicoId: medico1.id,
-      data: new Date(`${proximaSemana.toISOString().slice(0, 10)}T10:00:00`),
-      status: "agendado",
-    },
-  });
-
-  await prisma.agendamento.create({
-    data: {
-      pacienteId: paciente1.id,
-      medicoId: medico1.id,
-      data: new Date(`${hoje.toISOString().slice(0, 10)}T08:00:00`),
-      status: "concluido",
-    },
-  });
-
-  console.log("Criando prontuario e receita...");
-
-  const receita = await prisma.receita.create({
-    data: {
-      medicoId: medico1.id,
-      pacienteId: paciente1.id,
-      medicamento: "Paracetamol",
-      dosagem: "500mg",
-      dias: "7 dias",
-      observacao: "Tomar 1 comprimido a cada 8 horas",
-    },
-  });
-
-  const prontuario = await prisma.prontuario.create({
-    data: {
-      data: new Date(),
-      observacao: "Paciente apresenta febre e tosse. Iniciar tratamento.",
-      medicoId: medico1.id,
-      receitaId: receita.id,
-      pacienteId: paciente1.id,
-      medicamento: "Paracetamol",
-      dosagem: "500mg",
-      dias: "7 dias",
-      observacaoReceita: "Tomar 1 comprimido a cada 8 horas",
-    },
-  });
-
-  await prisma.exame.create({
-    data: {
-      nome: "Hemograma Completo",
-      observacao: "Solicitado para verificar infeccao",
-      pacienteId: paciente1.id,
-      medicoId: medico1.id,
-      prontuarioId: prontuario.id,
-    },
-  });
-
-  await prisma.exame.create({
-    data: {
-      nome: "Raio-X do Torax",
-      observacao: "Verificar condicoes pulmonares",
-      pacienteId: paciente1.id,
-      medicoId: medico1.id,
-      prontuarioId: prontuario.id,
-    },
+  await prisma.agendamento.createMany({
+    data: [
+      {
+        pacienteId: paciente1.id,
+        medicoId: medico1.id,
+        data: dataRelativa(-10, "10:00"),
+        status: "concluido",
+      },
+      {
+        pacienteId: paciente3.id,
+        medicoId: medico2.id,
+        data: dataRelativa(-4, "14:00"),
+        status: "concluido",
+      },
+      {
+        pacienteId: paciente2.id,
+        medicoId: medico1.id,
+        data: dataRelativa(1, "09:30"),
+        status: "confirmado",
+      },
+      {
+        pacienteId: paciente1.id,
+        medicoId: medico2.id,
+        data: dataRelativa(3, "15:20"),
+        status: "agendado",
+      },
+      {
+        pacienteId: paciente3.id,
+        medicoId: medico1.id,
+        data: dataRelativa(7, "08:40"),
+        status: "agendado",
+      },
+    ],
   });
 
   console.log("Criando notificacoes...");
 
-  await prisma.notificacao.create({
-    data: {
-      titulo: "Novo agendamento",
-      mensagem: "Joao Paciente foi agendado com Dr. Carlos Silva.",
-      tipo: "appointment",
-      categoria: "appointment",
-      data: new Date(),
-      usuarioId: pacienteUsuario1.id,
-    },
+  await prisma.notificacao.createMany({
+    data: [
+      {
+        titulo: "Consulta confirmada",
+        mensagem: "Sua consulta com Rafael Azevedo esta confirmada para amanha as 09:30.",
+        tipo: "appointment",
+        categoria: "appointment",
+        data: new Date(),
+        usuarioId: pacienteUsuario2.id,
+      },
+      {
+        titulo: "Prontuario atualizado",
+        mensagem: "O atendimento de Marcos Vinicius Rocha foi registrado no prontuario.",
+        tipo: "prontuario",
+        categoria: "medical_record",
+        data: new Date(),
+        usuarioId: admin.id,
+      },
+      {
+        titulo: "Exame solicitado",
+        mensagem: "Camila Duarte solicitou novos exames para Antonio Ferreira Lima.",
+        tipo: "exam",
+        categoria: "exam",
+        data: new Date(),
+        usuarioId: pacienteUsuario3.id,
+      },
+      {
+        titulo: "Agenda do dia",
+        mensagem: "Ha consultas confirmadas para revisar na recepcao.",
+        tipo: "appointment",
+        categoria: "appointment",
+        data: new Date(),
+        usuarioId: recepcionista.id,
+      },
+    ],
   });
-
-  await prisma.notificacao.create({
-    data: {
-      titulo: "Consulta finalizada",
-      mensagem: "Joao Paciente teve prontuario registrado por Dr. Carlos Silva.",
-      tipo: "reminder",
-      categoria: "reminder",
-      data: new Date(),
-    },
-  });
-
-  await prisma.notificacao.create({
-    data: {
-      titulo: "Lembrete de consulta",
-      mensagem: "Voce tem uma consulta amanha as 09:00 com Dra. Ana Santos.",
-      tipo: "reminder",
-      categoria: "reminder",
-      data: new Date(),
-      usuarioId: pacienteUsuario2.id,
-    },
-  });
-
-  console.log("\n=== SEED CONCLUIDO ===\n");
-  console.log("CREDENCIAIS DE LOGIN (senha: 123456):");
-  console.log("  Admin:         admin@clinica.com");
-  console.log("  Recepcionista: recepcionista@clinica.com");
-  console.log("  Medico 1:      carlos@medico.com");
-  console.log("  Medico 2:      ana@medico.com");
-  console.log("  Paciente 1:    joao@email.com");
-  console.log("  Paciente 2:    maria@email.com");
-  console.log("  Paciente 3:    pedro@email.com");
-  console.log("\nDADOS CRIADOS:");
-  console.log("  3 medicos, 3 pacientes, 1 admin, 1 recepcionista");
-  console.log("  4 agendamentos (1 concluido)");
-  console.log("  1 prontuario com 2 exames");
-  console.log("  3 notificacoes");
 }
 
 main()

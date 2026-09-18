@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const pacienteModel = require("../repository/pacientes.repository");
+const { onzeDigitosNumericos } = require("../lib/validacao");
 
 const uploadBaseDir = path.resolve(__dirname, "..", "uploads");
 
@@ -32,6 +33,8 @@ const listar = async (req, res, next) => {
 
     if (req.usuario?.role === "PACIENTE") {
       filtros.usuarioId = Number(req.usuario.id);
+    } else if (req.usuario?.role === "MEDICO") {
+      filtros.medicoUsuarioId = Number(req.usuario.id);
     }
 
     const pacientes = await pacienteModel.listarTodos(filtros);
@@ -58,14 +61,9 @@ const buscarPorId = async (req, res, next) => {
 
 const buscarPorCPF = async (req, res, next) => {
   try {
-    const cpf = req.params.cpf;
-    const cpfNumerico = Number(String(cpf || "").replace(/\D/g, ""));
+    const cpf = onzeDigitosNumericos(req.params.cpf, "CPF");
 
-    if (!cpfNumerico) {
-      return res.status(400).json({ erro: "CPF invalido" });
-    }
-
-    const paciente = await pacienteModel.buscarPorCPF(cpfNumerico);
+    const paciente = await pacienteModel.buscarPorCPF(cpf);
 
     if (!paciente) {
       return res.status(404).json({ erro: "Paciente não encontrado" });
@@ -100,7 +98,7 @@ const criarProntuario = async (req, res, next) => {
       return res.status(400).json({ erro: "Paciente invalido" });
     }
 
-    const registro = await pacienteModel.criarProntuario(id, req.body);
+    const registro = await pacienteModel.criarProntuario(id, req.body, req.usuario?.id);
 
     if (!registro) {
       return res.status(404).json({ erro: "Paciente nao encontrado" });
@@ -121,13 +119,34 @@ const adicionarExame = async (req, res, next) => {
       return res.status(400).json({ erro: "Paciente ou prontuario invalido" });
     }
 
-    const resultado = await pacienteModel.adicionarExame(pacienteId, prontuarioId, req.body);
+    const resultado = await pacienteModel.adicionarExame(pacienteId, prontuarioId, req.body, req.usuario?.id);
 
     if (!resultado) {
       return res.status(404).json({ erro: "Paciente ou prontuario nao encontrado" });
     }
 
     res.status(201).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const baixarReceitaProntuario = async (req, res, next) => {
+  try {
+    const pacienteId = Number(req.params.id);
+    const prontuarioId = Number(req.params.prontuarioId);
+
+    if (!pacienteId || !prontuarioId) {
+      return res.status(400).json({ erro: "Paciente ou prontuario invalido" });
+    }
+
+    const resultado = await pacienteModel.baixarReceitaProntuario(pacienteId, prontuarioId, req.usuario?.id);
+
+    if (!resultado) {
+      return res.status(404).json({ erro: "Paciente ou prontuario nao encontrado" });
+    }
+
+    res.status(200).json(resultado);
   } catch (err) {
     next(err);
   }
@@ -149,7 +168,7 @@ const adicionarAnexoExame = async (req, res, next) => {
       return res.status(400).json({ erro: "Arquivo e obrigatorio" });
     }
 
-    const resultado = await pacienteModel.adicionarAnexoExame(pacienteId, prontuarioId, exameId, arquivoUrl);
+    const resultado = await pacienteModel.adicionarAnexoExame(pacienteId, prontuarioId, exameId, arquivoUrl, req.usuario?.id);
 
     if (!resultado) {
       return res.status(404).json({ erro: "Exame nao encontrado" });
@@ -201,6 +220,7 @@ const criar = async (req, res, next) => {
 
     const novoPaciente = await pacienteModel.criar({
       ...req.body,
+      usuarioAlteracaoId: req.usuario?.id,
       sexo: sexo || "Não informado",
     });
 
@@ -213,7 +233,7 @@ const criar = async (req, res, next) => {
 const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const pacienteAtualizado = await pacienteModel.atualizar(id, req.body);
+    const pacienteAtualizado = await pacienteModel.atualizar(id, req.body, req.usuario?.id);
 
     if (!pacienteAtualizado) {
       return res.status(404).json({ erro: "Paciente nâo encontrado" });
@@ -228,7 +248,7 @@ const atualizar = async (req, res, next) => {
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const pacienteRemovido = await pacienteModel.remover(id);
+    const pacienteRemovido = await pacienteModel.remover(id, req.usuario?.id);
 
     if (!pacienteRemovido) {
       return res.status(404).json({ erro: "Paciente não encontrado" });
@@ -247,6 +267,7 @@ module.exports = {
   listarProntuario,
   criarProntuario,
   adicionarExame,
+  baixarReceitaProntuario,
   adicionarAnexoExame,
   abrirAnexoExame,
   criar,

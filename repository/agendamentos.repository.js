@@ -1,6 +1,9 @@
 const prisma = require("../lib/client");
 const notificacoesModel = require("./notificacoes.repository");
 const pacientesModel = require("./pacientes.repository");
+const { statusCancelado, statusConcluido } = require("../lib/agendamento-status");
+const { erroHttp } = require("../lib/http-error");
+const { dadosAuditoria, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includePacienteMedico = {
   paciente: {
@@ -13,23 +16,13 @@ const includePacienteMedico = {
       usuario: true,
     },
   },
+  ...includeAlteradoPor,
 };
 
 function montarData(dia, horario) {
   return new Date(`${dia}T${horario}:00`);
 }
 
-function statusCancelado(status) {
-  return ["cancelado", "cancelada", "cancelled", "canceled"].includes(
-    String(status || "").trim().toLowerCase()
-  );
-}
-
-function statusConcluido(status) {
-  return ["concluido", "concluida", "concluído", "concluída", "completed", "encerrado", "finalizado"].includes(
-    String(status || "").trim().toLowerCase()
-  );
-}
 
 async function criarNotificacaoSegura(dados) {
   try {
@@ -59,13 +52,12 @@ function dadosNotificacaoPaciente(agendamento) {
   return {
     usuarioId: agendamento?.paciente?.usuarioId,
     tipo: "appointment",
+    categoria: "appointment",
   };
 }
 
 function erroHorarioIndisponivel() {
-  const erro = new Error("Horario indisponivel para este medico ou paciente");
-  erro.status = 409;
-  return erro;
+  return erroHttp("Horario indisponivel para este medico ou paciente", 409);
 }
 
 async function validarHorarioDisponivel({ pacienteId, medicoId, data, status, ignorarId }) {
@@ -91,7 +83,7 @@ async function validarHorarioDisponivel({ pacienteId, medicoId, data, status, ig
   }
 }
 
-const listarTodos = (filtros = {}) => {
+const listarTodos = async (filtros = {}) => {
   const { dia, medicoId, medicoUsuarioId, pacienteUsuarioId } = filtros;
   const where = {};
 
@@ -118,21 +110,25 @@ const listarTodos = (filtros = {}) => {
     };
   }
 
-  return prisma.agendamento.findMany({
+  const agendamentos = await prisma.agendamento.findMany({
     where,
     include: includePacienteMedico,
     orderBy: { data: "asc" },
   });
+
+  return agendamentos.map(withUltimaAlteracao);
 };
 
-const buscarPorId = (id) => {
-  return prisma.agendamento.findUnique({
+const buscarPorId = async (id) => {
+  const agendamento = await prisma.agendamento.findUnique({
     where: { id },
     include: includePacienteMedico,
   });
+
+  return withUltimaAlteracao(agendamento);
 };
 
-const criar = async (dados) => {
+const criar = async (dados, usuarioAlteracaoId) => {
   const pacienteId = Number(dados.pacienteId);
   const medicoId = Number(dados.medicoId);
   const data = montarData(dados.dia, dados.horario);
@@ -149,6 +145,7 @@ const criar = async (dados) => {
       pacienteId,
       medicoId,
       data,
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
     include: includePacienteMedico,
   });
@@ -160,10 +157,10 @@ const criar = async (dados) => {
     mensagem: `${descricao.paciente} foi agendado com ${descricao.medico}${descricao.data ? ` em ${descricao.data}` : ""}.`,
   });
 
-  return agendamento;
+  return withUltimaAlteracao(agendamento);
 };
 
-const atualizar = async (id, dados) => {
+const atualizar = async (id, dados, usuarioAlteracaoId) => {
   const agendamento = await prisma.agendamento.findUnique({
     where: { id },
   });
@@ -190,6 +187,7 @@ const atualizar = async (id, dados) => {
       ...(dados.medicoId !== undefined ? { medicoId: Number(dados.medicoId) } : {}),
       ...(dados.dia && dados.horario ? { data: montarData(dados.dia, dados.horario) } : {}),
       ...(dados.status !== undefined ? { status: dados.status } : {}),
+      ...dadosAuditoria(usuarioAlteracaoId),
     },
     include: includePacienteMedico,
   });
@@ -200,13 +198,15 @@ const atualizar = async (id, dados) => {
       ...dadosNotificacaoPaciente(atualizado),
       titulo: "Agendamento cancelado",
       mensagem: `${descricao.paciente} teve a consulta cancelada${descricao.data ? ` de ${descricao.data}` : ""}.`,
+      tipo: "cancellation",
+      categoria: "appointment_cancelled",
     });
   }
 
-  return atualizado;
+  return withUltimaAlteracao(atualizado);
 };
 
-const finalizar = async (id, dados = {}) => {
+const finalizar = async (id, dados = {}, usuarioAlteracaoId) => {
   const agendamento = await prisma.agendamento.findUnique({
     where: { id: Number(id) },
     include: includePacienteMedico,
@@ -215,15 +215,11 @@ const finalizar = async (id, dados = {}) => {
   if (!agendamento) return null;
 
   if (statusCancelado(agendamento.status)) {
-    const erro = new Error("Nao e possivel finalizar um agendamento cancelado");
-    erro.status = 400;
-    throw erro;
+    throw erroHttp("Nao e possivel finalizar um agendamento cancelado", 400);
   }
 
   if (statusConcluido(agendamento.status)) {
-    const erro = new Error("Agendamento ja finalizado");
-    erro.status = 400;
-    throw erro;
+    throw erroHttp("Agendamento ja finalizado", 400);
   }
 
   const prontuario = await pacientesModel.criarProntuario(agendamento.pacienteId, {
@@ -231,11 +227,14 @@ const finalizar = async (id, dados = {}) => {
     medicoId: agendamento.medicoId,
     data: dados.data || agendamento.data,
     notificar: false,
-  });
+  }, usuarioAlteracaoId);
 
   const agendamentoAtualizado = await prisma.agendamento.update({
     where: { id: Number(id) },
-    data: { status: "concluido" },
+    data: {
+      status: "concluido",
+      ...dadosAuditoria(usuarioAlteracaoId),
+    },
     include: includePacienteMedico,
   });
 
@@ -244,10 +243,11 @@ const finalizar = async (id, dados = {}) => {
     ...dadosNotificacaoPaciente(agendamentoAtualizado),
     titulo: "Consulta finalizada",
     mensagem: `${descricao.paciente} teve prontuario registrado por ${descricao.medico}.`,
+    categoria: "appointment_completed",
   });
 
   return {
-    agendamento: agendamentoAtualizado,
+    agendamento: withUltimaAlteracao(agendamentoAtualizado),
     prontuario,
   };
 };

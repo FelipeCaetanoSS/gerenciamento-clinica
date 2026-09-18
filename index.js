@@ -37,7 +37,7 @@ app.use("/agendamentos", middleware.verificarAuth, agendamentosRoute);
 app.use("/medicos", middleware.verificarAuth, medicosRoute);
 app.use("/pacientes", middleware.verificarAuth, pacientesRoute);
 app.use("/notificacoes", middleware.verificarAuth, notificacoesRoute);
-app.use("/usuarios", middleware.verificarAuth, middleware.verificarAdmin, usuariosRoute);
+app.use("/usuarios", middleware.verificarAuth, usuariosRoute);
 app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError || err.isUploadError) {
@@ -67,9 +67,10 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-  });
+
+      app.listen(PORT, () => {
+        console.log(`Servidor rodando em http://localhost:${PORT}`);
+      });
 }
 
 module.exports = app;

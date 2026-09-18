@@ -6,6 +6,9 @@ const notificacoesController = require("../controllers/notificacoes.controller")
 router.get("/", notificacoesController.listar);
 
 // POST /notificacoes
+router.post("/", notificacoesController.criar);
+
+// POST /notificacoes/nova (compatibilidade)
 router.post("/nova", notificacoesController.criar);
 
 // PATCH /notificacoes/visualizar-todas

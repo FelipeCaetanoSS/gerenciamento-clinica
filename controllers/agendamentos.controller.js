@@ -48,7 +48,7 @@ const criar = async (req, res, next) => {
       medicoId,
       dia,
       horario,
-    });
+    }, req.usuario?.id);
 
     res.status(201).json(novoAgendamento);
   } catch (err) {
@@ -59,7 +59,7 @@ const criar = async (req, res, next) => {
 const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const agendamentoAtualizado = await agendamentoModel.atualizar(id, req.body);
+    const agendamentoAtualizado = await agendamentoModel.atualizar(id, req.body, req.usuario?.id);
 
     if (!agendamentoAtualizado) {
       return res.status(404).json({ erro: "Agendamento nao encontrado" });
@@ -79,7 +79,7 @@ const finalizar = async (req, res, next) => {
       return res.status(400).json({ erro: "Agendamento invalido" });
     }
 
-    const resultado = await agendamentoModel.finalizar(id, req.body);
+    const resultado = await agendamentoModel.finalizar(id, req.body, req.usuario?.id);
 
     if (!resultado) {
       return res.status(404).json({ erro: "Agendamento nao encontrado" });
@@ -94,7 +94,7 @@ const finalizar = async (req, res, next) => {
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const sucesso = await agendamentoModel.remover(id);
+    const sucesso = await agendamentoModel.remover(id, req.usuario?.id);
 
     if (!sucesso) {
       return res.status(404).json({ erro: "Agendamento nao encontrado" });

@@ -34,7 +34,7 @@ const buscarPorId = async (req, res, next) => {
 
 const criar = async (req, res, next) => {
   try {
-    const camposFaltando = camposObrigatorios(req.body, ["nome", "crm", "rg", "telefone", "email"]);
+    const camposFaltando = camposObrigatorios(req.body, ["nome", "crm", "rg", "cpf", "telefone", "email"]);
 
     if (camposFaltando.length > 0) {
       return res
@@ -42,7 +42,7 @@ const criar = async (req, res, next) => {
         .json({ erro: mensagemCamposObrigatorios(camposFaltando) });
     }
 
-    const novoMedico = await medicoModel.criar(req.body);
+    const novoMedico = await medicoModel.criar(req.body, req.usuario?.id);
     res.status(201).json(novoMedico);
   } catch (err) {
     next(err);
@@ -52,7 +52,7 @@ const criar = async (req, res, next) => {
 const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const medicoAtualizado = await medicoModel.atualizar(id, req.body);
+    const medicoAtualizado = await medicoModel.atualizar(id, req.body, req.usuario?.id);
 
     if (!medicoAtualizado) {
       return res.status(404).json({ erro: "Medico não encontrado" });
@@ -67,7 +67,7 @@ const atualizar = async (req, res, next) => {
 const remover = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const medicoRemovido = await medicoModel.remover(id);
+    const medicoRemovido = await medicoModel.remover(id, req.usuario?.id);
 
     if (!medicoRemovido) {
       return res.status(404).json({ erro: "Medico não encontrado" });

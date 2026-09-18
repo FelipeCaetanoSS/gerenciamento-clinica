@@ -22,6 +22,9 @@ router.get(
 );
 
 // POST /agendamentos
+router.post("/", verificarPerfis("ADMIN", "RECEPCIONISTA"), agendamentoController.criar);
+
+// POST /agendamentos/novo (compatibilidade)
 router.post("/novo", verificarPerfis("ADMIN", "RECEPCIONISTA"), agendamentoController.criar);
 
 // POST /agendamentos/:id/finalizar
