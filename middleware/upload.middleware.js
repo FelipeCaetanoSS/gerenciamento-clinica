@@ -2,8 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const prisma = require("../lib/client");
+const { getUploadBaseDir } = require("../lib/upload-dir");
 
-const uploadBaseDir = path.join(__dirname, "..", "uploads");
+const uploadBaseDir = getUploadBaseDir();
 
 fs.mkdirSync(uploadBaseDir, { recursive: true });
 

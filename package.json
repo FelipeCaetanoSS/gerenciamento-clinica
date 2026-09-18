@@ -10,8 +10,12 @@
   "scripts": {
     "dev": "nodemon index.js",
     "postinstall": "prisma generate",
+    "railway:start": "prisma migrate deploy && node index.js",
     "start": "node index.js",
     "test": "jest"
+  },
+  "engines": {
+    "node": ">=20 <25"
   },
   "repository": {
     "type": "git",

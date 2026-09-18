@@ -1,30 +1,17 @@
-const path = require("path");
 const fs = require("fs");
 const pacienteModel = require("../repository/pacientes.repository");
 const { onzeDigitosNumericos } = require("../lib/validacao");
-
-const uploadBaseDir = path.resolve(__dirname, "..", "uploads");
+const {
+  resolveStoredUploadPath,
+  toStoredUploadPath,
+} = require("../lib/upload-dir");
 
 function caminhoUpload(file) {
-  if (!file?.path) return null;
-
-  return path.relative(process.cwd(), file.path).replace(/\\/g, "/");
+  return toStoredUploadPath(file?.path);
 }
 
 function caminhoSeguroUpload(caminhoRelativo) {
-  if (!caminhoRelativo) return null;
-
-  const caminhoNormalizado = String(caminhoRelativo).replace(/\\/g, "/");
-  const caminhoSemUploads = caminhoNormalizado.startsWith("uploads/")
-    ? caminhoNormalizado.slice("uploads/".length)
-    : caminhoNormalizado;
-  const caminhoAbsoluto = path.resolve(uploadBaseDir, caminhoSemUploads);
-
-  if (caminhoAbsoluto !== uploadBaseDir && !caminhoAbsoluto.startsWith(`${uploadBaseDir}${path.sep}`)) {
-    return null;
-  }
-
-  return caminhoAbsoluto;
+  return resolveStoredUploadPath(caminhoRelativo);
 }
 
 const listar = async (req, res, next) => {
