@@ -3,6 +3,7 @@ const notificacoesModel = require("./notificacoes.repository");
 const pacientesModel = require("./pacientes.repository");
 const { statusCancelado, statusConcluido } = require("../lib/agendamento-status");
 const { erroHttp } = require("../lib/http-error");
+const { dataEHorarioValidos, dataHoraComAntecedenciaMinima } = require("../lib/validacao");
 const { dadosAuditoria, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includePacienteMedico = {
@@ -58,6 +59,24 @@ function dadosNotificacaoPaciente(agendamento) {
 
 function erroHorarioIndisponivel() {
   return erroHttp("Horario indisponivel para este medico ou paciente", 409);
+}
+
+function erroAntecedenciaMinima() {
+  return erroHttp("A consulta deve ser marcada com no minimo 2 horas de antecedencia", 400);
+}
+
+function erroDataHorarioInvalido() {
+  return erroHttp("dia e horario sao invalidos", 400);
+}
+
+function validarDataHorarioAgendamento(dia, horario) {
+  if (!dataEHorarioValidos(dia, horario)) {
+    throw erroDataHorarioInvalido();
+  }
+
+  if (!dataHoraComAntecedenciaMinima(dia, horario)) {
+    throw erroAntecedenciaMinima();
+  }
 }
 
 async function validarHorarioDisponivel({ pacienteId, medicoId, data, status, ignorarId }) {
@@ -131,6 +150,9 @@ const buscarPorId = async (id) => {
 const criar = async (dados, usuarioAlteracaoId) => {
   const pacienteId = Number(dados.pacienteId);
   const medicoId = Number(dados.medicoId);
+
+  validarDataHorarioAgendamento(dados.dia, dados.horario);
+
   const data = montarData(dados.dia, dados.horario);
 
   await validarHorarioDisponivel({
@@ -169,6 +191,15 @@ const atualizar = async (id, dados, usuarioAlteracaoId) => {
 
   const pacienteId = dados.pacienteId !== undefined ? Number(dados.pacienteId) : agendamento.pacienteId;
   const medicoId = dados.medicoId !== undefined ? Number(dados.medicoId) : agendamento.medicoId;
+
+  if ((dados.dia && !dados.horario) || (!dados.dia && dados.horario)) {
+    throw erroHttp("Para alterar data/hora, envie dia e horario juntos", 400);
+  }
+
+  if (dados.dia && dados.horario) {
+    validarDataHorarioAgendamento(dados.dia, dados.horario);
+  }
+
   const data = dados.dia && dados.horario ? montarData(dados.dia, dados.horario) : agendamento.data;
   const status = dados.status !== undefined ? dados.status : agendamento.status;
 
