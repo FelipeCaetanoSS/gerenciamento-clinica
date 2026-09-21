@@ -1,5 +1,6 @@
 const medicoModel = require("../repository/medicos.repository");
 const {
+  camposEnviadosEmBranco,
   camposObrigatorios,
   mensagemCamposObrigatorios,
 } = require("../lib/validacao");
@@ -52,6 +53,12 @@ const criar = async (req, res, next) => {
 const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const camposEmBranco = camposEnviadosEmBranco(req.body, ["nome", "crm", "rg", "cpf", "telefone", "email"]);
+
+    if (camposEmBranco.length > 0) {
+      return res.status(400).json({ erro: mensagemCamposObrigatorios(camposEmBranco) });
+    }
+
     const medicoAtualizado = await medicoModel.atualizar(id, req.body, req.usuario?.id);
 
     if (!medicoAtualizado) {

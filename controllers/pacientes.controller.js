@@ -1,6 +1,12 @@
 const fs = require("fs");
 const pacienteModel = require("../repository/pacientes.repository");
-const { onzeDigitosNumericos } = require("../lib/validacao");
+const {
+  camposEnviadosEmBranco,
+  camposObrigatorios,
+  mensagemCamposObrigatorios,
+  onzeDigitosNumericos,
+  temValor,
+} = require("../lib/validacao");
 const {
   resolveStoredUploadPath,
   toStoredUploadPath,
@@ -12,6 +18,28 @@ function caminhoUpload(file) {
 
 function caminhoSeguroUpload(caminhoRelativo) {
   return resolveStoredUploadPath(caminhoRelativo);
+}
+
+function camposObrigatoriosPaciente(dados = {}) {
+  const campos = camposObrigatorios(dados, ["nome", "cpf", "rg", "telefone"]);
+
+  if (!temValor(dados.dataNasc) && !temValor(dados.DataNasc)) {
+    campos.push("dataNasc");
+  }
+
+  return campos;
+}
+
+function camposPacienteEnviadosEmBranco(dados = {}) {
+  const campos = camposEnviadosEmBranco(dados, ["nome", "cpf", "rg", "telefone"]);
+  const enviouDataNasc = Object.prototype.hasOwnProperty.call(dados, "dataNasc");
+  const enviouDataNascCompat = Object.prototype.hasOwnProperty.call(dados, "DataNasc");
+
+  if ((enviouDataNasc && !temValor(dados.dataNasc)) || (enviouDataNascCompat && !temValor(dados.DataNasc))) {
+    campos.push("dataNasc");
+  }
+
+  return campos;
 }
 
 const listar = async (req, res, next) => {
@@ -198,6 +226,11 @@ const abrirAnexoExame = async (req, res, next) => {
 const criar = async (req, res, next) => {
   try {
     const { nome, cpf, telefone, sexo } = req.body;
+    const camposFaltando = camposObrigatoriosPaciente(req.body);
+
+    if (camposFaltando.length > 0) {
+      return res.status(400).json({ erro: mensagemCamposObrigatorios(camposFaltando) });
+    }
 
     if (!nome || !cpf || !telefone) {
       return res
@@ -220,6 +253,12 @@ const criar = async (req, res, next) => {
 const atualizar = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const camposEmBranco = camposPacienteEnviadosEmBranco(req.body);
+
+    if (camposEmBranco.length > 0) {
+      return res.status(400).json({ erro: mensagemCamposObrigatorios(camposEmBranco) });
+    }
+
     const pacienteAtualizado = await pacienteModel.atualizar(id, req.body, req.usuario?.id);
 
     if (!pacienteAtualizado) {

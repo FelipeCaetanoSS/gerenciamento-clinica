@@ -1,5 +1,6 @@
 const usuarioModel = require("../repository/usuarios.repository");
 const {
+  camposEnviadosEmBranco,
   camposObrigatorios,
   mensagemCamposObrigatorios,
 } = require("../lib/validacao");
@@ -136,6 +137,21 @@ const atualizar = async (req, res, next) => {
 
     if (normalizarRole(req.usuario?.role) !== "ADMIN") {
       return res.status(403).json({ erro: "Acesso restrito a administradores" });
+    }
+
+    const camposEmBranco = camposEnviadosEmBranco(req.body, [
+      "nome",
+      "email",
+      "idade",
+      "sexo",
+      "telefone",
+      "cpf",
+      "rg",
+      "role",
+    ]);
+
+    if (camposEmBranco.length > 0) {
+      return res.status(400).json({ erro: mensagemCamposObrigatorios(camposEmBranco) });
     }
 
     if (req.body.role !== undefined && !roleValida(req.body.role)) {

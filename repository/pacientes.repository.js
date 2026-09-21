@@ -337,7 +337,7 @@ const criar = async (dados, usuarioAlteracaoId = dados.usuarioAlteracaoId) => {
     senhaTemporaria: senhaTemporaria(dados),
     idade: Number(dados.idade) || 0,
     sexo: dados.sexo || "Nao informado",
-    rg: dados.rg || `RG-${Date.now()}`,
+    rg: dados.rg,
     cpf: onzeDigitosNumericos(dados.cpf, "CPF"),
     telefone: onzeDigitosNumericos(dados.telefone, "Telefone"),
     role: "PACIENTE",
