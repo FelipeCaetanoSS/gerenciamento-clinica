@@ -65,7 +65,6 @@ const criar = async (req, res, next) => {
     const camposFaltando = camposObrigatorios(req.body, [
       "nome",
       "email",
-      "senhaPlana",
       "idade",
       "sexo",
       "telefone",

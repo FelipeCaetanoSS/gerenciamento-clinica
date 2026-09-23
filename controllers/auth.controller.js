@@ -30,7 +30,6 @@ const registrar = async (req, res, next) => {
     if (
       !temValor(nome) ||
       !temValor(idade) ||
-      !temValor(senhaPlana) ||
       !temValor(sexo) ||
       !temValor(cpf) ||
       !temValor(email) ||
