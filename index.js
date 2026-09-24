@@ -1,10 +1,12 @@
 require("dotenv").config();
+process.env.TZ = "America/Sao_Paulo";
 
 const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require('cors'); 
 const multer = require("multer");
+const { formatarDataHoraClinica, getClinicTimeZone } = require("./lib/timezone");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,21 +25,28 @@ const authRoute = require("./routes/auth.router");
 const notificacoesRoute = require("./routes/notificacoes.router");
 const usuariosRoute = require("./routes/usuarios.router");
 const middleware = require("./middleware/auth.middleware");
+const rotaProtegida = [middleware.verificarAuth, middleware.bloquearSenhaTemporaria];
 
 app.use("/", indexRoute);
 app.use("/auth", authRoute);
 app.get("/saude", (req, res) => {
+  const agora = new Date();
+  const timezone = getClinicTimeZone();
+
   res.json({
     status: "ok",
     uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
+    timestamp: agora.toISOString(),
+    timezone,
+    timezoneProcesso: process.env.TZ,
+    horarioBrasilia: formatarDataHoraClinica(agora),
   });
 });
-app.use("/agendamentos", middleware.verificarAuth, agendamentosRoute);
-app.use("/medicos", middleware.verificarAuth, medicosRoute);
-app.use("/pacientes", middleware.verificarAuth, pacientesRoute);
-app.use("/notificacoes", middleware.verificarAuth, notificacoesRoute);
-app.use("/usuarios", middleware.verificarAuth, usuariosRoute);
+app.use("/agendamentos", rotaProtegida, agendamentosRoute);
+app.use("/medicos", rotaProtegida, medicosRoute);
+app.use("/pacientes", rotaProtegida, pacientesRoute);
+app.use("/notificacoes", rotaProtegida, notificacoesRoute);
+app.use("/usuarios", rotaProtegida, usuariosRoute);
 app.use((req, res) => res.status(404).json({ erro: "Rota não encontrada" }));
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError || err.isUploadError) {
@@ -50,7 +59,7 @@ app.use((err, req, res, next) => {
   }
 
   if (process.env.NODE_ENV !== "production") {
-    const horario = new Date().toLocaleTimeString("pt-BR");
+    const horario = formatarDataHoraClinica(new Date());
     console.log(`[${horario}] ${req.method} ${req.path}`);
   } else {
     console.error(`[ERRO] ${err.message || "Erro interno"}`);

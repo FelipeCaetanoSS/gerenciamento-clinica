@@ -30,7 +30,8 @@ router.post("/novo", verificarPerfis("ADMIN", "RECEPCIONISTA"), agendamentoContr
 // POST /agendamentos/:id/finalizar
 router.post(
   "/:id/finalizar",
-  verificarPerfis("ADMIN", "RECEPCIONISTA"),
+  verificarPerfis("ADMIN", "RECEPCIONISTA", "MEDICO"),
+  verificarAgendamentoMedicoProprio,
   agendamentoController.finalizar
 );
 

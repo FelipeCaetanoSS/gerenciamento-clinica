@@ -4,26 +4,39 @@ const pacientesModel = require("./pacientes.repository");
 const { statusCancelado, statusConcluido } = require("../lib/agendamento-status");
 const { erroHttp } = require("../lib/http-error");
 const { dataEHorarioValidos, dataHoraComAntecedenciaMinima } = require("../lib/validacao");
-const { dadosAuditoria, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
+const {
+  adicionarDiaHorarioClinica,
+  formatarDataHoraClinica,
+  intervaloDiaClinica,
+  montarDataHoraClinica,
+} = require("../lib/timezone");
+const { dadosAuditoria, includeAlteradoPor, usuarioPublicoSelect, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includePacienteMedico = {
   paciente: {
     include: {
-      usuario: true,
+      usuario: {
+        select: usuarioPublicoSelect,
+      },
     },
   },
   medico: {
     include: {
-      usuario: true,
+      usuario: {
+        select: usuarioPublicoSelect,
+      },
     },
   },
   ...includeAlteradoPor,
 };
 
 function montarData(dia, horario) {
-  return new Date(`${dia}T${horario}:00`);
+  return montarDataHoraClinica(dia, horario);
 }
 
+function mapAgendamentoResposta(agendamento) {
+  return adicionarDiaHorarioClinica(withUltimaAlteracao(agendamento));
+}
 
 async function criarNotificacaoSegura(dados) {
   try {
@@ -37,13 +50,7 @@ function descricaoAgendamento(agendamento) {
   const paciente = agendamento?.paciente?.usuario?.nome || "Paciente";
   const medico = agendamento?.medico?.usuario?.nome || "medico";
   const data = agendamento?.data instanceof Date
-    ? agendamento.data.toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+    ? formatarDataHoraClinica(agendamento.data)
     : "";
 
   return { paciente, medico, data };
@@ -121,12 +128,13 @@ const listarTodos = async (filtros = {}) => {
   }
 
   if (dia) {
-    const inicio = new Date(`${dia}T00:00:00`);
-    const fim = new Date(`${dia}T23:59:59.999`);
-    where.data = {
-      gte: inicio,
-      lte: fim,
-    };
+    const intervalo = intervaloDiaClinica(dia);
+    if (intervalo) {
+      where.data = {
+        gte: intervalo.inicio,
+        lt: intervalo.proximoInicio,
+      };
+    }
   }
 
   const agendamentos = await prisma.agendamento.findMany({
@@ -135,7 +143,7 @@ const listarTodos = async (filtros = {}) => {
     orderBy: { data: "asc" },
   });
 
-  return agendamentos.map(withUltimaAlteracao);
+  return agendamentos.map(mapAgendamentoResposta);
 };
 
 const buscarPorId = async (id) => {
@@ -144,7 +152,7 @@ const buscarPorId = async (id) => {
     include: includePacienteMedico,
   });
 
-  return withUltimaAlteracao(agendamento);
+  return mapAgendamentoResposta(agendamento);
 };
 
 const criar = async (dados, usuarioAlteracaoId) => {
@@ -179,7 +187,7 @@ const criar = async (dados, usuarioAlteracaoId) => {
     mensagem: `${descricao.paciente} foi agendado com ${descricao.medico}${descricao.data ? ` em ${descricao.data}` : ""}.`,
   });
 
-  return withUltimaAlteracao(agendamento);
+  return mapAgendamentoResposta(agendamento);
 };
 
 const atualizar = async (id, dados, usuarioAlteracaoId) => {
@@ -234,7 +242,7 @@ const atualizar = async (id, dados, usuarioAlteracaoId) => {
     });
   }
 
-  return withUltimaAlteracao(atualizado);
+  return mapAgendamentoResposta(atualizado);
 };
 
 const finalizar = async (id, dados = {}, usuarioAlteracaoId) => {
@@ -278,7 +286,7 @@ const finalizar = async (id, dados = {}, usuarioAlteracaoId) => {
   });
 
   return {
-    agendamento: withUltimaAlteracao(agendamentoAtualizado),
+    agendamento: mapAgendamentoResposta(agendamentoAtualizado),
     prontuario,
   };
 };

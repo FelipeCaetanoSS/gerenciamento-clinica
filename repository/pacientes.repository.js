@@ -3,10 +3,13 @@ const notificacoesModel = require("./notificacoes.repository");
 const { dataOuNull, texto, textoOuNull } = require("../lib/normalizacao");
 const { onzeDigitosNumericos } = require("../lib/validacao");
 const { hashSenha, senhaTemporaria } = require("../lib/senha");
-const { dadosAuditoria, dadosAuditoriaRelacao, dadosDesativacaoRelacao, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
+const { dataParaPartesClinica, montarDataHoraClinica } = require("../lib/timezone");
+const { dadosAuditoria, dadosAuditoriaRelacao, dadosDesativacaoRelacao, includeAlteradoPor, usuarioPublicoSelect, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includeUsuario = {
-  usuario: true,
+  usuario: {
+    select: usuarioPublicoSelect,
+  },
   convenio: true,
   endereco: true,
   exame: true,
@@ -16,7 +19,9 @@ const includeUsuario = {
 const includeProntuarioDetalhado = {
   medico: {
     include: {
-      usuario: true,
+      usuario: {
+        select: usuarioPublicoSelect,
+      },
     },
   },
   receita: true,
@@ -115,7 +120,7 @@ function mapProntuarioDetalhado(registro, pacienteId) {
     ...registroPublico,
     id: registro.id,
     medicoId: registro.medicoId,
-    data: registro.data?.toISOString().slice(0, 10) || "",
+    data: registro.data ? dataParaPartesClinica(registro.data).dia : "",
     observacao: registro.observacao || "",
     medicamento: prescricao.medicamento,
     dosagem: prescricao.dosagem,
@@ -230,6 +235,9 @@ const listarProntuario = async (pacienteId) => {
 
 function dataProntuario(value) {
   if (!value) return new Date();
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+    return montarDataHoraClinica(value.trim(), "00:00") || new Date();
+  }
 
   const data = new Date(value);
   return Number.isNaN(data.getTime()) ? new Date() : data;

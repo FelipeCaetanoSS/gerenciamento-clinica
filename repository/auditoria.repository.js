@@ -3,6 +3,23 @@ const usuarioAuditoriaSelect = {
   nome: true,
   role: true,
 };
+const { formatarDataHoraClinica } = require("../lib/timezone");
+
+const usuarioPublicoSelect = {
+  id: true,
+  email: true,
+  nome: true,
+  senhaTemporaria: true,
+  idade: true,
+  sexo: true,
+  rg: true,
+  cpf: true,
+  telefone: true,
+  ativo: true,
+  role: true,
+  alteradoPorId: true,
+  alteradoEm: true,
+};
 
 const includeAlteradoPor = {
   alteradoPor: {
@@ -52,12 +69,14 @@ function dadosDesativacaoRelacao(usuarioId) {
 
 function mapUltimaAlteracao(registro) {
   if (!registro?.alteradoPor) return null;
+  const em = registro.alteradoEm?.toISOString?.() || registro.alteradoEm || null;
 
   return {
     usuarioId: registro.alteradoPor.id,
     nome: registro.alteradoPor.nome,
     role: registro.alteradoPor.role,
-    em: registro.alteradoEm?.toISOString?.() || registro.alteradoEm || null,
+    em,
+    emHorarioBrasilia: registro.alteradoEm ? formatarDataHoraClinica(registro.alteradoEm) : null,
   };
 }
 
@@ -81,5 +100,6 @@ module.exports = {
   dadosDesativacaoRelacao,
   includeAlteradoPor,
   usuarioAuditoriaSelect,
+  usuarioPublicoSelect,
   withUltimaAlteracao,
 };

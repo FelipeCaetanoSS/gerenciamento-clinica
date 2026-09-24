@@ -1,7 +1,7 @@
 const prisma = require("../lib/client");
 const { booleano, normalizarRole } = require("../lib/normalizacao");
 const { onzeDigitosNumericos } = require("../lib/validacao");
-const { hashSenha, verificarSenha } = require("../lib/senha");
+const { hashSenha, senhaTemporaria, verificarSenha } = require("../lib/senha");
 const { dadosAuditoria, dadosDesativacao, usuarioAuditoriaSelect, withUltimaAlteracao } = require("./auditoria.repository");
 
 const usuarioSelect = {
@@ -56,7 +56,7 @@ const criar = async (dados, usuarioAlteracaoId) => {
       nome: dados.nome,
       email: dados.email,
       senha: dados.senha || (await hashSenha(dados.senhaPlana)),
-      senhaTemporaria: dados.senhaTemporaria === true,
+      senhaTemporaria: senhaTemporaria(),
       idade: Number(dados.idade) || 0,
       sexo: dados.sexo,
       telefone: onzeDigitosNumericos(dados.telefone, "Telefone"),

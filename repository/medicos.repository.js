@@ -3,10 +3,12 @@ const { numeroSomenteDigitos, texto } = require("../lib/normalizacao");
 const { onzeDigitosNumericos } = require("../lib/validacao");
 const { hashSenha, senhaTemporaria } = require("../lib/senha");
 const { erroHttp } = require("../lib/http-error");
-const { dadosAuditoria, dadosAuditoriaRelacao, dadosDesativacaoRelacao, includeAlteradoPor, withUltimaAlteracao } = require("./auditoria.repository");
+const { dadosAuditoria, dadosAuditoriaRelacao, dadosDesativacaoRelacao, includeAlteradoPor, usuarioPublicoSelect, withUltimaAlteracao } = require("./auditoria.repository");
 
 const includeUsuario = {
-  usuario: true,
+  usuario: {
+    select: usuarioPublicoSelect,
+  },
   _count: {
     select: {
       agendamento: true,

@@ -1,16 +1,15 @@
 require("dotenv").config();
+process.env.TZ = "America/Sao_Paulo";
 const { PrismaClient } = require("@prisma/client");
 const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 const { hashSenha } = require("../lib/senha");
+const { adicionarDiasClinica, montarDataHoraClinica } = require("../lib/timezone");
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 function dataRelativa(dias, hora = "09:00") {
-  const data = new Date();
-  data.setDate(data.getDate() + dias);
-  const dia = data.toISOString().slice(0, 10);
-  return new Date(`${dia}T${hora}:00`);
+  return montarDataHoraClinica(adicionarDiasClinica(new Date(), dias), hora);
 }
 
 async function limparBanco() {
@@ -37,7 +36,7 @@ async function criarUsuario(dados, senhaPadrao) {
     data: {
       ...dadosUsuario,
       senha: senhaPadrao,
-      senhaTemporaria: false,
+      senhaTemporaria: true,
       ativo: true,
     },
   });
