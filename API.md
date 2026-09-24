@@ -247,17 +247,17 @@ Resposta:
 
 ## Pacientes
 
-Todas as rotas exigem token. Algumas rotas restringem `PACIENTE` ao proprio cadastro e `MEDICO` a pacientes vinculados por agendamento ou prontuario.
+Todas as rotas exigem token. Algumas rotas restringem `PACIENTE` ao proprio cadastro. `MEDICO` pode acessar e operar pacientes de forma ampla, exceto desativacao.
 
 | Metodo | Rota | Perfis | Descricao |
 | --- | --- | --- | --- |
 | `GET` | `/pacientes` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Lista pacientes |
-| `GET` | `/pacientes/cpf/:cpf` | `ADMIN`, `RECEPCIONISTA` | Busca paciente por CPF |
-| `GET` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA`, `PACIENTE` | Busca paciente por ID |
-| `POST` | `/pacientes` | `ADMIN`, `RECEPCIONISTA` | Cria paciente |
-| `POST` | `/pacientes/criar` | `ADMIN`, `RECEPCIONISTA` | Alias de compatibilidade para criacao |
-| `PUT` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA` | Atualiza paciente |
-| `PATCH` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA` | Atualiza paciente parcialmente |
+| `GET` | `/pacientes/cpf/:cpf` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Busca paciente por CPF |
+| `GET` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Busca paciente por ID |
+| `POST` | `/pacientes` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Cria paciente |
+| `POST` | `/pacientes/criar` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Alias de compatibilidade para criacao |
+| `PUT` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Atualiza paciente |
+| `PATCH` | `/pacientes/:id` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Atualiza paciente parcialmente |
 | `DELETE` | `/pacientes/:id` | `ADMIN` | Desativa paciente |
 
 ### `GET /pacientes`
@@ -274,7 +274,7 @@ Resposta `200`: lista de pacientes com `usuario`, `convenio`, `endereco` e `exam
 Restricoes:
 
 - `PACIENTE`: lista apenas o paciente vinculado ao usuario autenticado.
-- `MEDICO`: lista apenas pacientes vinculados ao medico autenticado.
+- `MEDICO`: lista todos os pacientes.
 
 ### `GET /pacientes/cpf/:cpf`
 
@@ -383,18 +383,17 @@ Todas as rotas exigem token.
 | Metodo | Rota | Perfis | Descricao |
 | --- | --- | --- | --- |
 | `GET` | `/pacientes/:id/prontuario` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Lista prontuario |
-| `POST` | `/pacientes/:id/prontuario` | `ADMIN`, `RECEPCIONISTA` | Cria registro de prontuario |
-| `POST` | `/pacientes/:id/prontuario/:prontuarioId/exames` | `ADMIN`, `RECEPCIONISTA` | Adiciona exame |
+| `POST` | `/pacientes/:id/prontuario` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Cria registro de prontuario |
+| `POST` | `/pacientes/:id/prontuario/:prontuarioId/exames` | `ADMIN`, `RECEPCIONISTA`, `MEDICO` | Adiciona exame |
 | `POST` | `/pacientes/:id/prontuario/:prontuarioId/receita/download` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Marca receita como baixada |
-| `POST` | `/pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo` | `ADMIN`, `RECEPCIONISTA`, `PACIENTE` | Envia anexo do exame |
-| `GET` | `/pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo/abrir` | `ADMIN`, `RECEPCIONISTA`, `PACIENTE` | Abre anexo |
+| `POST` | `/pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Envia anexo do exame |
+| `GET` | `/pacientes/:id/prontuario/:prontuarioId/exames/:exameId/anexo/abrir` | `ADMIN`, `RECEPCIONISTA`, `MEDICO`, `PACIENTE` | Abre anexo |
 
 ### `GET /pacientes/:id/prontuario`
 
 Restricoes:
 
 - `PACIENTE`: so acessa o proprio prontuario.
-- `MEDICO`: so acessa prontuario de paciente vinculado por agendamento ou prontuario.
 
 Resposta `200`: lista de registros com exames.
 
@@ -454,7 +453,6 @@ Marca a prescricao do prontuario como baixada pelo paciente e registra a data do
 Restricoes:
 
 - `PACIENTE`: so acessa a propria prescricao.
-- `MEDICO`: so acessa prescricao de paciente vinculado por agendamento ou prontuario.
 
 Resposta:
 
@@ -807,4 +805,4 @@ Resposta:
 - Upload de anexo de exame aceita arquivos de ate `5MB`.
 - O sistema pode criar notificacoes automaticamente ao criar/cancelar/finalizar agendamentos e ao registrar prontuario.
 - O middleware de acesso proprio restringe `PACIENTE` ao proprio cadastro, prontuario, anexos e agendamentos.
-- O middleware de acesso proprio restringe `MEDICO` ao proprio cadastro, aos proprios agendamentos e a pacientes/prontuarios vinculados por agendamento ou prontuario.
+- O middleware de acesso proprio restringe `MEDICO` ao proprio cadastro e aos proprios agendamentos. No modulo de pacientes, `MEDICO` tem acesso amplo, exceto desativacao.

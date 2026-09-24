@@ -48,8 +48,6 @@ const listar = async (req, res, next) => {
 
     if (req.usuario?.role === "PACIENTE") {
       filtros.usuarioId = Number(req.usuario.id);
-    } else if (req.usuario?.role === "MEDICO") {
-      filtros.medicoUsuarioId = Number(req.usuario.id);
     }
 
     const pacientes = await pacienteModel.listarTodos(filtros);
